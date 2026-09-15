@@ -2790,6 +2790,7 @@ function makeResizable(frame, minSize)
 end
 
 	end
+task.wait()
 do
 	G2L["1"] = Instance.new("ScreenGui");
 	G2L["1"]["Name"] = [[SlateUi]];
@@ -3588,6 +3589,7 @@ do
 		end
 		_init_block_8460()
 	end
+	task.wait()
 	do
 		local function initializeGameConfigs()
 
@@ -3765,6 +3767,7 @@ do
 		end
 		_init_block_8793()
 	end
+	task.wait()
 	do
 		local function _init_block_8821()
 
@@ -4600,7 +4603,7 @@ do
 		end
 		_init_block_8821()
 	end
-
+	task.wait()
 	do
 		local function _init_block_8954()
 		local SP_W, SP_H = 340, 435
@@ -4986,7 +4989,7 @@ do
 		end
 		_init_block_8958()
 	end
-
+	task.wait()
 	do
 		local function _init_block_9424()
 		local _memAssetCache = {}
@@ -7614,6 +7617,7 @@ do
 		end
 		pcall(_init_block_9424)
 	end
+	task.wait() -- yield to prevent frame freeze
 
 	do
 		local function initFacebang()
@@ -11776,6 +11780,7 @@ end)()
 		end
 		pcall(_init_block_9891)
 	end
+	task.wait() -- yield to prevent frame freeze
 
 	ResetCustomsBtn = Instance.new("ImageButton", CharacterTab)
 	ResetCustomsBtn.Name = "ResetCustomsBtn"
@@ -13232,7 +13237,7 @@ do
 		warn("[Slate] Chat failed to initialise: " .. tostring(errChat))
 	end
 end
-
+	task.wait()
 	HomeBtn.MouseButton1Click:Connect(function() switchTab(G2L["6"]) end)
 
 	CharacterBtn.MouseButton1Click:Connect(function() switchTab(CharacterTab) end)
@@ -16811,17 +16816,15 @@ _IY_autoKeyConn = nil
 _IY_autoKeyLoop = false
 
 
--- Commands loaded from SlateCommands.lua (spawned to avoid blocking)
-task.spawn(function()
-	_awaitPrefetch("commands", 5)
-	local _cmdOk, _cmdErr = pcall(function()
-		loadstring(_prefetchedScripts.commands or game:HttpGet(LPS_ENCSTR("https://raw.githubusercontent.com/EORScopeZ/test/refs/heads/main/commands.lua")))()
-	end)
-	if not _cmdOk then
-		warn("[Slate] commands.lua failed to load: " .. tostring(_cmdErr))
-	end
+-- Commands loaded from SlateCommands.lua
+task.wait()
+local _cmdOk, _cmdErr = pcall(function()
+	loadstring(_prefetchedScripts.commands or game:HttpGet(LPS_ENCSTR("https://raw.githubusercontent.com/EORScopeZ/test/refs/heads/main/commands.lua")))()
 end)
-
+if not _cmdOk then
+	warn("[Slate] commands.lua failed to load: " .. tostring(_cmdErr))
+end
+task.wait()
 
 local ffActiveRings = {}
 local ffLocalOn = false
@@ -17195,6 +17198,7 @@ if spawnCmds and #spawnCmds > 0 then
 	end
 	updatesaves()
 end
+task.wait()
 if loadedEventData then eventEditor.LoadData(loadedEventData) end
 eventEditor.Refresh()
 eventEditor.FireEvent("OnExecute")
