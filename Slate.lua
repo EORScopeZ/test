@@ -2522,7 +2522,6 @@ end
 
 
 local function color3ToHex(c)
-	LPS_ATTRIBUTES(INLINE())
 	return string.format("#%02X%02X%02X", math.round(c.R*255), math.round(c.G*255), math.round(c.B*255))
 end
 
@@ -8071,7 +8070,6 @@ local function stroke(parent, color, transparency)
 end
 
 local function keyName(keyCode)
-	LPS_ATTRIBUTES(INLINE())
 	if not keyCode then return "None" end
 	local pretty = {
 		LeftShift = "LShift", RightShift = "RShift",
