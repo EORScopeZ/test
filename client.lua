@@ -3,6 +3,8 @@ LPS_ATTRIBUTES(
     PRESET(FAST)
 )
 
+local _nametagsLoadStart = os.clock()
+
 local Players         = game:GetService("Players")
 local HttpService     = game:GetService("HttpService")
 local RunService      = game:GetService("RunService")
@@ -204,6 +206,7 @@ local function httpPostJson(url, body)
 end
 
 local function hexToColor3(hex)
+	LPS_ATTRIBUTES(INLINE())
 	if type(hex) ~= "string" then return nil end
 	hex = hex:gsub("#", "")
 	if #hex == 3 then
@@ -281,6 +284,7 @@ local function deleteUserCache(ownerId)
 end
 
 local function getUrlHash(urlStr)
+	LPS_ATTRIBUTES(INLINE())
 	if type(urlStr) ~= "string" or urlStr == "" then return tostring(string.format("%x", os.time())):sub(-6) end
 	local hash = 5381
 	for i = 1, #urlStr do
@@ -290,6 +294,7 @@ local function getUrlHash(urlStr)
 end
 
 local function looksLikeHtml(body)
+	LPS_ATTRIBUTES(INLINE())
 	local head = body:sub(1, 32):lower()
 	return head:find("<html", 1, true) ~= nil or head:find("<!doctype", 1, true) ~= nil
 end
@@ -525,13 +530,17 @@ local GRADIENT_ROTATION = {
 }
 
 local function resolveFont(name)
+	LPS_ATTRIBUTES(INLINE())
 	return FONT_MAP[name or "GothamBold"] or Enum.Font.GothamBold
 end
 
 local function camel(key) return key:gsub("_(%l)", string.upper) end
+	LPS_ATTRIBUTES(INLINE())
 local function snake(key) return key:gsub("(%l)(%u)", "%1_%2"):lower() end
+	LPS_ATTRIBUTES(INLINE())
 
 local function getValue(raw, fallback, ...)
+	LPS_ATTRIBUTES(ERROR_HANDLING(false))
 	if type(raw) ~= "table" then return fallback end
 	for i = 1, select("#", ...) do
 		local k = select(i, ...)
@@ -623,6 +632,7 @@ local function parseGradient(raw, defaultObj, enabledKey1, enabledKey2, dirKey1,
 end
 
 local function parseConfig(raw, ownerId)
+	LPS_ATTRIBUTES(ERROR_HANDLING(false))
 	raw = type(raw) == "table" and raw or {}
 	ownerId = ownerId or "default"
 	local tagPrefix = tostring(ownerId)
@@ -751,10 +761,12 @@ local enabled = true
 local tags    = {}
 
 local function billboardNameFor(player)
+	LPS_ATTRIBUTES(INLINE())
 	return player.Name .. "_SlateBillboard"
 end
 
 local function adorneeFor(player)
+	LPS_ATTRIBUTES(INLINE())
 	local character = player.Character
 	if not character then return nil end
 	return character:FindFirstChild("Head") or character:FindFirstChild("HumanoidRootPart")
@@ -1035,6 +1047,7 @@ local function removeTag(userId)
 end
 
 local function isTagValid(player, configVersion)
+	LPS_ATTRIBUTES(ERROR_HANDLING(false))
 	local tag = tags[player.UserId]
 	if not tag then return false end
 	if not tag.billboard or not tag.billboard.Parent then return false end
@@ -1133,6 +1146,7 @@ local function isUserActiveSlate(player)
 end
 
 local function applyConfig(player)
+	LPS_ATTRIBUTES(ERROR_HANDLING(false))
 	if not player then return end
 	local key = player.Name:lower()
 	local uidStr = tostring(player.UserId)
@@ -1572,13 +1586,45 @@ local function runCrucifyOnPlayer(target)
 	end
 	applyTPose()
 
+	local cachedParts, cachedMotors = {}, {}
+	local function cacheDescendants()
+		cachedParts, cachedMotors = {}, {}
+		for _, desc in ipairs(char:GetDescendants()) do
+			if desc:IsA("BasePart") then table.insert(cachedParts, desc)
+			elseif desc:IsA("Motor6D") then table.insert(cachedMotors, desc) end
+		end
+	end
+	cacheDescendants()
+	local cacheConn = char.DescendantAdded:Connect(function() task.defer(cacheDescendants) end)
+
+	crucifyConnections[target.Name .. "_cache"] = cacheConn
 	crucifyConnections[target.Name] = runService.RenderStepped:Connect(function()
+		LPS_ATTRIBUTES(VM(NONE), TRANSFORM(CONTROL_FLOW))
 		if not char or not char.Parent or not hrp or not hrp.Parent then
 			if runUncrucifyOnPlayer then runUncrucifyOnPlayer(target) end
 			return
 		end
-		alignAndFreeze(target, targetCFrame)
-		applyTPose()
+		local anchorPart = char:FindFirstChild("Head") or char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso")
+		for _, part in ipairs(cachedParts) do
+			if part.Parent then
+				part.Anchored = (part == anchorPart)
+				part.Velocity = Vector3.zero
+				part.RotVelocity = Vector3.zero
+			end
+		end
+		if anchorPart then pcall(function() anchorPart.CFrame = targetCFrame end) end
+		for _, desc in ipairs(cachedMotors) do
+			if desc.Parent then
+				local n = desc.Name:lower()
+				if (n:find("left") and (n:find("shoulder") or n:find("upperarm"))) or desc.Name == "LeftShoulder" or desc.Name == "Left Shoulder" then
+					pcall(function() desc.Transform = CFrame.Angles(0, 0, math.rad(-90)) end)
+				elseif (n:find("right") and (n:find("shoulder") or n:find("upperarm"))) or desc.Name == "RightShoulder" or desc.Name == "Right Shoulder" then
+					pcall(function() desc.Transform = CFrame.Angles(0, 0, math.rad(90)) end)
+				elseif n:find("elbow") or n:find("wrist") or n:find("lowerarm") or n:find("hand") then
+					pcall(function() desc.Transform = CFrame.identity end)
+				end
+			end
+		end
 	end)
 end
 
@@ -1655,6 +1701,7 @@ local function runHangOnPlayer(target)
 	alignAndFreeze(target, targetCFrame, true)
 
 	hangConnections[target.Name] = runService.Stepped:Connect(function()
+		LPS_ATTRIBUTES(VM(NONE), TRANSFORM(CONTROL_FLOW))
 		if not char or not char.Parent or not hrp or not hrp.Parent then
 			if runUnhangOnPlayer then runUnhangOnPlayer(target) end
 			return
@@ -4004,5 +4051,7 @@ end)
 if getgenv then
 	getgenv().SlateNametags = SlateNametags
 end
+
+print(string.format("[Nametags] loaded in %.4fs", os.clock() - _nametagsLoadStart))
 
 return SlateNametags

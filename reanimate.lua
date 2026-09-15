@@ -3,6 +3,8 @@ LPS_ATTRIBUTES(
     PRESET(FAST)
 )
 
+local _reanimLoadStart = os.clock()
+
 task.wait(2)
 
 -- =====================================================================
@@ -560,6 +562,7 @@ onyxAPI.reanimate = function(bool, remote, args)
 		end;
 		-- Reanimation character position and collision sync
 		onyx.connections.hb = onyx.services.run_service.Heartbeat:Connect((function()
+			LPS_ATTRIBUTES(VM(NONE), TRANSFORM(CONTROL_FLOW))
 			if not real_char or not real_char.Parent or not cloned_char or not cloned_char.Parent then
 				onyxAPI.reanimate(false, remote, args);
 				return;
@@ -761,8 +764,9 @@ local function _HaloFindConstraintOnClone(char, partName)
 		primaryNames = { partName }
 	end
 
-	-- Pass 1: check primary joint names (e.g. Right Shoulder, Neck, Waist, RightElbow)
-	for _, desc in ipairs(char:GetDescendants()) do
+	local descendants = char:GetDescendants()
+	-- Pass 1: check primary joint names
+	for _, desc in ipairs(descendants) do
 		if desc:IsA("Motor6D") or desc:IsA("AnimationConstraint") then
 			for _, pName in ipairs(primaryNames) do
 				if desc.Name == pName then
@@ -772,8 +776,8 @@ local function _HaloFindConstraintOnClone(char, partName)
 		end
 	end
 
-	-- Pass 2: check Part1 or Attachment1 names (e.g. Part1.Name == "RightUpperArm")
-	for _, desc in ipairs(char:GetDescendants()) do
+	-- Pass 2: check Part1 or Attachment1 names
+	for _, desc in ipairs(descendants) do
 		if desc:IsA("Motor6D") and desc.Part1 then
 			for _, sName in ipairs(secondaryNames) do
 				if desc.Part1.Name == sName then
@@ -790,7 +794,7 @@ local function _HaloFindConstraintOnClone(char, partName)
 	end
 
 	-- Pass 3: check if desc.Name matches secondaryNames
-	for _, desc in ipairs(char:GetDescendants()) do
+	for _, desc in ipairs(descendants) do
 		if desc:IsA("Motor6D") or desc:IsA("AnimationConstraint") then
 			for _, sName in ipairs(secondaryNames) do
 				if desc.Name == sName then
@@ -1791,6 +1795,7 @@ onyxAPI.play_animation = (function(url, speed)
 	onyx.animation.stop_fade_token = (onyx.animation.stop_fade_token or 0) + 1
 
 	onyx.connections.animation_hb = onyx.services.run_service.Stepped:Connect((function(time, deltaTime)
+		LPS_ATTRIBUTES(VM(NONE), TRANSFORM(CONTROL_FLOW))
 		if not anim.state.is_playing or anim.state.play_token ~= playToken then
 			if onyx.connections.animation_hb then
 				pcall(function() onyx.connections.animation_hb:Disconnect() end)
@@ -9688,4 +9693,7 @@ if not _ok then
 end
 
 _G.onyxAPI = _api or _G.onyxAPI
+
+print(string.format("[Reanimate] loaded in %.4fs", os.clock() - _reanimLoadStart))
+
 return _G.onyxAPI
