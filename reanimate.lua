@@ -713,6 +713,7 @@ end;
 -- SHARED TRACKERS & LIMBS LOGIC (Unified for both Animation & Standalone)
 -- =========================================================================
 
+task.wait()
 local function _HaloFindConstraintOnClone(char, partName)
 	if not char then return nil end
 
@@ -1332,6 +1333,7 @@ local function _HaloApplyAllTrackers(targetChar, deltaTime, isFromAnim)
 	end
 end
 
+task.wait()
 --- Plays an animation on the reanimated character.
 -- @param url (string) - The URL of the keyframe script.
 -- @param speed (number) [optional] - The playback speed multiplier. Defaults to 1.
@@ -2011,6 +2013,7 @@ onyxAPI.preload_animation = function(url)
         end
     end
 end
+task.wait()
 local standaloneTrackerConn = nil
 local function updateStandaloneTrackers()
 	if not (onyx and onyx.flags and onyx.flags.reanimated) then
@@ -2727,6 +2730,7 @@ function saveSlateSettings()
 	end
 end
 
+task.wait()
 local combinedPlayToken = 0
 function playCombinedSequence(seqData)
 	if not seqData or not seqData.anim1 or not seqData.anim2 then return end
@@ -4026,7 +4030,7 @@ local keybindIconId = "rbxthumb://type=Asset&id=124657808272985&w=150&h=150"
 local isSettingBind = false
 
 -- createVectorShadow moved to global scope
-
+task.wait()
 function guiUpdateFunction()
 	local panelHost = (gethui and gethui()) or game:GetService("CoreGui")
 
@@ -9436,6 +9440,7 @@ function hookPlayer(p)
 	playerCharConns[p] = charConn
 end
 
+task.wait()
 function startLoggingAnimations()
 	stopLoggingAnimations()
 	for _, p in ipairs(game:GetService("Players"):GetPlayers()) do
