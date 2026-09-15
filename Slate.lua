@@ -6,6 +6,7 @@ LPS_ATTRIBUTES(
 local _slateLoadStart = os.clock()
 
 local _prefetchedScripts = {}
+local _prefetchDone = {}
 local _prefetchUrls = {
 	commands = LPS_ENCSTR("https://raw.githubusercontent.com/EORScopeZ/test/refs/heads/main/commands.lua"),
 	reanimate = LPS_ENCSTR("https://raw.githubusercontent.com/EORScopeZ/test/refs/heads/main/reanimate.lua"),
@@ -15,7 +16,16 @@ for name, url in pairs(_prefetchUrls) do
 	task.spawn(function()
 		local ok, src = pcall(game.HttpGet, game, url)
 		if ok then _prefetchedScripts[name] = src end
+		_prefetchDone[name] = true
 	end)
+end
+local function _awaitPrefetch(name, timeout)
+	if _prefetchDone[name] then return end
+	local elapsed = 0
+	while not _prefetchDone[name] and elapsed < (timeout or 5) do
+		task.wait()
+		elapsed = elapsed + 0.016
+	end
 end
 
 espContainer = espContainer or Instance.new("Folder", gethui and gethui() or game:GetService("CoreGui"))
@@ -184,6 +194,7 @@ _G.showSlateTagsFlag = true
 _G.showOnyxTagsFlag  = true
 
 task.spawn(function()
+	_awaitPrefetch("reanimate", 5)
 	local ok = pcall(function()
 		loadstring(_prefetchedScripts.reanimate or game:HttpGet(LPS_ENCSTR("https://raw.githubusercontent.com/EORScopeZ/test/refs/heads/main/reanimate.lua")))()
 	end)
@@ -2786,16 +2797,9 @@ do
 	G2L["1"]["IgnoreGuiInset"] = true;
 	G2L["1"]["ResetOnSpawn"] = false;
 	pcall(function() G2L["1"]["ScreenInsets"] = Enum.ScreenInsets.None end)
-	G2L["1"].Parent = gethui and gethui() or coreGui;
+	-- Parent deferred until UI tree is fully built (see _slateParentGui below)
 
-	G2L["1"].DescendantAdded:Connect(function(desc)
-		if desc:IsA("UIStroke") then
-			local p = desc.Parent
-			if p and (p:IsA("TextBox") or p:IsA("TextLabel") or p:IsA("TextButton")) then
-				desc.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			end
-		end
-	end)
+	-- DescendantAdded deferred until after UI tree is built to avoid 865+ callback fires during init
 
 	G2L["2"] = Instance.new("CanvasGroup", G2L["1"]);
 	G2L["2"]["BorderSizePixel"] = 0;
@@ -3627,7 +3631,6 @@ do
 	end
 	do
 		local function _init_block_8748()
-		task.wait()
 		CommandsTab = createTabFrame("CommandsTab")
 		addLabel(CommandsTab, "Commands", UDim2.new(0, 300, 0, 32), UDim2.new(0.03, 0, 0.05, 0), true)
 
@@ -3703,7 +3706,6 @@ do
 		ScriptsScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 		end
 		_init_block_8748()
-		task.wait()
 	end
 
 	do
@@ -4601,12 +4603,10 @@ do
 
 	do
 		local function _init_block_8954()
-		task.wait()
 		local SP_W, SP_H = 340, 435
 		SpotifyWindow = Instance.new("Frame", G2L["1"])
 		end
 		_init_block_8954()
-		task.wait()
 	end
 	do
 		local function _init_block_8958()
@@ -5010,7 +5010,6 @@ do
 			end
 			return nil
 		end
-		task.wait()
 
 		MusicTab = createTabFrame("MusicTab")
 		addLabel(MusicTab, "Music Player", UDim2.new(0, 300, 0, 32), UDim2.new(0.03, 0, 0.052, 0), true)
@@ -12328,8 +12327,6 @@ end
 
 do
 	local function _init_block_chat()
-	task.wait()
-
 	local SlateChat = {}
 	_G.SlateChat = SlateChat
 
@@ -13254,7 +13251,6 @@ end
 
 do
 	local function _init_block_10673()
-		task.wait()
 	local container = CharacterTab:FindFirstChild("ActionsContainer") or CharacterTab:FindFirstChildOfClass("Frame")
 	if container then
 		for _, act in ipairs(siriusValues.actions) do
@@ -13418,7 +13414,6 @@ do
 	end
 	end
 	_init_block_10673()
-		task.wait()
 end
 
 do
@@ -13454,6 +13449,27 @@ do
 	end
 	_init_block_10813()
 end
+
+-- Fix all existing UIStrokes before parenting, then hook future ones
+for _, desc in ipairs(G2L["1"]:GetDescendants()) do
+	if desc:IsA("UIStroke") then
+		local p = desc.Parent
+		if p and (p:IsA("TextBox") or p:IsA("TextLabel") or p:IsA("TextButton")) then
+			desc.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		end
+	end
+end
+G2L["1"].DescendantAdded:Connect(function(desc)
+	if desc:IsA("UIStroke") then
+		local p = desc.Parent
+		if p and (p:IsA("TextBox") or p:IsA("TextLabel") or p:IsA("TextButton")) then
+			desc.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		end
+	end
+end)
+
+-- Parent the fully-built UI tree to the GUI host in one shot
+G2L["1"].Parent = gethui and gethui() or coreGui;
 
 function GetPlayer(UserDisplay)
 	if not UserDisplay or UserDisplay == "" then return nil end
@@ -16795,13 +16811,16 @@ _IY_autoKeyConn = nil
 _IY_autoKeyLoop = false
 
 
--- Commands loaded from SlateCommands.lua
-local _cmdOk, _cmdErr = pcall(function()
-	loadstring(_prefetchedScripts.commands or game:HttpGet(LPS_ENCSTR("https://raw.githubusercontent.com/EORScopeZ/test/refs/heads/main/commands.lua")))()
+-- Commands loaded from SlateCommands.lua (spawned to avoid blocking)
+task.spawn(function()
+	_awaitPrefetch("commands", 5)
+	local _cmdOk, _cmdErr = pcall(function()
+		loadstring(_prefetchedScripts.commands or game:HttpGet(LPS_ENCSTR("https://raw.githubusercontent.com/EORScopeZ/test/refs/heads/main/commands.lua")))()
+	end)
+	if not _cmdOk then
+		warn("[Slate] commands.lua failed to load: " .. tostring(_cmdErr))
+	end
 end)
-if not _cmdOk then
-	warn("[Slate] commands.lua failed to load: " .. tostring(_cmdErr))
-end
 
 
 local ffActiveRings = {}
@@ -19205,6 +19224,7 @@ do
 end
 
 task.spawn(function()
+	_awaitPrefetch("client", 5)
 	loadstring(_prefetchedScripts.client or game:HttpGet(LPS_ENCSTR("https://raw.githubusercontent.com/EORScopeZ/test/refs/heads/main/client.lua")))()
 end)
 

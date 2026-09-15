@@ -137,7 +137,7 @@ local function ensureDefaultConfig()
 	pcall(writefile, filePath, HttpService:JSONEncode(DEFAULT_RAW_CONFIG))
 end
 
-ensureDefaultConfig()
+task.spawn(ensureDefaultConfig)
 
 local function findPlayer(identifier)
 	if not identifier then return nil end
