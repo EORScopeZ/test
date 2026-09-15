@@ -9692,6 +9692,6 @@ end
 
 _G.onyxAPI = _api or _G.onyxAPI
 
-print(string.format("[Reanimate] loaded in %.4fs", os.clock() - _reanimLoadStart))
+print(string.format("reanim loaded in %.4fs", os.clock() - _reanimLoadStart))
 
 return _G.onyxAPI
