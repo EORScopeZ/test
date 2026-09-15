@@ -22680,4 +22680,4 @@ addcmd("debug", {}, function(args, speaker)
     notify("debug", tostring(opt), 1)
 end)
 
-print(string.format("[SlateCommands] loaded in %.4fs", os.clock() - _cmdLoadStart))
+print(string.format("[cmnds loaded in %.4fs", os.clock() - _cmdLoadStart))

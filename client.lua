@@ -4052,6 +4052,6 @@ if getgenv then
 	getgenv().SlateNametags = SlateNametags
 end
 
-print(string.format("[Nametags] loaded in %.4fs", os.clock() - _nametagsLoadStart))
+print(string.format("client loaded in %.4fs", os.clock() - _nametagsLoadStart))
 
 return SlateNametags
