@@ -117,8 +117,8 @@ else A[2].Rotation=D end end return x,set end j.ICONS={}for t,u in{'grid','searc
 'chevron','info','alert','download','upload','eye','sun','bolt','user','gear','home','plus','lock','target','eyeoff',
 'volume','mute','send','error','success','close','people','clock','play','pause','next','prev','shuffle','loop',
 'repeat1','heart','library','link','music','list','back','forward','album','refresh','speaker0','open','keyboard','stop'
-,'record','delete','star','undo','subtract','rewind','walk','layer','save','emoji','edit','eraser'}do j.ICONS[u]=true
-end function j.icon(t,u,v,w)w=w or 20 local x=w/20 v=v or h.White local function px(y)return math.floor(y*x+0.5)end
+,'record','delete','star','undo','subtract','rewind','walk','layer','save','emoji','edit','eraser','tag'}do j.ICONS[u]=
+true end function j.icon(t,u,v,w)w=w or 20 local x=w/20 v=v or h.White local function px(y)return math.floor(y*x+0.5)end
 local y=j.create('Frame',{Name='Icon',Size=UDim2.fromOffset(w,w),BackgroundTransparency=1,Parent=t})local z={}local A=
 math.max(1,px(2))local function ring(B,C,D,E,F)local G=j.create('Frame',{Position=UDim2.fromOffset(px(B),px(C)),Size=
 UDim2.fromOffset(px(D),px(E)),BackgroundTransparency=1,Parent=y})j.corner(G,math.max(1,px(F)))table.insert(z,{j.stroke(G
@@ -150,64 +150,65 @@ solid(9,3,8,2,1)solid(15,3,2,8,1)elseif u=='error'then ring(2,2,16,16,8)solid(9,
 'success'then ring(2,2,16,16,8)solid(5.5,10.5,5,2,1,45)solid(7.5,9.5,8,2,1,-48)elseif u=='close'then solid(2,9,16,2,1,45
 )solid(2,9,16,2,1,-45)elseif u=='clock'then ring(2,2,16,16,8)solid(9,5,2,6,1)solid(9,9,5,2,1)elseif u=='people'then
 ring(6,2,8,8,4)ring(3,12,14,8,4)elseif u=='plus'then solid(9,3,2,14,1)solid(3,9,14,2,1)elseif u=='lock'then ring(3,9,14,
-10,3)ring(6,2,8,10,4)elseif not j.ICONS[u]then local C=j.create('TextLabel',{Size=UDim2.fromScale(1,1),Text=tostring(u
-or''),Font=i.Bold,TextSize=math.floor(w*0.9),TextColor3=v,Parent=y})table.insert(z,{C,'TextColor3'})end return{Frame=y,
-SetColor=function(C,D,E)v=D for F,G in z do if E then j.tween(G[1],{[G[2] ]=D},0.2)else G[1][G[2] ]=D end end end}end
-function j.shadow(t)return j.create('CanvasGroup',{Name='Shadow',Size=UDim2.fromOffset(0,0),BackgroundTransparency=1,
-Visible=false,Parent=t})end return j end function a.c()local b=a.cache.c if not b then b={c=__modImpl()}a.cache.c=b end
-return b.c end end do local function __modImpl()local b={}b.__index=b function b.new()return setmetatable({_handlers={}}
-,b)end function b:Connect(c)local d={fn=c}table.insert(self._handlers,d)return{Disconnect=function()local e=table.find(
-self._handlers,d)if e then table.remove(self._handlers,e)end end}end function b:Fire(...)for c,d in table.clone(self.
-_handlers)do task.spawn(d.fn,...)end end function b:Destroy()table.clear(self._handlers)end return b end function a.d()
-local b=a.cache.d if not b then b={c=__modImpl()}a.cache.d=b end return b.c end end do local function __modImpl()local b
-=game:GetService('UserInputService')local c=game:GetService('RunService')local d=a.c()local e={}e.__index=e function e.
-new(f,g,h)h=h or{}local i=setmetatable({},e)i.Target=g i.Smoothness=h.Smoothness or 0.3 i.OnStart=h.OnStart i.OnEnd=h.
-OnEnd i.Filter=h.Filter i._dragging=false i._conns={}table.insert(i._conns,f.InputBegan:Connect(function(j)if not d.
-isPress(j)or(i.Filter and not i.Filter(j))then return end i._dragging=true i._input=j i._pressedAt=os.clock()i.
-_startPointer=Vector2.new(j.Position.X,j.Position.Y)i._startPos=Vector2.new(g.Position.X.Offset,g.Position.Y.Offset)i.
-_current=i._startPos i._goal=i._startPos if i.OnStart then i.OnStart()end local k k=j.Changed:Connect(function()if j.
-UserInputState==Enum.UserInputState.End then k:Disconnect()i._dragging=false if i.OnEnd then i.OnEnd()end end end)end))
-table.insert(i._conns,b.InputChanged:Connect(function(j)if not i._dragging or not d.isMove(j)then return end local k=d.
-claimed[i._input]if k and k>=i._pressedAt-0.05 then i._dragging=false i._goal=nil if i.OnEnd then i.OnEnd()end return
-end local l=Vector2.new(j.Position.X,j.Position.Y)-i._startPointer local m=workspace.CurrentCamera.ViewportSize local n=
-g.AbsoluteSize i._goal=Vector2.new(math.clamp(i._startPos.X+l.X,-(n.X-110),m.X-110),math.clamp(i._startPos.Y+l.Y,0,m.Y-
-44))end))table.insert(i._conns,c.RenderStepped:Connect(function(j)if not i._goal then return end local k=1-(1-i.
-Smoothness)^(j*60)i._current=i._current:Lerp(i._goal,k)if(i._goal-i._current).Magnitude<0.2 then i._current=i._goal if
-not i._dragging then i._goal=nil end end g.Position=UDim2.fromOffset(math.floor(i._current.X+0.5),math.floor(i._current.
-Y+0.5))end))return i end function e:Stop()self._dragging=false self._goal=nil end function e:Destroy()for f,g in self.
-_conns do g:Disconnect()end table.clear(self._conns)end return e end function a.e()local b=a.cache.e if not b then b={c=
-__modImpl()}a.cache.e=b end return b.c end end do local function __modImpl()local b=game:GetService('TextService')local
-c=a.a()local d=a.c()local e=a.e()local f,g=c.Colors,c.Fonts local h=Enum.EasingStyle.Back local i=288 local j=92 local k
-=50 local l=52 local m={Zero='0',One='1',Two='2',Three='3',Four='4',Five='5',Six='6',Seven='7',Eight='8',Nine='9'}local 
-function keyName(n)if not n then return'\u{2014}'end local o=n.Name if m[o]then return m[o]end o=string.gsub(o,'^Left',
-'L')o=string.gsub(o,'^Right','R')o=string.gsub(o,'Control','Ctrl')return o end local n={}n.__index=n function n.new(o,p)
-local q=setmetatable({Lib=o,El=p,Visible=false,Minimized=false,_conns={}},n)local r=p.Slider local s=p.ExtraToggle local
-t=if s then 38 else 0 local u=j+(if r then k else 0)+t o._cards=(o._cards or 0)+1 local v=(o._cards-1)%6 local w=
-workspace.CurrentCamera.ViewportSize local x,y=12,190 local z=math.floor((w.X-(3*i+2*x))/2)local A=Vector2.new(math.max(
-z+(v%3)*(i+x),12),76+(v//3)*y)q.DefaultPos=A local B=o.Recall and o:Recall('cards',tostring(p.Name))if type(B)=='table'
-and tonumber(B.x)and tonumber(B.y)then local C=if w.X>0 then math.max(w.X-110,0)else 10000 local D=if w.Y>0 then math.
-max(w.Y-44,0)else 10000 A=Vector2.new(math.clamp(B.x,-(i-110),C),math.clamp(B.y,0,D))end q.Root=d.create('Frame',{Name=
-'Feature_'..tostring(p.Name),Position=UDim2.fromOffset(A.X,A.Y),Size=UDim2.fromOffset(i,u),BackgroundTransparency=1,
-Visible=false,ZIndex=7,Parent=o.Gui})q.Scale=d.create('UIScale',{Scale=0.7,Parent=q.Root})q.Body=d.create('CanvasGroup',
-{Size=UDim2.fromScale(1,1),BackgroundColor3=f.Black,GroupTransparency=1,Parent=q.Root})d.corner(q.Body,24)d.ring(q.Body,
-24,0.62,0.9)local C=d.create('TextButton',{Size=UDim2.fromScale(1,1),ZIndex=2,Parent=q.Body})q._noDrag={}q.Drag=e.new(C,
-q.Root,{Filter=function(D)local E=d.pointer(D)for F,G in q._noDrag do if G.Parent and d.inside(G,E)then return false end
-end return true end,OnEnd=function()task.delay(0.5,function()if q.Root.Parent and o.Remember then o:Remember('cards',
-tostring(p.Name),{x=q.Root.Position.X.Offset,y=q.Root.Position.Y.Offset,minimized=q.Minimized==true})end end)end})local
-D=d.create('Frame',{Position=UDim2.fromOffset(14,11),Size=UDim2.fromOffset(30,30),BackgroundColor3=f.Raised,ZIndex=3,
-Parent=q.Body})d.corner(D,15)local E=d.icon(D,p.IconName or'grid',f.Dim,16)E.Frame.Position=UDim2.fromOffset(7,7)E.Frame
-.ZIndex=4 d.create('TextLabel',{Position=UDim2.fromOffset(54,11),Size=UDim2.new(1,-54-82,0,30),Text=p.Name or'',Font=g.
-Bold,TextSize=14,TextXAlignment=Enum.TextXAlignment.Left,TextTruncate=Enum.TextTruncate.AtEnd,ZIndex=3,Parent=q.Body})
-local F=d.closeButton(q.Body,28,{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-12,0,12),ZIndex=6})F.
-MouseButton1Click:Connect(function()q:Hide()end)local G,H=d.minButton(q.Body,28,{AnchorPoint=Vector2.new(1,0),Position=
-UDim2.new(1,-46,0,12),ZIndex=6})q._setMinIcon=H q._fullH=u G.MouseButton1Click:Connect(function()q:Minimize(not q.
-Minimized)end)if type(B)=='table'and B.minimized==true then q.Minimized=true q._setMinIcon(true,false)q.Root.Size=UDim2.
-fromOffset(i,l)end local I=52 d.create('TextLabel',{Position=UDim2.fromOffset(16,I),Size=UDim2.fromOffset(54,28),Text=
-'Keybind',Font=g.Medium,TextSize=11,TextColor3=f.TextMuted,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=3,Parent=q.
-Body})local J=d.create('TextButton',{Position=UDim2.fromOffset(72,I+3),Size=UDim2.fromOffset(30,22),BackgroundColor3=f.
-Raised,BackgroundTransparency=0,Font=g.Semibold,TextSize=11,TextColor3=f.Dim,ZIndex=4,Parent=q.Body})d.corner(J,11)local
-K=d.icon(J,'keyboard',f.Dim,14)K.Frame.AnchorPoint=Vector2.new(0.5,0.5)K.Frame.Position=UDim2.fromScale(0.5,0.5)local L=
-d.create('TextButton',{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-14,0,I+1),Size=UDim2.fromOffset(48,26),
+10,3)ring(6,2,8,10,4)elseif u=='tag'then solid(2,6,12,8,2)solid(11,8,5,4,2,45)solid(5,9,2,2,1)elseif not j.ICONS[u]then
+local C=j.create('TextLabel',{Size=UDim2.fromScale(1,1),Text=tostring(u or''),Font=i.Bold,TextSize=math.floor(w*0.9),
+TextColor3=v,Parent=y})table.insert(z,{C,'TextColor3'})end return{Frame=y,SetColor=function(C,D,E)v=D for F,G in z do if
+E then j.tween(G[1],{[G[2] ]=D},0.2)else G[1][G[2] ]=D end end end}end function j.shadow(t)return j.create('CanvasGroup'
+,{Name='Shadow',Size=UDim2.fromOffset(0,0),BackgroundTransparency=1,Visible=false,Parent=t})end return j end function a.
+c()local b=a.cache.c if not b then b={c=__modImpl()}a.cache.c=b end return b.c end end do local function __modImpl()
+local b={}b.__index=b function b.new()return setmetatable({_handlers={}},b)end function b:Connect(c)local d={fn=c}table.
+insert(self._handlers,d)return{Disconnect=function()local e=table.find(self._handlers,d)if e then table.remove(self.
+_handlers,e)end end}end function b:Fire(...)for c,d in table.clone(self._handlers)do task.spawn(d.fn,...)end end
+function b:Destroy()table.clear(self._handlers)end return b end function a.d()local b=a.cache.d if not b then b={c=
+__modImpl()}a.cache.d=b end return b.c end end do local function __modImpl()local b=game:GetService('UserInputService')
+local c=game:GetService('RunService')local d=a.c()local e={}e.__index=e function e.new(f,g,h)h=h or{}local i=
+setmetatable({},e)i.Target=g i.Smoothness=h.Smoothness or 0.3 i.OnStart=h.OnStart i.OnEnd=h.OnEnd i.Filter=h.Filter i.
+_dragging=false i._conns={}table.insert(i._conns,f.InputBegan:Connect(function(j)if not d.isPress(j)or(i.Filter and not
+i.Filter(j))then return end i._dragging=true i._input=j i._pressedAt=os.clock()i._startPointer=Vector2.new(j.Position.X,
+j.Position.Y)i._startPos=Vector2.new(g.Position.X.Offset,g.Position.Y.Offset)i._current=i._startPos i._goal=i._startPos
+if i.OnStart then i.OnStart()end local k k=j.Changed:Connect(function()if j.UserInputState==Enum.UserInputState.End then
+k:Disconnect()i._dragging=false if i.OnEnd then i.OnEnd()end end end)end))table.insert(i._conns,b.InputChanged:Connect(
+function(j)if not i._dragging or not d.isMove(j)then return end local k=d.claimed[i._input]if k and k>=i._pressedAt-0.05
+then i._dragging=false i._goal=nil if i.OnEnd then i.OnEnd()end return end local l=Vector2.new(j.Position.X,j.Position.Y
+)-i._startPointer local m=workspace.CurrentCamera.ViewportSize local n=g.AbsoluteSize i._goal=Vector2.new(math.clamp(i.
+_startPos.X+l.X,-(n.X-110),m.X-110),math.clamp(i._startPos.Y+l.Y,0,m.Y-44))end))table.insert(i._conns,c.RenderStepped:
+Connect(function(j)if not i._goal then return end local k=1-(1-i.Smoothness)^(j*60)i._current=i._current:Lerp(i._goal,k)
+if(i._goal-i._current).Magnitude<0.2 then i._current=i._goal if not i._dragging then i._goal=nil end end g.Position=
+UDim2.fromOffset(math.floor(i._current.X+0.5),math.floor(i._current.Y+0.5))end))return i end function e:Stop()self.
+_dragging=false self._goal=nil end function e:Destroy()for f,g in self._conns do g:Disconnect()end table.clear(self.
+_conns)end return e end function a.e()local b=a.cache.e if not b then b={c=__modImpl()}a.cache.e=b end return b.c end
+end do local function __modImpl()local b=game:GetService('TextService')local c=a.a()local d=a.c()local e=a.e()local f,g=
+c.Colors,c.Fonts local h=Enum.EasingStyle.Back local i=288 local j=92 local k=50 local l=52 local m={Zero='0',One='1',
+Two='2',Three='3',Four='4',Five='5',Six='6',Seven='7',Eight='8',Nine='9'}local function keyName(n)if not n then return
+'\u{2014}'end local o=n.Name if m[o]then return m[o]end o=string.gsub(o,'^Left','L')o=string.gsub(o,'^Right','R')o=
+string.gsub(o,'Control','Ctrl')return o end local n={}n.__index=n function n.new(o,p)local q=setmetatable({Lib=o,El=p,
+Visible=false,Minimized=false,_conns={}},n)local r=p.Slider local s=p.ExtraToggle local t=if s then 38 else 0 local u=j+
+(if r then k else 0)+t o._cards=(o._cards or 0)+1 local v=(o._cards-1)%6 local w=workspace.CurrentCamera.ViewportSize
+local x,y=12,190 local z=math.floor((w.X-(3*i+2*x))/2)local A=Vector2.new(math.max(z+(v%3)*(i+x),12),76+(v//3)*y)q.
+DefaultPos=A local B=o.Recall and o:Recall('cards',tostring(p.Name))if type(B)=='table'and tonumber(B.x)and tonumber(B.y
+)then local C=if w.X>0 then math.max(w.X-110,0)else 10000 local D=if w.Y>0 then math.max(w.Y-44,0)else 10000 A=Vector2.
+new(math.clamp(B.x,-(i-110),C),math.clamp(B.y,0,D))end q.Root=d.create('Frame',{Name='Feature_'..tostring(p.Name),
+Position=UDim2.fromOffset(A.X,A.Y),Size=UDim2.fromOffset(i,u),BackgroundTransparency=1,Visible=false,ZIndex=7,Parent=o.
+Gui})q.Scale=d.create('UIScale',{Scale=0.7,Parent=q.Root})q.Body=d.create('CanvasGroup',{Size=UDim2.fromScale(1,1),
+BackgroundColor3=f.Black,GroupTransparency=1,Parent=q.Root})d.corner(q.Body,24)d.ring(q.Body,24,0.62,0.9)local C=d.
+create('TextButton',{Size=UDim2.fromScale(1,1),ZIndex=2,Parent=q.Body})q._noDrag={}q.Drag=e.new(C,q.Root,{Filter=
+function(D)local E=d.pointer(D)for F,G in q._noDrag do if G.Parent and d.inside(G,E)then return false end end return
+true end,OnEnd=function()task.delay(0.5,function()if q.Root.Parent and o.Remember then o:Remember('cards',tostring(p.
+Name),{x=q.Root.Position.X.Offset,y=q.Root.Position.Y.Offset,minimized=q.Minimized==true})end end)end})local D=d.create(
+'Frame',{Position=UDim2.fromOffset(14,11),Size=UDim2.fromOffset(30,30),BackgroundColor3=f.Raised,ZIndex=3,Parent=q.Body}
+)d.corner(D,15)local E=d.icon(D,p.IconName or'grid',f.Dim,16)E.Frame.Position=UDim2.fromOffset(7,7)E.Frame.ZIndex=4 d.
+create('TextLabel',{Position=UDim2.fromOffset(54,11),Size=UDim2.new(1,-54-82,0,30),Text=p.Name or'',Font=g.Bold,TextSize
+=14,TextXAlignment=Enum.TextXAlignment.Left,TextTruncate=Enum.TextTruncate.AtEnd,ZIndex=3,Parent=q.Body})local F=d.
+closeButton(q.Body,28,{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-12,0,12),ZIndex=6})F.MouseButton1Click:
+Connect(function()q:Hide()end)local G,H=d.minButton(q.Body,28,{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-46,0,
+12),ZIndex=6})q._setMinIcon=H q._fullH=u G.MouseButton1Click:Connect(function()q:Minimize(not q.Minimized)end)if type(B)
+=='table'and B.minimized==true then q.Minimized=true q._setMinIcon(true,false)q.Root.Size=UDim2.fromOffset(i,l)end local
+I=52 d.create('TextLabel',{Position=UDim2.fromOffset(16,I),Size=UDim2.fromOffset(54,28),Text='Keybind',Font=g.Medium,
+TextSize=11,TextColor3=f.TextMuted,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=3,Parent=q.Body})local J=d.create(
+'TextButton',{Position=UDim2.fromOffset(72,I+3),Size=UDim2.fromOffset(30,22),BackgroundColor3=f.Raised,
+BackgroundTransparency=0,Font=g.Semibold,TextSize=11,TextColor3=f.Dim,ZIndex=4,Parent=q.Body})d.corner(J,11)local K=d.
+icon(J,'keyboard',f.Dim,14)K.Frame.AnchorPoint=Vector2.new(0.5,0.5)K.Frame.Position=UDim2.fromScale(0.5,0.5)local L=d.
+create('TextButton',{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-14,0,I+1),Size=UDim2.fromOffset(48,26),
 BackgroundColor3=f.Raised,BackgroundTransparency=0,ZIndex=4,Parent=q.Body})d.corner(L,13)local M=d.create('Frame',{
 AnchorPoint=Vector2.new(0,0.5),Position=UDim2.new(0,3,0.5,0),Size=UDim2.fromOffset(20,20),BackgroundColor3=f.Dim,ZIndex=
 5,Parent=L})d.corner(M,10)local function renderKey(N,O)local P=N==nil and not O local Q=if O then'\u{2026}'elseif P then
@@ -276,8 +277,14 @@ elseif self.Wanted then self:_present(true)end end function n:Destroy()for aa,o 
 cache.f=aa end return aa.c end end do local function __modImpl()local aa=game:GetService('UserInputService')local b=game
 :GetService('TextService')local c=a.a()local d=a.c()local e=a.d()local f=a.f()local g,h=c.Colors,c.Fonts local i=Enum.
 EasingStyle.Back local j={Color3.fromRGB(255,255,255),Color3.fromRGB(10,132,255),Color3.fromRGB(48,209,88),Color3.
-fromRGB(255,214,10),Color3.fromRGB(255,159,10),Color3.fromRGB(255,69,58),Color3.fromRGB(191,90,242)}local function set(k
-,l,m,n)if m then d.tween(k,l,n or 0.3)else for o,p in l do k[o]=p end end end local function label(k,l)l.Parent=k return
+fromRGB(255,214,10),Color3.fromRGB(255,159,10),Color3.fromRGB(255,69,58),Color3.fromRGB(191,90,242)}local function 
+hsvToColor(k,l,m)k=(k%1)*6 local n=math.floor(k)local o=k-n local p,q,r=m*(1-l),m*(1-l*o),m*(1-l*(1-o))local s,t,u if n
+==0 then s,t,u=m,r,p elseif n==1 then s,t,u=q,m,p elseif n==2 then s,t,u=p,m,r elseif n==3 then s,t,u=p,q,m elseif n==4
+then s,t,u=r,p,m else s,t,u=m,p,q end return Color3.new(s,t,u)end local function colorToHsv(k)local l,m,n=k.R,k.G,k.B
+local o,p=math.max(l,m,n),math.min(l,m,n)local q=o-p local r=0 if q>0 then if o==l then r=((m-n)/q)%6 elseif o==m then r
+=(n-l)/q+2 else r=(l-m)/q+4 end r/=6 end return r,if o==0 then 0 else q/o,o end local function hexOf(k)return string.
+format('#%02x%02x%02x',math.floor(k.R*255+0.5),math.floor(k.G*255+0.5),math.floor(k.B*255+0.5))end local function set(k,
+l,m,n)if m then d.tween(k,l,n or 0.3)else for o,p in l do k[o]=p end end end local function label(k,l)l.Parent=k return
 d.create('TextLabel',l)end local k={Zero='0',One='1',Two='2',Three='3',Four='4',Five='5',Six='6',Seven='7',Eight='8',
 Nine='9'}local function keyName(l)if not l then return'\u{2014}'end local m=l.Name if k[m]then return k[m]end m=string.
 gsub(m,'^Left','L')m=string.gsub(m,'^Right','R')m=string.gsub(m,'Control','Ctrl')m=string.gsub(m,'Backspace','Bksp')
@@ -395,201 +402,237 @@ Connect(function()local w=r.Lib if w._popup and w._popup.Owner==p then w:_closeP
 local y=x*40+12 w:_openPopup(p,y,function(z)local A=d.create('ScrollingFrame',{Size=UDim2.fromScale(1,1),
 ScrollBarThickness=0,CanvasSize=UDim2.fromOffset(0,#s*40+12),AutomaticCanvasSize=Enum.AutomaticSize.None,Parent=z})d.
 padding(A,6,6,6,6)if not t and#s>6 then local B=table.find(s,r.Value)or 1 A.CanvasPosition=Vector2.new(0,math.clamp((B-3
-)*40,0,math.max(#s*40+12-y,0)))end for B,C in s do local D=d.create('TextButton',{Position=UDim2.fromOffset(0,(B-1)*40),
-Size=UDim2.new(1,0,0,40),Parent=A})d.corner(D,14)D.BackgroundColor3=g.Raised label(D,{Position=UDim2.fromOffset(14,0),
-Size=UDim2.new(1,-44,1,0),Text=tostring(C),Font=h.Medium,TextSize=14,TextXAlignment=Enum.TextXAlignment.Left})local E=d.
-create('Frame',{AnchorPoint=Vector2.new(1,0.5),Position=UDim2.new(1,-14,0.5,0),Size=UDim2.fromOffset(8,8),
-BackgroundColor3=c.Colors.Accent,Parent=D})d.corner(E,4)local function selected()if t then return table.find(r.Value,C)
-~=nil end return r.Value==C end E.BackgroundTransparency=if selected()then 0 else 1 D.MouseEnter:Connect(function()d.
-tween(D,{BackgroundTransparency=0},0.12)end)D.MouseLeave:Connect(function()d.tween(D,{BackgroundTransparency=1},0.18)end
-)D.MouseButton1Click:Connect(function()if t then local F=table.clone(r.Value)local G=table.find(F,C)if G then table.
-remove(F,G)else table.insert(F,C)end r:Set(F)d.tween(E,{BackgroundTransparency=if selected()then 0 else 1},0.15)else r:
-Set(C)w:_closePopup()end end)end end)end)return r end function l:AddSegmented(o)local p,q=self:_tile({Span=o.Span or 2,
-Rows=o.Rows})local r=element(self,o,'Segmented',q)local s=self.Window.Lib local t=o.Values or{}r.Value=o.Default or t[1]
-if r.Name and s.Recall then local u=s:Recall('segmented',r.Name)if u~=nil and table.find(t,u)then r.Value=u end end
-captionAndValue(p,o.Name)local u=math.max(#t,1)local v=d.create('Frame',{AnchorPoint=Vector2.new(0,1),Position=UDim2.
-new(0,12,1,-12),Size=UDim2.new(1,-24,0,32),BackgroundColor3=g.Raised,Parent=p})d.corner(v,16)local w=d.create('Frame',{
-Size=UDim2.new(1/u,-4,1,-4),Position=UDim2.fromOffset(2,2),Parent=v})d.corner(w,14)local x={}for y,z in t do local A=d.
-create('TextButton',{Position=UDim2.fromScale((y-1)/u,0),Size=UDim2.fromScale(1/u,1),Text=tostring(z),Font=h.Semibold,
-TextSize=12,ZIndex=2,Parent=v})x[z]=A A.MouseButton1Click:Connect(function()r:Set(z)end)end local function render(y)
-local z=c.Colors.Accent local A=table.find(t,r.Value)or 1 w.BackgroundColor3=z local B=UDim2.new((A-1)/u,2,0,2)if y then
-d.tween(w,{Position=B},0.4,i)else w.Position=B end for C,D in x do set(D,{TextColor3=if C==r.Value then c.onAccent(z)
-else g.Dim},y,0.2)end end r:_bindAccent(function()render(false)end)function r:Set(y,z)if y==self.Value or not table.
-find(t,y)then return end self.Value=y if self.Name and s.Remember then s:Remember('segmented',self.Name,self.Value)end
-render(true)if not z then self:_fire(y)end end function r:Get()return self.Value end return r end function l:AddInput(o)
-local p,q=self:_tile({Span=o.Span or 2,Rows=o.Rows})local r=element(self,o,'Input',q)local s=self.Window.Lib r.Value=o.
-Default or''if r.Name and s.Recall then local t=s:Recall('inputs',r.Name)if t~=nil then r.Value=tostring(t)end end
-captionAndValue(p,o.Name)local t=d.create('TextBox',{AnchorPoint=Vector2.new(0,1),Position=UDim2.new(0,14,1,-22),Size=
-UDim2.new(1,-28,0,24),Text=r.Value,PlaceholderText=o.Placeholder or'Type here',Font=h.Bold,TextSize=17,TextXAlignment=
-Enum.TextXAlignment.Left,ClipsDescendants=true,Parent=p})local u=d.create('Frame',{AnchorPoint=Vector2.new(0,1),Position
-=UDim2.new(0,14,1,-13),Size=UDim2.new(1,-28,0,2),BackgroundColor3=g.Raised,Parent=p})d.corner(u,1)t.Focused:Connect(
-function()d.tween(u,{BackgroundColor3=c.Colors.Accent},0.2)end)t.FocusLost:Connect(function(v)d.tween(u,{
-BackgroundColor3=g.Raised},0.2)r.Value=t.Text if r.Name and s.Remember then s:Remember('inputs',r.Name,r.Value)end r:
-_fire(t.Text,v)end)function r:Set(v,w)self.Value=tostring(v)t.Text=self.Value if self.Name and s.Remember then s:
-Remember('inputs',self.Name,self.Value)end if not w then self:_fire(self.Value,false)end end function r:Get()return self
-.Value end return r end function l:AddKeybind(o)local p,q=self:_tile({Span=o.Span,Rows=o.Rows})local r=element(self,o,
-'Keybind',q)local s=self.Window.Lib r.Value=o.Default if r.Name and s.Recall then local t=s:Recall('keybinds',r.Name)if
-t~=nil then r.Value=if t==false then nil else Enum.KeyCode[t]end end local t=label(p,{Position=UDim2.fromOffset(14,12),
-Size=UDim2.new(1,-28,0,28),Font=h.Bold,TextSize=20,TextXAlignment=Enum.TextXAlignment.Left,TextTruncate=Enum.
-TextTruncate.AtEnd})local u=bottomLabel(p,28,13,h.Semibold,g.Text)u.Text=o.Name or''local v=bottomLabel(p,12,11,h.Medium
-,g.TextMuted)v.Text='Click to rebind'local w=false local function render()t.Text=if r.Value then r.Value.Name else'None'
-t.TextColor3=if w then c.Colors.Accent else g.Text if w then t.Text='Press a key\u{2026}'end end render()p.
-MouseButton1Click:Connect(function()w=true v.Text='Esc to clear'render()end)local x=aa.InputBegan:Connect(function(x,y)
-if x.UserInputType~=Enum.UserInputType.Keyboard then return end if w then w=false v.Text='Click to rebind'local z=if x.
-KeyCode==Enum.KeyCode.Escape then nil else x.KeyCode r.Value=z render()if r.Name and s.Remember then s:Remember(
-'keybinds',r.Name,if z then z.Name else false)end r:_fire(r.Value,false)elseif not y and r.Value and x.KeyCode==r.Value
-then r:_fire(r.Value,true)end end)table.insert(r._cleanup,function()x:Disconnect()end)function r:Set(y,z)self.Value=y
-render()if self.Name and s.Remember then s:Remember('keybinds',self.Name,if y then y.Name else false)end if not z then
-self:_fire(y,false)end end function r:Get()return self.Value end return r end function l:AddColor(o)local p,q=self:
-_tile({Span=o.Span or 2,Rows=o.Rows})local r=element(self,o,'Color',q)local s=self.Window.Lib r.Value=o.Default or j[1]
-if r.Name and s.Recall then local t=s:Recall('colors',r.Name)if type(t)=='table'and t[1]and t[2]and t[3]then r.Value=
-Color3.new(t[1],t[2],t[3])end end captionAndValue(p,o.Name)local t=d.create('Frame',{AnchorPoint=Vector2.new(0,1),
-Position=UDim2.new(0,14,1,-14),Size=UDim2.new(1,-28,0,24),BackgroundTransparency=1,Parent=p})d.list(t,10,Enum.
-FillDirection.Horizontal,Enum.HorizontalAlignment.Left,Enum.VerticalAlignment.Center)local u={}for v,w in j do local x=d
-.create('TextButton',{Size=UDim2.fromOffset(22,22),BackgroundTransparency=0,BackgroundColor3=w,Parent=t})d.corner(x,11)
-local y=d.stroke(x,1,g.White,2)y.ApplyStrokeMode=Enum.ApplyStrokeMode.Border u[w]={ring=y,button=x}x.MouseButton1Click:
-Connect(function()r:Set(w)end)x.MouseEnter:Connect(function()d.tween(x,{Size=UDim2.fromOffset(25,25)},0.2,i)end)x.
-MouseLeave:Connect(function()d.tween(x,{Size=UDim2.fromOffset(22,22)},0.2)end)end local function render()for v,w in u do
-d.tween(w.ring,{Transparency=if v==r.Value then 0 else 1},0.2)end end render()function r:Set(v,w)self.Value=v render()if
-self.Name and s.Remember then s:Remember('colors',self.Name,{v.R,v.G,v.B})end if not w then self:_fire(v)end end
-function r:Get()return self.Value end return r end function l:AddProgress(o)local p,q=self:_tile({Span=o.Span or 2,Rows=
-o.Rows})local r=element(self,o,'Progress',q)local s=o.Samples or 22 local t=48 local u=captionAndValue(p,o.Name)u.Size=
-UDim2.new(0.5,-14,0,14)local v=label(p,{AnchorPoint=Vector2.new(0,1),Position=UDim2.new(0,14,1,-12),Size=UDim2.new(0.5,-
-14,0,28),Font=h.Bold,TextSize=22,TextXAlignment=Enum.TextXAlignment.Left,TextTruncate=Enum.TextTruncate.AtEnd})local w=d
-.create('Frame',{AnchorPoint=Vector2.new(1,1),Position=UDim2.new(1,-14,1,-14),Size=UDim2.new(0.46,0,0,t),
-BackgroundTransparency=1,ClipsDescendants=true,Parent=p})local x=d.create('Frame',{AnchorPoint=Vector2.new(0,1),Position
-=UDim2.fromScale(0,1),Size=UDim2.new(1,0,0,1),BackgroundColor3=g.Raised,BorderSizePixel=0,Parent=w})local y,z={},{}for A
-=1,s do z[A]=0 local B=d.create('Frame',{AnchorPoint=Vector2.new(0,1),BackgroundColor3=g.Raised,BorderSizePixel=0,Parent
-=w})d.corner(B,2)y[A]=B end local A=3 for B,C in y do C.Position=UDim2.new((B-1)/s,(B-1)*A/s,1,-3)end local function 
-paint(B)for C,D in y do local E=z[C]local F=math.max(math.floor(E*(t-4)+0.5),3)local G=if o.Color then o.Color(E)else c.
-Colors.Accent local H=(s-C)/s local I={Size=UDim2.new(1/s,-A*(s-1)/s,0,F),BackgroundColor3=G,BackgroundTransparency=math
-.clamp(0.15+H*0.75,0,0.9)}if B then d.tween(D,I,0.35)else for J,K in I do D[J]=K end end end end r.Value=0 r:
-_bindAccent(function()paint(false)end)function r:Set(B,C)B=math.clamp(B,0,1)self.Value=B v.Text=C or(math.floor(B*100+
-0.5)..'%')table.remove(z,1)table.insert(z,B)paint(true)end for B=1,s do z[B]=o.Value or 0 end r:Set(o.Value or 0,o.Text)
-return r end function l:AddLabel(o)if type(o)=='string'then o={Text=o}end local p,q=self:_tile({Span=o.Span or 4,Rows=o.
-Rows,NoScale=true})p.AutoButtonColor=false p.Active=false local r=element(self,o,'Label',q)local s=label(p,{Position=
-UDim2.fromOffset(14,12),Size=UDim2.new(1,-28,0,18),Text=o.Title or'',Font=h.Bold,TextSize=15,TextXAlignment=Enum.
-TextXAlignment.Left,TextTruncate=Enum.TextTruncate.AtEnd})local t=label(p,{Position=UDim2.fromOffset(14,if o.Title then
-34 else 12),Size=UDim2.new(1,-28,1,-(if o.Title then 44 else 24)),Text=o.Text or'',TextSize=12,TextColor3=g.Dim,
-TextWrapped=true,TextXAlignment=Enum.TextXAlignment.Left,TextYAlignment=Enum.TextYAlignment.Top})function r:Set(u,v)t.
-Text=u if v then s.Text=v end end return r end function l:_removeTile(o)local p=table.find(self.Tiles,o)if p then table.
-remove(self.Tiles,p)end o.Frame:Destroy()self:_queueLayout()end end end function a.g()local aa=a.cache.g if not aa then
-aa={c=__modImpl()}a.cache.g=aa end return aa.c end end do local function __modImpl()local aa=game:GetService('Players')
-local b=a.a()local c=a.c()local d,e=b.Colors,b.Fonts local f=Enum.EasingStyle.Back local g,h,i=60,8,38 local j,k=32,5
-local l=aa.LocalPlayer local m={{id='tp',icon='send',tip='Teleport'},{id='spectate',icon='camera',tip='Spectate',tipOn=
-'Stop spectating',toggle=true},{id='track',icon='target',tip='Track',tipOn='Untrack',toggle=true},{id='hide',icon=
-'eyeoff',iconOn='eye',tip='Hide',tipOn='Unhide',toggle=true},{id='mute',icon='mute',iconOn='volume',tip='Mute sounds',
-tipOn='Unmute',toggle=true}}local n=game:GetService('TextChatService')local o={}local p=false local function 
-ensureChatHook()if p then return end p=true local q pcall(function()q=n.OnIncomingMessage end)pcall(function()n.
-OnIncomingMessage=function(r)local s=if q then q(r)else nil local t=r.TextSource if t and o[t.UserId]then s=s or
-Instance.new('TextChatMessageProperties')s.Text=''s.PrefixText=''end return s end end)end local function charOf(q)return
-q and q.Character end return function(q)function q:AddPlayerList()local r=self local s=c.create('Frame',{Name=
-'PlayerList',BackgroundTransparency=1,Parent=self.Scroll})local t={Frame=s,Span=4,Rows=1,Height=i}table.insert(self.
-Tiles,t)local u={}local v,w,x={},{},{}local y local z={Destroyed=false}local A=c.create('Frame',{Size=UDim2.new(1,0,0,i)
-,BackgroundColor3=d.Tile,Parent=s})c.corner(A,19)c.stroke(A,0.93)local B=c.icon(A,'search',d.Dim,20)B.Frame.Position=
-UDim2.fromOffset(14,9)local C=c.create('TextBox',{Position=UDim2.fromOffset(42,0),Size=UDim2.new(1,-150,1,0),
-PlaceholderText='Search players',Font=e.Medium,TextSize=13,TextXAlignment=Enum.TextXAlignment.Left,ClipsDescendants=true
-,Parent=A})local D=c.create('TextLabel',{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-18,0,0),Size=UDim2.
-fromOffset(90,i),TextSize=12,TextColor3=d.TextMuted,TextXAlignment=Enum.TextXAlignment.Right,Parent=A})local E=c.create(
-'TextLabel',{Position=UDim2.fromOffset(0,i+h),Size=UDim2.new(1,0,0,56),Text='No other players here',TextSize=14,
-TextColor3=d.TextMuted,Visible=false,Parent=s})local function hidePlayer(F,G)local H=charOf(F)if not H then return end
-for I,J in H:GetDescendants()do if J:IsA('BasePart')then J.LocalTransparencyModifier=if G then 1 else 0 elseif J:IsA(
-'Decal')or J:IsA('Texture')then if G then if J:GetAttribute('LumenT')==nil then J:SetAttribute('LumenT',J.Transparency)
-end J.Transparency=1 else local K=J:GetAttribute('LumenT')if K~=nil then J.Transparency=K J:SetAttribute('LumenT',nil)
-end end end end end local function mutePlayer(F,G,H)o[F.UserId]=G or nil if G then ensureChatHook()end if H then pcall(
-function()local I=game:GetService('VoiceChatInternal')if G then I:SubscribeBlock(F.UserId)else I:SubscribeUnblock(F.
-UserId)end end)end for I,J in F:GetDescendants()do if J:IsA('AudioDeviceInput')then pcall(function()J.Muted=G end)end
-end local I=charOf(F)if not I then return end for J,K in I:GetDescendants()do if K:IsA('Sound')or K:IsA('AudioPlayer')
-then if G then if K:GetAttribute('LumenV')==nil then K:SetAttribute('LumenV',K.Volume)end K.Volume=0 else local L=K:
-GetAttribute('LumenV')if L~=nil then K.Volume=L K:SetAttribute('LumenV',nil)end end elseif K:IsA('AudioDeviceInput')then
-pcall(function()K.Muted=G end)end end end local function clearTrack(F)local G=x[F]if G then G.hl:Destroy()G.gui:Destroy(
-)x[F]=nil end end local function ensureTrack(F)local G=charOf(F)local H=G and G:FindFirstChild('Head')local I=x[F]if not
-H then clearTrack(F)return end if I and I.hl.Parent==G and I.gui.Parent==H then return I end clearTrack(F)local J=
-Instance.new('Highlight')J.Name='LumenTrack'J.FillTransparency=1 J.OutlineColor=b.Colors.Accent J.DepthMode=Enum.
-HighlightDepthMode.AlwaysOnTop J.Parent=G local K=Instance.new('BillboardGui')K.Name='LumenTag'K.Adornee=H K.AlwaysOnTop
-=true K.Size=UDim2.fromOffset(150,30)K.StudsOffset=Vector3.new(0,3,0)K.Parent=H local L=c.create('Frame',{Size=UDim2.
-fromScale(1,1),BackgroundColor3=d.Black,Parent=K})c.corner(L,15)c.stroke(L,0.7)local M=c.create('TextLabel',{Size=UDim2.
-fromScale(1,1),Font=e.Semibold,TextSize=13,Parent=L})I={hl=J,gui=K,label=M}x[F]=I return I end local function 
-setSpectate(F,G)local H=workspace.CurrentCamera if G then local I=y y=F if I and I~=F and v[I]then v[I].set('spectate',
-false,true)end local J=charOf(F)and charOf(F):FindFirstChildOfClass('Humanoid')if J then H.CameraSubject=J end else if y
-==F then y=nil end local I=l.Character and l.Character:FindFirstChildOfClass('Humanoid')if I then H.CameraSubject=I end
-end end local function apply(F,G,H)if G=='hide'then hidePlayer(F,H)elseif G=='mute'then mutePlayer(F,H,true)elseif G==
-'track'then if H then ensureTrack(F)else clearTrack(F)end elseif G=='spectate'then setSpectate(F,H)end end local 
-function ordered()local F={}for G in v do table.insert(F,G)end table.sort(F,function(G,H)return string.lower(G.
-DisplayName)<string.lower(H.DisplayName)end)return F end local function relayout()local F=string.lower(C.Text)local G,H=
-i+h,0 for I,J in ordered()do local K=v[J]local L=F==''or string.find(string.lower(J.DisplayName),F,1,true)or string.
-find(string.lower(J.Name),F,1,true)K.Frame.Visible=L and true or false if L then c.tween(K.Frame,{Position=UDim2.
-fromOffset(0,G)},0.35)G+=g+h H+=1 end end E.Visible=H==0 E.Text=if F==''then'No other players here'else'No matches't.
-Height=if H==0 then i+h+56 else G-h D.Text=H..(if H==1 then' player'else' players')r:_queueLayout()end table.insert(u,C:
-GetPropertyChangedSignal('Text'):Connect(relayout))local function addCard(F)if v[F]or F==l then return end w[F]={}local
-G=c.create('Frame',{Name=F.Name,Position=UDim2.fromOffset(0,i+h+(g+h)*6),Size=UDim2.new(1,0,0,g),BackgroundColor3=d.Tile
-,Parent=s})c.corner(G,18)c.stroke(G,0.93)local H=c.create('UIScale',{Scale=0.94,Parent=G})local I=c.create('ImageLabel',
-{Position=UDim2.fromOffset(10,10),Size=UDim2.fromOffset(40,40),BackgroundTransparency=0,BackgroundColor3=d.Raised,
-ImageTransparency=1,Parent=G})c.corner(I,20)task.spawn(function()local J,K=pcall(function()return aa:
-GetUserThumbnailAsync(F.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size100x100)end)if J and I.Parent then I.
-Image=K c.tween(I,{ImageTransparency=0},0.35)end end)local J=60+(#m*(j+k)-k)+12+8 local K=c.create('TextLabel',{Position
-=UDim2.fromOffset(60,11),Size=UDim2.new(1,-J,0,20),Text=F.DisplayName,Font=e.Bold,TextSize=14,TextXAlignment=Enum.
-TextXAlignment.Left,TextTruncate=Enum.TextTruncate.AtEnd,Parent=G})local L=c.create('TextLabel',{Position=UDim2.
-fromOffset(60,31),Size=UDim2.new(1,-J,0,18),Text='@'..F.Name,TextSize=11,TextColor3=d.Dim,TextXAlignment=Enum.
-TextXAlignment.Left,TextTruncate=Enum.TextTruncate.AtEnd,Parent=G})local M={}local function render(N,O)local P=M[N]local
-Q=w[F][N]==true local R=b.Colors.Accent local S={BackgroundColor3=if Q then R else d.Raised}if O then c.tween(P.Button,S
-,0.25)else P.Button.BackgroundColor3=S.BackgroundColor3 end local T=if Q then b.onAccent(R)else d.Dim P.Icon:SetColor(T,
-O)if P.IconOn then P.IconOn:SetColor(T,O)P.Icon.Frame.Visible=not Q P.IconOn.Frame.Visible=Q end P.Tip=if Q and P.Action
-.tipOn then P.Action.tipOn else P.Action.tip end local N=false local function set(O,P,Q)w[F][O]=P render(O,true)if not Q
-then apply(F,O,P)end if O=='hide'then if P and not w[F].mute then N=true w[F].mute=true render('mute',true)apply(F,
-'mute',true)elseif not P and N then N=false w[F].mute=false render('mute',true)apply(F,'mute',false)end elseif O=='mute'
-and not P then N=false end end for O,P in m do local Q=c.create('TextButton',{Name=P.id,AnchorPoint=Vector2.new(1,0.5),
-Position=UDim2.new(1,-10-(#m-O)*(j+k),0.5,0),Size=UDim2.fromOffset(j,j),BackgroundTransparency=0,BackgroundColor3=d.
-Raised,Parent=G})c.corner(Q,j//2)local R={Button=Q,Action=P,Tip=P.tip}R.Icon=c.icon(Q,P.icon,d.Dim,20)R.Icon.Frame.
-Position=UDim2.fromOffset(6,6)if P.iconOn then R.IconOn=c.icon(Q,P.iconOn,d.Dim,20)R.IconOn.Frame.Position=UDim2.
-fromOffset(6,6)R.IconOn.Frame.Visible=false end M[P.id]=R local S=c.create('UIScale',{Parent=Q})Q.MouseEnter:Connect(
-function()r.Window.Lib:_showTip(Q,R.Tip)c.tween(S,{Scale=1.08},0.25,f)if w[F][P.id]~=true then c.tween(Q,{
-BackgroundColor3=d.TileHi},0.12)end end)Q.MouseLeave:Connect(function()r.Window.Lib:_hideTip()c.tween(S,{Scale=1},0.2)if
-w[F][P.id]~=true then c.tween(Q,{BackgroundColor3=d.Raised},0.18)end end)Q.MouseButton1Down:Connect(function()c.tween(S,
-{Scale=0.9},0.08)end)Q.MouseButton1Up:Connect(function()c.tween(S,{Scale=1.08},0.3,f)end)Q.MouseButton1Click:Connect(
-function()if P.id=='tp'then local T=l.Character and l.Character:FindFirstChild('HumanoidRootPart')local U=charOf(F)and
-charOf(F):FindFirstChild('HumanoidRootPart')if T and U then T.CFrame=U.CFrame*CFrame.new(0,0,4)end else set(P.id,not w[F
-][P.id])r.Window.Lib:_showTip(Q,R.Tip)end end)end v[F]={Frame=G,Sub=L,set=set}c.tween(H,{Scale=1},0.6,f)relayout()end
-local function removeCard(F)local G=v[F]if not G then return end hidePlayer(F,false)mutePlayer(F,false,true)clearTrack(F
-)if y==F then setSpectate(F,false)end v[F]=nil w[F]=nil G.Frame:Destroy()relayout()end for F,G in aa:GetPlayers()do
-addCard(G)end table.insert(u,aa.PlayerAdded:Connect(addCard))table.insert(u,aa.PlayerRemoving:Connect(removeCard))task.
-spawn(function()local F=0 while not z.Destroyed and s.Parent do task.wait(0.25)F+=1 local G=l.Character and l.Character:
-FindFirstChild('HumanoidRootPart')for H,I in v do local J=charOf(H)and charOf(H):FindFirstChild('HumanoidRootPart')local
-K=w[H]if G and J then I.Sub.Text=string.format('@%s  \u{b7}  %d studs',H.Name,(G.Position-J.Position).Magnitude)else I.
-Sub.Text='@'..H.Name end if F%2==0 then if K.hide then hidePlayer(H,true)end if K.mute then mutePlayer(H,true,false)end
-end if K.track then local L=ensureTrack(H)if L then L.hl.OutlineColor=b.Colors.Accent L.label.Text=string.format(
-'%s \u{b7} %d',H.DisplayName,if G and J then(G.Position-J.Position).Magnitude else 0)end end if y==H then local L=
-charOf(H)and charOf(H):FindFirstChildOfClass('Humanoid')if L and workspace.CurrentCamera.CameraSubject~=L then workspace
-.CurrentCamera.CameraSubject=L end end end end end)function z:Destroy()self.Destroyed=true for F,G in u do G:Disconnect(
-)end for F in table.clone(v)do removeCard(F)end local F=table.find(r.Tiles,t)if F then table.remove(r.Tiles,F)end s:
-Destroy()r:_queueLayout()end table.insert(self.Window.Lib.Cleanups,function()z:Destroy()end)self:_queueLayout()return z
-end end end function a.h()local aa=a.cache.h if not aa then aa={c=__modImpl()}a.cache.h=aa end return aa.c end end do
-local function __modImpl()local aa={0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,
-0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786
-,0xfc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3
-,0xd5a79147,0x6ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85
-,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,
-0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa
-,0xa4506ceb,0xbef9a3f7,0xc67178f2}local b,c,d,e,f=bit32.band,bit32.bxor,bit32.bnot,bit32.rrotate,bit32.rshift local 
-function sha256(g)local h=#g g=g..'\128'..string.rep('\0',(55-h)%64)..string.pack('>I4I4',0,(h*8)%4294967296)local i,j,k
-,l,m,n,o,p=0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19 local q=table.create(
-64,0)for r=0,#g//64-1 do local s=r*64+1 for t=1,16 do q[t]=string.unpack('>I4',g,s+(t-1)*4)end for t=17,64 do local u,v=
-q[t-15],q[t-2]local w=c(e(u,7),e(u,18),f(u,3))local x=c(e(v,17),e(v,19),f(v,10))q[t]=(q[t-16]+w+q[t-7]+x)%4294967296 end
-local t,u,v,w,x,y,z,A=i,j,k,l,m,n,o,p for B=1,64 do local C=c(e(x,6),e(x,11),e(x,25))local D=c(b(x,y),b(d(x),z))local E=
-(A+C+D+aa[B]+q[B])%4294967296 local F=c(e(t,2),e(t,13),e(t,22))local G=c(b(t,u),b(t,v),b(u,v))local H=(F+G)%4294967296 A
-,z,y,x,w,v,u,t=z,y,x,(w+E)%4294967296,v,u,t,(E+H)%4294967296 end i=(i+t)%4294967296 j=(j+u)%4294967296 k=(k+v)%
-4294967296 l=(l+w)%4294967296 m=(m+x)%4294967296 n=(n+y)%4294967296 o=(o+z)%4294967296 p=(p+A)%4294967296 end return
-string.pack('>I4I4I4I4I4I4I4I4',i,j,k,l,m,n,o,p)end return sha256 end function a.i()local aa=a.cache.i if not aa then aa
-={c=__modImpl()}a.cache.i=aa end return aa.c end end do local function __modImpl()local aa=game:GetService('HttpService'
-)local b=a.d()local c=a.b()local d=a.i()local e='https://api.spotify.com/v1'local f='https://accounts.spotify.com'local
-g='http://127.0.0.1:8888/callback'local h=table.concat({'user-read-playback-state','user-modify-playback-state',
-'user-read-currently-playing','user-library-read','playlist-read-private','playlist-read-collaborative',
-'user-read-recently-played','user-follow-read'},' ')local function httpFn()return(syn and syn.request)or(http and http.
-request)or http_request or request or(fluxus and fluxus.request)end local i=
-[[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_]]local function b64url(j)local k={}for l=1,#j,3 do
-local m,n,o=string.byte(j,l,l+2)local p=m*65536+(n or 0)*256+(o or 0)local q,r,s,t=p//262144,(p//4096)%64,(p//64)%64,p%
-64 k[#k+1]=string.sub(i,q+1,q+1)..string.sub(i,r+1,r+1)if n then k[#k+1]=string.sub(i,s+1,s+1)end if o then k[#k+1]=
-string.sub(i,t+1,t+1)end end return table.concat(k)end local j=
+)*40,0,math.max(#s*40+12-y,0)))end local B={}local function viewed()if not o.Preview then return end local C=A.
+CanvasPosition.Y for D,E in B do local F=(D-1)*40 if not E.seen and F+40>C and F<C+y then E.seen=true o.Preview(E.value,
+E.label,true)end end end local C=0 if o.Preview then pcall(function()A:GetPropertyChangedSignal('CanvasPosition'):
+Connect(function()C+=1 local D=C task.delay(0.25,function()if D==C and A.Parent then viewed()end end)end)end)end for D,E
+in s do local F=d.create('TextButton',{Position=UDim2.fromOffset(0,(D-1)*40),Size=UDim2.new(1,0,0,40),Parent=A})d.
+corner(F,14)F.BackgroundColor3=g.Raised local G=label(F,{Position=UDim2.fromOffset(14,0),Size=UDim2.new(1,-44,1,0),Text=
+tostring(E),Font=h.Medium,TextSize=14,TextXAlignment=Enum.TextXAlignment.Left})if o.Preview then B[D]={value=E,label=G}o
+.Preview(E,G,false)end local H=d.create('Frame',{AnchorPoint=Vector2.new(1,0.5),Position=UDim2.new(1,-14,0.5,0),Size=
+UDim2.fromOffset(8,8),BackgroundColor3=c.Colors.Accent,Parent=F})d.corner(H,4)local function selected()if t then return
+table.find(r.Value,E)~=nil end return r.Value==E end H.BackgroundTransparency=if selected()then 0 else 1 F.MouseEnter:
+Connect(function()d.tween(F,{BackgroundTransparency=0},0.12)end)F.MouseLeave:Connect(function()d.tween(F,{
+BackgroundTransparency=1},0.18)end)F.MouseButton1Click:Connect(function()if t then local I=table.clone(r.Value)local J=
+table.find(I,E)if J then table.remove(I,J)else table.insert(I,E)end r:Set(I)d.tween(H,{BackgroundTransparency=if
+selected()then 0 else 1},0.15)else r:Set(E)w:_closePopup()end end)end viewed()end)end)return r end function l:
+AddSegmented(o)local p,q=self:_tile({Span=o.Span or 2,Rows=o.Rows})local r=element(self,o,'Segmented',q)local s=self.
+Window.Lib local t=o.Values or{}r.Value=o.Default or t[1]if r.Name and s.Recall then local u=s:Recall('segmented',r.Name
+)if u~=nil and table.find(t,u)then r.Value=u end end captionAndValue(p,o.Name)local u=math.max(#t,1)local v=d.create(
+'Frame',{AnchorPoint=Vector2.new(0,1),Position=UDim2.new(0,12,1,-12),Size=UDim2.new(1,-24,0,32),BackgroundColor3=g.
+Raised,Parent=p})d.corner(v,16)local w=d.create('Frame',{Size=UDim2.new(1/u,-4,1,-4),Position=UDim2.fromOffset(2,2),
+Parent=v})d.corner(w,14)local x={}for y,z in t do local A=d.create('TextButton',{Position=UDim2.fromScale((y-1)/u,0),
+Size=UDim2.fromScale(1/u,1),Text=tostring(z),Font=h.Semibold,TextSize=12,ZIndex=2,Parent=v})x[z]=A A.MouseButton1Click:
+Connect(function()r:Set(z)end)end local function render(y)local z=c.Colors.Accent local A=table.find(t,r.Value)or 1 w.
+BackgroundColor3=z local B=UDim2.new((A-1)/u,2,0,2)if y then d.tween(w,{Position=B},0.4,i)else w.Position=B end for C,D
+in x do set(D,{TextColor3=if C==r.Value then c.onAccent(z)else g.Dim},y,0.2)end end r:_bindAccent(function()render(false
+)end)function r:Set(y,z)if y==self.Value or not table.find(t,y)then return end self.Value=y if self.Name and s.Remember
+then s:Remember('segmented',self.Name,self.Value)end render(true)if not z then self:_fire(y)end end function r:Get()
+return self.Value end return r end function l:AddInput(o)local p,q=self:_tile({Span=o.Span or 2,Rows=o.Rows})local r=
+element(self,o,'Input',q)local s=self.Window.Lib r.Value=o.Default or''if r.Name and s.Recall then local t=s:Recall(
+'inputs',r.Name)if t~=nil then r.Value=tostring(t)end end captionAndValue(p,o.Name)local t=d.create('TextBox',{
+AnchorPoint=Vector2.new(0,1),Position=UDim2.new(0,14,1,-22),Size=UDim2.new(1,-28,0,24),Text=r.Value,PlaceholderText=o.
+Placeholder or'Type here',Font=h.Bold,TextSize=17,TextXAlignment=Enum.TextXAlignment.Left,ClipsDescendants=true,Parent=p
+})local u=d.create('Frame',{AnchorPoint=Vector2.new(0,1),Position=UDim2.new(0,14,1,-13),Size=UDim2.new(1,-28,0,2),
+BackgroundColor3=g.Raised,Parent=p})d.corner(u,1)t.Focused:Connect(function()d.tween(u,{BackgroundColor3=c.Colors.Accent
+},0.2)end)t.FocusLost:Connect(function(v)d.tween(u,{BackgroundColor3=g.Raised},0.2)r.Value=t.Text if r.Name and s.
+Remember then s:Remember('inputs',r.Name,r.Value)end r:_fire(t.Text,v)end)function r:Set(v,w)self.Value=tostring(v)t.
+Text=self.Value if self.Name and s.Remember then s:Remember('inputs',self.Name,self.Value)end if not w then self:_fire(
+self.Value,false)end end function r:Get()return self.Value end return r end function l:AddKeybind(o)local p,q=self:
+_tile({Span=o.Span,Rows=o.Rows})local r=element(self,o,'Keybind',q)local s=self.Window.Lib r.Value=o.Default if r.Name
+and s.Recall then local t=s:Recall('keybinds',r.Name)if t~=nil then r.Value=if t==false then nil else Enum.KeyCode[t]end
+end local t=label(p,{Position=UDim2.fromOffset(14,12),Size=UDim2.new(1,-28,0,28),Font=h.Bold,TextSize=20,TextXAlignment=
+Enum.TextXAlignment.Left,TextTruncate=Enum.TextTruncate.AtEnd})local u=bottomLabel(p,28,13,h.Semibold,g.Text)u.Text=o.
+Name or''local v=bottomLabel(p,12,11,h.Medium,g.TextMuted)v.Text='Click to rebind'local w=false local function render()t
+.Text=if r.Value then r.Value.Name else'None't.TextColor3=if w then c.Colors.Accent else g.Text if w then t.Text=
+'Press a key\u{2026}'end end render()p.MouseButton1Click:Connect(function()w=true v.Text='Esc to clear'render()end)local
+x=aa.InputBegan:Connect(function(x,y)if x.UserInputType~=Enum.UserInputType.Keyboard then return end if w then w=false v
+.Text='Click to rebind'local z=if x.KeyCode==Enum.KeyCode.Escape then nil else x.KeyCode r.Value=z render()if r.Name and
+s.Remember then s:Remember('keybinds',r.Name,if z then z.Name else false)end r:_fire(r.Value,false)elseif not y and r.
+Value and x.KeyCode==r.Value then r:_fire(r.Value,true)end end)table.insert(r._cleanup,function()x:Disconnect()end)
+function r:Set(y,z)self.Value=y render()if self.Name and s.Remember then s:Remember('keybinds',self.Name,if y then y.
+Name else false)end if not z then self:_fire(y,false)end end function r:Get()return self.Value end return r end function
+l:AddColor(o)local p,q=self:_tile({Span=o.Span or 2,Rows=o.Rows})local r=element(self,o,'Color',q)local s=self.Window.
+Lib r.Value=o.Default or j[1]if r.Name and s.Recall then local t=s:Recall('colors',r.Name)if type(t)=='table'and t[1]and
+t[2]and t[3]then r.Value=Color3.new(t[1],t[2],t[3])end end captionAndValue(p,o.Name)local t=d.create('Frame',{
+AnchorPoint=Vector2.new(0,1),Position=UDim2.new(0,14,1,-14),Size=UDim2.new(1,-28,0,24),BackgroundTransparency=1,Parent=p
+})d.list(t,10,Enum.FillDirection.Horizontal,Enum.HorizontalAlignment.Left,Enum.VerticalAlignment.Center)local u={}for v,
+w in j do local x=d.create('TextButton',{Size=UDim2.fromOffset(22,22),BackgroundTransparency=0,BackgroundColor3=w,Parent
+=t})d.corner(x,11)local y=d.stroke(x,1,g.White,2)y.ApplyStrokeMode=Enum.ApplyStrokeMode.Border u[w]={ring=y,button=x}x.
+MouseButton1Click:Connect(function()r:Set(w)end)x.MouseEnter:Connect(function()d.tween(x,{Size=UDim2.fromOffset(25,25)},
+0.2,i)end)x.MouseLeave:Connect(function()d.tween(x,{Size=UDim2.fromOffset(22,22)},0.2)end)end local v if o.Picker then v
+=d.create('TextButton',{Size=UDim2.fromOffset(22,22),BackgroundTransparency=0,BackgroundColor3=Color3.new(1,1,1),Parent=
+t})d.corner(v,11)d.create('UIGradient',{Rotation=90,Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.fromRGB(
+255,69,58)),ColorSequenceKeypoint.new(0.2,Color3.fromRGB(255,214,10)),ColorSequenceKeypoint.new(0.4,Color3.fromRGB(48,
+209,88)),ColorSequenceKeypoint.new(0.6,Color3.fromRGB(10,132,255)),ColorSequenceKeypoint.new(0.8,Color3.fromRGB(191,90,
+242)),ColorSequenceKeypoint.new(1,Color3.fromRGB(255,69,58))}),Parent=v})local w=d.stroke(v,1,g.White,2)w.
+ApplyStrokeMode=Enum.ApplyStrokeMode.Border u[v]={ring=w,button=v,custom=true}end local function render()local w=false
+for x,y in u do if not y.custom and x==r.Value then w=true end end for x,y in u do local z=if y.custom then not w else x
+==r.Value d.tween(y.ring,{Transparency=if z then 0 else 1},0.2)end end render()function r:Set(w,x)self.Value=w render()
+if self.Name and s.Remember then s:Remember('colors',self.Name,{w.R,w.G,w.B})end if not x then self:_fire(w)end end
+function r:Get()return self.Value end if v then v.MouseButton1Click:Connect(function()if s._popup and s._popup.Owner==p
+then s:_closePopup()return end s:_openPopup(p,200,function(w)local x,y,z=colorToHsv(r.Value)local A=d.create(
+'CanvasGroup',{Position=UDim2.fromOffset(12,12),Size=UDim2.new(1,-24,0,112),BackgroundColor3=hsvToColor(x,1,1),
+ClipsDescendants=true,Parent=w})d.corner(A,10)local B=d.create('Frame',{Size=UDim2.fromScale(1,1),BackgroundColor3=
+Color3.new(1,1,1),Parent=A})d.corner(B,10)d.create('UIGradient',{Transparency=NumberSequence.new(0,1),Parent=B})local C=
+d.create('Frame',{Size=UDim2.fromScale(1,1),BackgroundColor3=Color3.new(0,0,0),Parent=A})d.corner(C,10)d.create(
+'UIGradient',{Rotation=90,Transparency=NumberSequence.new(1,0),Parent=C})local D=d.create('Frame',{AnchorPoint=Vector2.
+new(0.5,0.5),Size=UDim2.fromOffset(14,14),BackgroundTransparency=1,ZIndex=3,Parent=A})d.corner(D,7)d.stroke(D,0,g.White,
+2).ApplyStrokeMode=Enum.ApplyStrokeMode.Border local E=d.create('Frame',{Position=UDim2.fromOffset(12,134),Size=UDim2.
+new(1,-24,0,14),BackgroundColor3=Color3.new(1,1,1),Parent=w})d.corner(E,7)local F={}for G=0,6 do table.insert(F,
+ColorSequenceKeypoint.new(G/6,hsvToColor(G/6,1,1)))end d.create('UIGradient',{Color=ColorSequence.new(F),Parent=E})local
+G=d.create('Frame',{AnchorPoint=Vector2.new(0.5,0.5),Size=UDim2.fromOffset(6,20),BackgroundColor3=Color3.new(1,1,1),
+Parent=E})d.corner(G,3)local H=d.create('TextBox',{Position=UDim2.fromOffset(12,160),Size=UDim2.new(1,-60,0,28),Text=
+hexOf(r.Value),PlaceholderText='#rrggbb',Font=h.Bold,TextSize=14,BackgroundColor3=g.Raised,TextColor3=g.Text,
+ClearTextOnFocus=false,Parent=w})d.corner(H,10)local I=d.create('Frame',{AnchorPoint=Vector2.new(1,0),Position=UDim2.
+new(1,-12,0,160),Size=UDim2.fromOffset(28,28),BackgroundColor3=r.Value,Parent=w})d.corner(I,14)local function local_(J)
+return J-game:GetService('GuiService'):GetGuiInset()end local function show()A.BackgroundColor3=hsvToColor(x,1,1)D.
+Position=UDim2.fromScale(y,1-z)G.Position=UDim2.fromScale(x,0.5)end local function apply(J)local K=hsvToColor(x,y,z)I.
+BackgroundColor3=K if not J then H.Text=hexOf(K)end r:Set(K)end show()d.trackDrag(A,function(J)local K,L,M=local_(J),A.
+AbsolutePosition,A.AbsoluteSize y=math.clamp((K.X-L.X)/math.max(M.X,1),0,1)z=1-math.clamp((K.Y-L.Y)/math.max(M.Y,1),0,1)
+show()apply()end)d.trackDrag(E,function(J)x=math.clamp((local_(J).X-E.AbsolutePosition.X)/math.max(E.AbsoluteSize.X,1),0
+,1)show()apply()end)H.FocusLost:Connect(function()local J,K,L=string.match(H.Text,'^#?(%x%x)(%x%x)(%x%x)$')if J then
+local M=Color3.fromRGB(tonumber(J,16),tonumber(K,16),tonumber(L,16))x,y,z=colorToHsv(M)show()I.BackgroundColor3=M H.Text
+=hexOf(M)r:Set(M)else H.Text=hexOf(r.Value)end end)end)end)end return r end function l:AddProgress(o)local p,q=self:
+_tile({Span=o.Span or 2,Rows=o.Rows})local r=element(self,o,'Progress',q)local s=o.Samples or 22 local t=48 local u=
+captionAndValue(p,o.Name)u.Size=UDim2.new(0.5,-14,0,14)local v=label(p,{AnchorPoint=Vector2.new(0,1),Position=UDim2.new(
+0,14,1,-12),Size=UDim2.new(0.5,-14,0,28),Font=h.Bold,TextSize=22,TextXAlignment=Enum.TextXAlignment.Left,TextTruncate=
+Enum.TextTruncate.AtEnd})local w=d.create('Frame',{AnchorPoint=Vector2.new(1,1),Position=UDim2.new(1,-14,1,-14),Size=
+UDim2.new(0.46,0,0,t),BackgroundTransparency=1,ClipsDescendants=true,Parent=p})local x=d.create('Frame',{AnchorPoint=
+Vector2.new(0,1),Position=UDim2.fromScale(0,1),Size=UDim2.new(1,0,0,1),BackgroundColor3=g.Raised,BorderSizePixel=0,
+Parent=w})local y,z={},{}for A=1,s do z[A]=0 local B=d.create('Frame',{AnchorPoint=Vector2.new(0,1),BackgroundColor3=g.
+Raised,BorderSizePixel=0,Parent=w})d.corner(B,2)y[A]=B end local A=3 for B,C in y do C.Position=UDim2.new((B-1)/s,(B-1)*
+A/s,1,-3)end local function paint(B)for C,D in y do local E=z[C]local F=math.max(math.floor(E*(t-4)+0.5),3)local G=if o.
+Color then o.Color(E)else c.Colors.Accent local H=(s-C)/s local I={Size=UDim2.new(1/s,-A*(s-1)/s,0,F),BackgroundColor3=G
+,BackgroundTransparency=math.clamp(0.15+H*0.75,0,0.9)}if B then d.tween(D,I,0.35)else for J,K in I do D[J]=K end end end
+end r.Value=0 r:_bindAccent(function()paint(false)end)function r:Set(B,C)B=math.clamp(B,0,1)self.Value=B v.Text=C or(
+math.floor(B*100+0.5)..'%')table.remove(z,1)table.insert(z,B)paint(true)end for B=1,s do z[B]=o.Value or 0 end r:Set(o.
+Value or 0,o.Text)return r end function l:AddPreview(o)o=o or{}local p,q=self:_tile({Span=o.Span or 4,Rows=o.Rows or 2,
+NoScale=true})p.AutoButtonColor=false p.Active=false local r=element(self,o,'Preview',q)local s=d.create('Frame',{Size=
+UDim2.fromScale(1,1),BackgroundTransparency=1,ClipsDescendants=true,Parent=p})r.Host=s return r end function l:AddLabel(
+o)if type(o)=='string'then o={Text=o}end local p,q=self:_tile({Span=o.Span or 4,Rows=o.Rows,NoScale=true})p.
+AutoButtonColor=false p.Active=false local r=element(self,o,'Label',q)local s=label(p,{Position=UDim2.fromOffset(14,12),
+Size=UDim2.new(1,-28,0,18),Text=o.Title or'',Font=h.Bold,TextSize=15,TextXAlignment=Enum.TextXAlignment.Left,
+TextTruncate=Enum.TextTruncate.AtEnd})local t=label(p,{Position=UDim2.fromOffset(14,if o.Title then 34 else 12),Size=
+UDim2.new(1,-28,1,-(if o.Title then 44 else 24)),Text=o.Text or'',TextSize=12,TextColor3=g.Dim,TextWrapped=true,
+TextXAlignment=Enum.TextXAlignment.Left,TextYAlignment=Enum.TextYAlignment.Top})function r:Set(u,v)t.Text=u if v then s.
+Text=v end end return r end function l:_removeTile(o)local p=table.find(self.Tiles,o)if p then table.remove(self.Tiles,p
+)end o.Frame:Destroy()self:_queueLayout()end end end function a.g()local aa=a.cache.g if not aa then aa={c=__modImpl()}a
+.cache.g=aa end return aa.c end end do local function __modImpl()local aa=game:GetService('Players')local b=a.a()local c
+=a.c()local d,e=b.Colors,b.Fonts local f=Enum.EasingStyle.Back local g,h,i=60,8,38 local j,k=32,5 local l=aa.LocalPlayer
+local m={{id='tp',icon='send',tip='Teleport'},{id='spectate',icon='camera',tip='Spectate',tipOn='Stop spectating',toggle
+=true},{id='track',icon='target',tip='Track',tipOn='Untrack',toggle=true},{id='hide',icon='eyeoff',iconOn='eye',tip=
+'Hide',tipOn='Unhide',toggle=true},{id='mute',icon='mute',iconOn='volume',tip='Mute sounds',tipOn='Unmute',toggle=true}}
+local n=game:GetService('TextChatService')local o={}local p=false local function ensureChatHook()if p then return end p=
+true local q pcall(function()q=n.OnIncomingMessage end)pcall(function()n.OnIncomingMessage=function(r)local s=if q then
+q(r)else nil local t=r.TextSource if t and o[t.UserId]then s=s or Instance.new('TextChatMessageProperties')s.Text=''s.
+PrefixText=''end return s end end)end local function charOf(q)return q and q.Character end return function(q)function q:
+AddPlayerList()local r=self local s=c.create('Frame',{Name='PlayerList',BackgroundTransparency=1,Parent=self.Scroll})
+local t={Frame=s,Span=4,Rows=1,Height=i}table.insert(self.Tiles,t)local u={}local v,w,x={},{},{}local y local z={
+Destroyed=false}local A=c.create('Frame',{Size=UDim2.new(1,0,0,i),BackgroundColor3=d.Tile,Parent=s})c.corner(A,19)c.
+stroke(A,0.93)local B=c.icon(A,'search',d.Dim,20)B.Frame.Position=UDim2.fromOffset(14,9)local C=c.create('TextBox',{
+Position=UDim2.fromOffset(42,0),Size=UDim2.new(1,-150,1,0),PlaceholderText='Search players',Font=e.Medium,TextSize=13,
+TextXAlignment=Enum.TextXAlignment.Left,ClipsDescendants=true,Parent=A})local D=c.create('TextLabel',{AnchorPoint=
+Vector2.new(1,0),Position=UDim2.new(1,-18,0,0),Size=UDim2.fromOffset(90,i),TextSize=12,TextColor3=d.TextMuted,
+TextXAlignment=Enum.TextXAlignment.Right,Parent=A})local E=c.create('TextLabel',{Position=UDim2.fromOffset(0,i+h),Size=
+UDim2.new(1,0,0,56),Text='No other players here',TextSize=14,TextColor3=d.TextMuted,Visible=false,Parent=s})local 
+function hidePlayer(F,G)local H=charOf(F)if not H then return end for I,J in H:GetDescendants()do if J:IsA('BasePart')
+then J.LocalTransparencyModifier=if G then 1 else 0 elseif J:IsA('Decal')or J:IsA('Texture')then if G then if J:
+GetAttribute('LumenT')==nil then J:SetAttribute('LumenT',J.Transparency)end J.Transparency=1 else local K=J:
+GetAttribute('LumenT')if K~=nil then J.Transparency=K J:SetAttribute('LumenT',nil)end end end end end local function 
+mutePlayer(F,G,H)o[F.UserId]=G or nil if G then ensureChatHook()end if H then pcall(function()local I=game:GetService(
+'VoiceChatInternal')if G then I:SubscribeBlock(F.UserId)else I:SubscribeUnblock(F.UserId)end end)end for I,J in F:
+GetDescendants()do if J:IsA('AudioDeviceInput')then pcall(function()J.Muted=G end)end end local I=charOf(F)if not I then
+return end for J,K in I:GetDescendants()do if K:IsA('Sound')or K:IsA('AudioPlayer')then if G then if K:GetAttribute(
+'LumenV')==nil then K:SetAttribute('LumenV',K.Volume)end K.Volume=0 else local L=K:GetAttribute('LumenV')if L~=nil then
+K.Volume=L K:SetAttribute('LumenV',nil)end end elseif K:IsA('AudioDeviceInput')then pcall(function()K.Muted=G end)end
+end end local function clearTrack(F)local G=x[F]if G then G.hl:Destroy()G.gui:Destroy()x[F]=nil end end local function 
+ensureTrack(F)local G=charOf(F)local H=G and G:FindFirstChild('Head')local I=x[F]if not H then clearTrack(F)return end
+if I and I.hl.Parent==G and I.gui.Parent==H then return I end clearTrack(F)local J=Instance.new('Highlight')J.Name=
+'LumenTrack'J.FillTransparency=1 J.OutlineColor=b.Colors.Accent J.DepthMode=Enum.HighlightDepthMode.AlwaysOnTop J.Parent
+=G local K=Instance.new('BillboardGui')K.Name='LumenTag'K.Adornee=H K.AlwaysOnTop=true K.Size=UDim2.fromOffset(150,30)K.
+StudsOffset=Vector3.new(0,3,0)K.Parent=H local L=c.create('Frame',{Size=UDim2.fromScale(1,1),BackgroundColor3=d.Black,
+Parent=K})c.corner(L,15)c.stroke(L,0.7)local M=c.create('TextLabel',{Size=UDim2.fromScale(1,1),Font=e.Semibold,TextSize=
+13,Parent=L})I={hl=J,gui=K,label=M}x[F]=I return I end local function setSpectate(F,G)local H=workspace.CurrentCamera if
+G then local I=y y=F if I and I~=F and v[I]then v[I].set('spectate',false,true)end local J=charOf(F)and charOf(F):
+FindFirstChildOfClass('Humanoid')if J then H.CameraSubject=J end else if y==F then y=nil end local I=l.Character and l.
+Character:FindFirstChildOfClass('Humanoid')if I then H.CameraSubject=I end end end local function apply(F,G,H)if G==
+'hide'then hidePlayer(F,H)elseif G=='mute'then mutePlayer(F,H,true)elseif G=='track'then if H then ensureTrack(F)else
+clearTrack(F)end elseif G=='spectate'then setSpectate(F,H)end end local function ordered()local F={}for G in v do table.
+insert(F,G)end table.sort(F,function(G,H)return string.lower(G.DisplayName)<string.lower(H.DisplayName)end)return F end
+local function relayout()local F=string.lower(C.Text)local G,H=i+h,0 for I,J in ordered()do local K=v[J]local L=F==''or
+string.find(string.lower(J.DisplayName),F,1,true)or string.find(string.lower(J.Name),F,1,true)K.Frame.Visible=L and true
+or false if L then c.tween(K.Frame,{Position=UDim2.fromOffset(0,G)},0.35)G+=g+h H+=1 end end E.Visible=H==0 E.Text=if F
+==''then'No other players here'else'No matches't.Height=if H==0 then i+h+56 else G-h D.Text=H..(if H==1 then' player'
+else' players')r:_queueLayout()end table.insert(u,C:GetPropertyChangedSignal('Text'):Connect(relayout))local function 
+addCard(F)if v[F]or F==l then return end w[F]={}local G=c.create('Frame',{Name=F.Name,Position=UDim2.fromOffset(0,i+h+(g
++h)*6),Size=UDim2.new(1,0,0,g),BackgroundColor3=d.Tile,Parent=s})c.corner(G,18)c.stroke(G,0.93)local H=c.create(
+'UIScale',{Scale=0.94,Parent=G})local I=c.create('ImageLabel',{Position=UDim2.fromOffset(10,10),Size=UDim2.fromOffset(40
+,40),BackgroundTransparency=0,BackgroundColor3=d.Raised,ImageTransparency=1,Parent=G})c.corner(I,20)task.spawn(function(
+)local J,K=pcall(function()return aa:GetUserThumbnailAsync(F.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.
+Size100x100)end)if J and I.Parent then I.Image=K c.tween(I,{ImageTransparency=0},0.35)end end)local J=60+(#m*(j+k)-k)+12
++8 local K=c.create('TextLabel',{Position=UDim2.fromOffset(60,11),Size=UDim2.new(1,-J,0,20),Text=F.DisplayName,Font=e.
+Bold,TextSize=14,TextXAlignment=Enum.TextXAlignment.Left,TextTruncate=Enum.TextTruncate.AtEnd,Parent=G})local L=c.
+create('TextLabel',{Position=UDim2.fromOffset(60,31),Size=UDim2.new(1,-J,0,18),Text='@'..F.Name,TextSize=11,TextColor3=d
+.Dim,TextXAlignment=Enum.TextXAlignment.Left,TextTruncate=Enum.TextTruncate.AtEnd,Parent=G})local M={}local function 
+render(N,O)local P=M[N]local Q=w[F][N]==true local R=b.Colors.Accent local S={BackgroundColor3=if Q then R else d.Raised
+}if O then c.tween(P.Button,S,0.25)else P.Button.BackgroundColor3=S.BackgroundColor3 end local T=if Q then b.onAccent(R)
+else d.Dim P.Icon:SetColor(T,O)if P.IconOn then P.IconOn:SetColor(T,O)P.Icon.Frame.Visible=not Q P.IconOn.Frame.Visible=
+Q end P.Tip=if Q and P.Action.tipOn then P.Action.tipOn else P.Action.tip end local N=false local function set(O,P,Q)w[F
+][O]=P render(O,true)if not Q then apply(F,O,P)end if O=='hide'then if P and not w[F].mute then N=true w[F].mute=true
+render('mute',true)apply(F,'mute',true)elseif not P and N then N=false w[F].mute=false render('mute',true)apply(F,'mute'
+,false)end elseif O=='mute'and not P then N=false end end for O,P in m do local Q=c.create('TextButton',{Name=P.id,
+AnchorPoint=Vector2.new(1,0.5),Position=UDim2.new(1,-10-(#m-O)*(j+k),0.5,0),Size=UDim2.fromOffset(j,j),
+BackgroundTransparency=0,BackgroundColor3=d.Raised,Parent=G})c.corner(Q,j//2)local R={Button=Q,Action=P,Tip=P.tip}R.Icon
+=c.icon(Q,P.icon,d.Dim,20)R.Icon.Frame.Position=UDim2.fromOffset(6,6)if P.iconOn then R.IconOn=c.icon(Q,P.iconOn,d.Dim,
+20)R.IconOn.Frame.Position=UDim2.fromOffset(6,6)R.IconOn.Frame.Visible=false end M[P.id]=R local S=c.create('UIScale',{
+Parent=Q})Q.MouseEnter:Connect(function()r.Window.Lib:_showTip(Q,R.Tip)c.tween(S,{Scale=1.08},0.25,f)if w[F][P.id]~=true
+then c.tween(Q,{BackgroundColor3=d.TileHi},0.12)end end)Q.MouseLeave:Connect(function()r.Window.Lib:_hideTip()c.tween(S,
+{Scale=1},0.2)if w[F][P.id]~=true then c.tween(Q,{BackgroundColor3=d.Raised},0.18)end end)Q.MouseButton1Down:Connect(
+function()c.tween(S,{Scale=0.9},0.08)end)Q.MouseButton1Up:Connect(function()c.tween(S,{Scale=1.08},0.3,f)end)Q.
+MouseButton1Click:Connect(function()if P.id=='tp'then local T=l.Character and l.Character:FindFirstChild(
+'HumanoidRootPart')local U=charOf(F)and charOf(F):FindFirstChild('HumanoidRootPart')if T and U then T.CFrame=U.CFrame*
+CFrame.new(0,0,4)end else set(P.id,not w[F][P.id])r.Window.Lib:_showTip(Q,R.Tip)end end)end v[F]={Frame=G,Sub=L,set=set}
+c.tween(H,{Scale=1},0.6,f)relayout()end local function removeCard(F)local G=v[F]if not G then return end hidePlayer(F,
+false)mutePlayer(F,false,true)clearTrack(F)if y==F then setSpectate(F,false)end v[F]=nil w[F]=nil G.Frame:Destroy()
+relayout()end for F,G in aa:GetPlayers()do addCard(G)end table.insert(u,aa.PlayerAdded:Connect(addCard))table.insert(u,
+aa.PlayerRemoving:Connect(removeCard))task.spawn(function()local F=0 while not z.Destroyed and s.Parent do task.wait(
+0.25)F+=1 local G=l.Character and l.Character:FindFirstChild('HumanoidRootPart')for H,I in v do local J=charOf(H)and
+charOf(H):FindFirstChild('HumanoidRootPart')local K=w[H]if G and J then I.Sub.Text=string.format('@%s  \u{b7}  %d studs'
+,H.Name,(G.Position-J.Position).Magnitude)else I.Sub.Text='@'..H.Name end if F%2==0 then if K.hide then hidePlayer(H,
+true)end if K.mute then mutePlayer(H,true,false)end end if K.track then local L=ensureTrack(H)if L then L.hl.
+OutlineColor=b.Colors.Accent L.label.Text=string.format('%s \u{b7} %d',H.DisplayName,if G and J then(G.Position-J.
+Position).Magnitude else 0)end end if y==H then local L=charOf(H)and charOf(H):FindFirstChildOfClass('Humanoid')if L and
+workspace.CurrentCamera.CameraSubject~=L then workspace.CurrentCamera.CameraSubject=L end end end end end)function z:
+Destroy()self.Destroyed=true for F,G in u do G:Disconnect()end for F in table.clone(v)do removeCard(F)end local F=table.
+find(r.Tiles,t)if F then table.remove(r.Tiles,F)end s:Destroy()r:_queueLayout()end table.insert(self.Window.Lib.Cleanups
+,function()z:Destroy()end)self:_queueLayout()return z end end end function a.h()local aa=a.cache.h if not aa then aa={c=
+__modImpl()}a.cache.h=aa end return aa.c end end do local function __modImpl()local aa={0x428a2f98,0x71374491,0xb5c0fbcf
+,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,
+0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0xfc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x6ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,
+0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624
+,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2}local b,c,d,e,f=bit32.band,bit32
+.bxor,bit32.bnot,bit32.rrotate,bit32.rshift local function sha256(g)local h=#g g=g..'\128'..string.rep('\0',(55-h)%64)..
+string.pack('>I4I4',0,(h*8)%4294967296)local i,j,k,l,m,n,o,p=0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,
+0x9b05688c,0x1f83d9ab,0x5be0cd19 local q=table.create(64,0)for r=0,#g//64-1 do local s=r*64+1 for t=1,16 do q[t]=string.
+unpack('>I4',g,s+(t-1)*4)end for t=17,64 do local u,v=q[t-15],q[t-2]local w=c(e(u,7),e(u,18),f(u,3))local x=c(e(v,17),e(
+v,19),f(v,10))q[t]=(q[t-16]+w+q[t-7]+x)%4294967296 end local t,u,v,w,x,y,z,A=i,j,k,l,m,n,o,p for B=1,64 do local C=c(e(x
+,6),e(x,11),e(x,25))local D=c(b(x,y),b(d(x),z))local E=(A+C+D+aa[B]+q[B])%4294967296 local F=c(e(t,2),e(t,13),e(t,22))
+local G=c(b(t,u),b(t,v),b(u,v))local H=(F+G)%4294967296 A,z,y,x,w,v,u,t=z,y,x,(w+E)%4294967296,v,u,t,(E+H)%4294967296
+end i=(i+t)%4294967296 j=(j+u)%4294967296 k=(k+v)%4294967296 l=(l+w)%4294967296 m=(m+x)%4294967296 n=(n+y)%4294967296 o=
+(o+z)%4294967296 p=(p+A)%4294967296 end return string.pack('>I4I4I4I4I4I4I4I4',i,j,k,l,m,n,o,p)end return sha256 end
+function a.i()local aa=a.cache.i if not aa then aa={c=__modImpl()}a.cache.i=aa end return aa.c end end do local function 
+__modImpl()local aa=game:GetService('HttpService')local b=a.d()local c=a.b()local d=a.i()local e=
+'https://api.spotify.com/v1'local f='https://accounts.spotify.com'local g='http://127.0.0.1:8888/callback'local h=table.
+concat({'user-read-playback-state','user-modify-playback-state','user-read-currently-playing','user-library-read',
+'playlist-read-private','playlist-read-collaborative','user-read-recently-played','user-follow-read'},' ')local function 
+httpFn()return(syn and syn.request)or(http and http.request)or http_request or request or(fluxus and fluxus.request)end
+local i=[[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_]]local function b64url(j)local k={}for l=1,#j
+,3 do local m,n,o=string.byte(j,l,l+2)local p=m*65536+(n or 0)*256+(o or 0)local q,r,s,t=p//262144,(p//4096)%64,(p//64)%
+64,p%64 k[#k+1]=string.sub(i,q+1,q+1)..string.sub(i,r+1,r+1)if n then k[#k+1]=string.sub(i,s+1,s+1)end if o then k[#k+1]
+=string.sub(i,t+1,t+1)end end return table.concat(k)end local j=
 [[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~]]local function randomString(k)local l=Random.new(
 os.clock()*1e6+os.time())local m=table.create(k)for n=1,k do local o=l:NextInteger(1,#j)m[n]=string.sub(j,o,o)end return
 table.concat(m)end local function encodeQuery(k)local l={}for m,n in k do l[#l+1]=aa:UrlEncode(tostring(m))..'='..aa:
@@ -1348,116 +1391,121 @@ self.Scroll.CanvasSize=UDim2.fromOffset(0,aD+(if self.Window.Compact then 64 els
 _lazy=av end function au:Build()local av=self._lazy if not av then return end self._lazy=nil local aw=ad.Pacing ad.
 Pacing=false av(self)ad.Pacing=aw end function au:_intro()local av=0 for aw,ax in self.Tiles do if ax.Intro then ax.
 Intro()end end for aw,ax in self.Tiles do if ax.Scale then av+=1 ax.Scale.Scale=0.92 task.delay(math.min(av,12)*0.02+
-0.03,function()ad.tween(ax.Scale,{Scale=1},0.45,am)end)end end end function au:_setActive(av)local aw=self.Button if av
-then self._activeAt=os.clock()self.Page.Visible=true self.Page.GroupTransparency=1 self:_layout()self.Scroll.Position=
-UDim2.fromOffset(0,16)ad.tween(self.Page,{GroupTransparency=0},0.25)ad.tween(self.Scroll,{Position=UDim2.fromOffset(0,0)
-},0.5)self:_intro()ad.tween(aw,{Size=UDim2.fromOffset(self.ActiveW,self.Window.BtnH),BackgroundTransparency=0},0.38,Enum
-.EasingStyle.Quint)ad.tween(self.Label,{TextTransparency=0},0.3)self.Icon:SetColor(ak.Black,true)else ad.tween(self.Page
-,{GroupTransparency=1},0.15)task.delay(0.16,function()if self.Window.ActiveTab~=self then self.Page.Visible=false end
-end)ad.tween(aw,{Size=UDim2.fromOffset(self.Window.BtnH,self.Window.BtnH),BackgroundTransparency=1},0.4)ad.tween(self.
-Label,{TextTransparency=1},0.12)self.Icon:SetColor(ak.Dim,true)end end local av={}av.__index=av av.Tab=au local function 
-toVector(aw,ax)if typeof(aw)=='Vector2'or(type(aw)=='table'and type(aw.X)=='number'and type(aw.Y)=='number')then return
-aw end if typeof(aw)=='UDim2'then return Vector2.new(aw.X.Offset,aw.Y.Offset)end return ax end function av.new(aw,ax)ax=
-ax or{}local ay=setmetatable({},av)ay.Lib=aw ay.Title=ax.Title or'Window'ay.Key=ax.Id or ay.Title ay.Compact=ax.Compact
-==true ay.IconName=ax.Icon local az=if ay.Compact then 50 else an local aA=if ay.Compact then 12 else ao ay.HeaderH=az
-ay.BtnH=if ay.Compact then 34 else 40 ay.Tabs={}ay.Visible=false ay.Minimized=false ay.MinSize=toVector(ax.MinSize,
-Vector2.new(460,360))ay._conns={}local aB=toVector(ax.Size,Vector2.new(720,540))local aC=workspace.CurrentCamera.
-ViewportSize local aD=(#aw.Windows%5)*34 local aE=toVector(ax.Position,Vector2.new(math.floor((aC.X-aB.X)/2)+aD-50,math.
-floor((aC.Y-aB.Y)/2)+aD-50))if ax.Center then aE=Vector2.new(math.floor((aC.X-aB.X)/2),math.floor((aC.Y-aB.Y)/2))end ay.
-DefaultSize,ay.DefaultPos=aB,aE local aF=aw.Recall and aw:Recall('windows',ay.Key)if type(aF)=='table'and tonumber(aF.w)
-and tonumber(aF.h)then aB=Vector2.new(math.clamp(aF.w,ay.MinSize.X,math.max(ay.MinSize.X,aC.X)),math.clamp(aF.h,ay.
-MinSize.Y,math.max(ay.MinSize.Y,aC.Y)))if tonumber(aF.x)and tonumber(aF.y)then aE=Vector2.new(math.clamp(aF.x,-(aB.X-110
-),math.max(aC.X-110,0)),math.clamp(aF.y,0,math.max(aC.Y-44,0)))end end ay.Root=ad.create('Frame',{Name=ay.Title,
-BackgroundTransparency=1,Size=UDim2.fromOffset(aB.X,aB.Y),Position=UDim2.fromOffset(aE.X,aE.Y),Visible=false,Parent=aw.
-Gui})ay.Shadow=ad.shadow(ay.Root,30,44,0.6,12)ay.Shadow.GroupTransparency=1 local aG=ad.create('CanvasGroup',{Name=
-'Body',AnchorPoint=Vector2.new(0.5,0.5),Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromScale(1,1),BackgroundColor3=ak.
-Black,GroupTransparency=1,Active=true,ZIndex=1,Parent=ay.Root})ay.Body=aG ay._bodyCorner=ad.corner(aG,if ay.Compact then
-20 else 28)ay._ring=ad.ring(aG,if ay.Compact then 20 else 28,0.62,0.9)ay.Scale=ad.create('UIScale',{Scale=0.94,Parent=aG
-})ay.Pages=ad.create('Frame',{Name='Pages',Position=UDim2.fromOffset(0,az),Size=UDim2.new(1,0,1,-az),
-BackgroundTransparency=1,ClipsDescendants=true,Parent=aG})local aH=ad.create('Frame',{AnchorPoint=Vector2.new(0,1),
-Position=UDim2.fromScale(0,1),Size=UDim2.new(1,0,0,100),BackgroundColor3=ak.Black,ZIndex=5,Parent=aG})ad.gradient(aH,nil
-,90,NumberSequence.new({NumberSequenceKeypoint.new(0,1),NumberSequenceKeypoint.new(0.55,0.15),NumberSequenceKeypoint.
-new(1,0)}))local aI=ad.create('TextButton',{Name='Header',Size=UDim2.new(1,0,0,az),BackgroundColor3=ak.Black,
-BackgroundTransparency=0,ZIndex=8,Parent=aG})local aJ=ad.create('Frame',{AnchorPoint=Vector2.new(0.5,0),Position=UDim2.
-new(0.5,0,0,if ay.Compact then 5 else 9),Size=UDim2.fromOffset(if ay.Compact then 28 else 38,if ay.Compact then 4 else 5
-),BackgroundColor3=ak.Raised,ZIndex=9,Parent=aI})ad.corner(aJ,3)ay._grab=aJ ay._kicker=ad.create('TextLabel',{Position=
-UDim2.fromOffset(aA,20),Visible=not ay.Compact,Size=UDim2.new(1,if ax.Minimizable~=false then-160 else-120,0,14),Text=
-string.upper(ay.Title),Font=al.Semibold,TextSize=11,TextColor3=ak.TextMuted,TextXAlignment=Enum.TextXAlignment.Left,
-ZIndex=9,Parent=aI})ay.TitleLabel=ad.create('TextLabel',{Position=UDim2.fromOffset(aA+(if ay.Compact then 2 else 0),if
-ay.Compact then 11 else 34),Size=UDim2.new(1,if ax.Minimizable~=false then-140 else-100,0,if ay.Compact then 26 else 32)
-,Font=al.Bold,RichText=ay.Compact,TextSize=if ay.Compact then 17 else 26,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=
-9,Parent=aI})ay.DescLabel=ad.create('TextLabel',{Position=UDim2.fromOffset(aA,64),Visible=not ay.Compact,Size=UDim2.new(
-1,if ax.Minimizable~=false then-160 else-120,0,18),TextSize=12,TextColor3=ak.Dim,TextXAlignment=Enum.TextXAlignment.Left
-,ZIndex=9,Parent=aI})local aK=ad.create('Frame',{Position=UDim2.fromScale(0,1),Size=UDim2.new(1,0,0,18),BackgroundColor3
-=ak.Black,ZIndex=8,Parent=aI})ad.gradient(aK,nil,90,NumberSequence.new(0,1))local aL=ad.create('TextButton',{Name=
-'Close',AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-aA,0,if ay.Compact then 11 else 24),Size=UDim2.fromOffset(if
-ay.Compact then 28 else 32,if ay.Compact then 28 else 32),BackgroundTransparency=0,BackgroundColor3=ak.Tile,ZIndex=10,
-Parent=aI})ad.corner(aL,16)ay._close=aL ay._badge=ad.create('Frame',{Position=UDim2.fromOffset(14,11),Size=UDim2.
-fromOffset(30,30),BackgroundColor3=ak.Raised,Visible=false,ZIndex=9,Parent=aI})ad.corner(ay._badge,15)if ay.Compact and
-ay.IconName then ay._badgeAlways=true ay._badge.Visible=true ay._badgeIcon=ad.icon(ay._badge,ay.IconName,ak.Dim,16)ay.
-_badgeIcon.Frame.Position=UDim2.fromOffset(7,7)ay._badgeIcon.Frame.ZIndex=10 ay.TitleLabel.Position=UDim2.fromOffset(54,
-11)ay.TitleLabel.Size=UDim2.new(1,if ax.Minimizable~=false then-(54+82)else-(54+42),0,30)ay.TitleLabel.TextSize=14 end
-local aM={}for aN,aO in{45,-45}do local aP=ad.create('Frame',{AnchorPoint=Vector2.new(0.5,0.5),Position=UDim2.fromScale(
-0.5,0.5),Size=UDim2.fromOffset(14,3),Rotation=aO,BackgroundColor3=ak.Dim,ZIndex=11,Parent=aL})ad.corner(aP,2)table.
-insert(aM,aP)end aL.MouseEnter:Connect(function()ad.tween(aL,{BackgroundColor3=ak.Red},0.2)for aN,aO in aM do ad.tween(
-aO,{BackgroundColor3=ak.White},0.2)end end)aL.MouseLeave:Connect(function()ad.tween(aL,{BackgroundColor3=ak.Tile},0.25)
-for aN,aO in aM do ad.tween(aO,{BackgroundColor3=ak.Dim},0.25)end end)aL.MouseButton1Click:Connect(function()ay:Hide()if
-ax.OnClose then task.spawn(ax.OnClose)end end)ay.TabBar=ad.create('Frame',{Name='TabBar',AnchorPoint=Vector2.new(0.5,1),
-Position=UDim2.new(0.5,0,1,if ay.Compact then-10 else-16),Size=UDim2.fromOffset(0,if ay.Compact then 44 else 52),
-AutomaticSize=Enum.AutomaticSize.X,BackgroundColor3=ak.Tile,ZIndex=12,Parent=aG})ad.corner(ay.TabBar,if ay.Compact then
-22 else 26)ad.edge(ay.TabBar,0.72,0.92)ad.padding(ay.TabBar,5,5,5,5)ad.list(ay.TabBar,3,Enum.FillDirection.Horizontal,
-Enum.HorizontalAlignment.Center,Enum.VerticalAlignment.Center)if ax.NoTabBar then ay.TabBar.Visible=false aH.Visible=
-false end ay._handles={}ay.Minimizable=ax.Minimizable~=false if ay.Minimizable then local aN,aO=ad.minButton(aI,if ay.
-Compact then 28 else 32,{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-(aA+(if ay.Compact then 34 else 40)),0,if ay
-.Compact then 11 else 24),ZIndex=10})ay._setMinIcon=aO ay._minBtn=aN aN.MouseButton1Click:Connect(function()ay:Minimize(
-not ay.Minimized)end)if type(aF)=='table'and aF.minimized==true then ay.Minimized=true ay._fullH,ay._fullW=aB.Y,aB.X ay.
-_setMinIcon(true,false)if ay._handles then for aP,aQ in ay._handles do aQ.Visible=false end end ay.Root.Size=UDim2.
-fromOffset(math.min(aB.X,ar),as)ay.TabBar.Position=at ay:_miniLook(true,false)end end ay.Drag=ae.new(aI,ay.Root,{OnEnd=
-function()task.delay(0.5,function()if ay.Root.Parent then ay:_remember()end end)end})local aN local function rect()local
-aO,aP=ay.Root.Position,ay.Root.Size return{x=aO.X.Offset,y=aO.Y.Offset,w=aP.X.Offset,h=aP.Y.Offset}end local aO={{-1,-1,
-UDim2.fromOffset(-6,-6),UDim2.fromOffset(22,22)},{1,-1,UDim2.new(1,-16,0,-6),UDim2.fromOffset(22,22)},{-1,1,UDim2.new(0,
--6,1,-16),UDim2.fromOffset(22,22)},{1,1,UDim2.new(1,-16,1,-16),UDim2.fromOffset(22,22)},{0,-1,UDim2.new(0,16,0,-5),UDim2
-.new(1,-32,0,10)},{0,1,UDim2.new(0,16,1,-5),UDim2.new(1,-32,0,10)},{-1,0,UDim2.new(0,-5,0,16),UDim2.new(0,10,1,-32)},{1,
-0,UDim2.new(1,-5,0,16),UDim2.new(0,10,1,-32)}}ay._handles={}for aP,aQ in aO do local aR,aS=aQ[1],aQ[2]local aT=ad.
-create('TextButton',{Name='Resize',Position=aQ[3],Size=aQ[4],BackgroundColor3=ak.White,BackgroundTransparency=1,ZIndex=
-30,Parent=ay.Root})ad.corner(aT,5)table.insert(ay._handles,aT)aT.MouseEnter:Connect(function()ad.tween(aT,{
-BackgroundTransparency=0.94},0.15)end)aT.MouseLeave:Connect(function()if not(aN and aN.handle==aT)then ad.tween(aT,{
-BackgroundTransparency=1},0.25)end end)aT.InputBegan:Connect(function(aU)if ad.isPress(aU)then local aV=rect()aN={dx=aR,
-dy=aS,origin=ad.pointer(aU),start=aV,target=table.clone(aV),cur=table.clone(aV),handle=aT}ad.tween(aT,{
-BackgroundTransparency=0.88},0.1)end end)ad.trackDrag(aT,function(aU)if not aN or aN.handle~=aT then return end local aV
-=aU-aN.origin local aW,aX=aN.start,aN.target if aR==1 then aX.w=math.max(ay.MinSize.X,aW.w+aV.X)elseif aR==-1 then aX.w=
-math.max(ay.MinSize.X,aW.w-aV.X)aX.x=aW.x+aW.w-aX.w end if aS==1 then aX.h=math.max(ay.MinSize.Y,aW.h+aV.Y)elseif aS==-1
-then aX.h=math.max(ay.MinSize.Y,aW.h-aV.Y)aX.y=aW.y+aW.h-aX.h end end,function()if aN then ad.tween(aN.handle,{
-BackgroundTransparency=1},0.3)aN.done=true end end)end ay._rzConn=game:GetService('RunService').RenderStepped:Connect(
-function(aP)if not aN then return end local aQ=1-(1-0.22)^(aP*60)local aR,aS=aN.cur,aN.target local aT=true for aU,aV in
-{'x','y','w','h'}do aR[aV]+=(aS[aV]-aR[aV])*aQ if math.abs(aS[aV]-aR[aV])<0.3 then aR[aV]=aS[aV]else aT=false end end ay
-.Root.Position=UDim2.fromOffset(math.floor(aR.x+0.5),math.floor(aR.y+0.5))ay.Root.Size=UDim2.fromOffset(math.floor(aR.w+
-0.5),math.floor(aR.h+0.5))if aN.done and aT then aN=nil ay:_remember()end end)return ay end function av:_remember()local
-aw=self.Lib if not aw.Remember then return end local ax,ay=self.Root.Position,self.Root.Size local az=aw:Recall(
-'windows',self.Key)or{}local aA={x=ax.X.Offset,y=ax.Y.Offset,w=az.w,h=az.h}if not self.Minimized then aA.w,aA.h=ay.X.
-Offset,ay.Y.Offset end if aA.w and aA.h then aA.minimized=self.Minimized==true aw:Remember('windows',self.Key,aA)end end
-function av:SetTop(aw)local ax=self.HeaderH if not self.TopFrame then self.TopFrame=ad.create('CanvasGroup',{Name='Top',
-Position=UDim2.fromOffset(0,ax),Size=UDim2.new(1,0,0,aw),BackgroundTransparency=1,ZIndex=9,Parent=self.Body})end self.
-TopFrame.Size=UDim2.new(1,0,0,aw)if self.Minimized then self.TopFrame.GroupTransparency=1 end self.Pages.Position=UDim2.
-fromOffset(0,ax+aw)self.Pages.Size=UDim2.new(1,0,1,-(ax+aw))return self.TopFrame end function av:CreateTab(aw)if type(aw
-)=='string'then aw={Name=aw}end local ax=setmetatable({Window=self,Name=aw.Name or'Tab',Title=aw.Title or aw.Name or
-'Tab',Description=aw.Description or'',IconName=aw.Icon,Tiles={}},au)local ay=ab:GetTextSize(ax.Name,if self.Compact then
-12 else 14,Enum.Font.GothamSemibold,Vector2.new(400,30)).X ax.ActiveW=math.ceil(if self.Compact then 30+ay+12 else 36+ay
-+16)ax.Button=ad.create('TextButton',{Name=ax.Name,Size=UDim2.fromOffset(self.BtnH,self.BtnH),BackgroundTransparency=1,
-BackgroundColor3=ak.White,ClipsDescendants=true,LayoutOrder=#self.Tabs+1,ZIndex=13,Parent=self.TabBar})ad.corner(ax.
-Button,self.BtnH//2)local az=if self.Compact then 18 else 20 ax.Icon=ad.icon(ax.Button,aw.Icon or string.upper(string.
-sub(ax.Name,1,1)),ak.Dim,az)ax.Icon.Frame.Position=UDim2.fromOffset((self.BtnH-az)//2,(self.BtnH-az)//2)ax.Icon.Frame.
-ZIndex=14 ax.Label=ad.create('TextLabel',{Position=UDim2.fromOffset(if self.Compact then 30 else 36,0),Size=UDim2.new(1,
--(if self.Compact then 30 else 36),1,0),Text=ax.Name,Font=al.Semibold,TextSize=if self.Compact then 12 else 13,
-TextColor3=ak.Black,TextTransparency=1,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=14,Parent=ax.Button})ax.Button.
-MouseEnter:Connect(function()if self.ActiveTab~=ax then ax.Icon:SetColor(ak.Text,true)end end)ax.Button.MouseLeave:
-Connect(function()if self.ActiveTab~=ax then ax.Icon:SetColor(ak.Dim,true)end end)ax.Button.MouseButton1Click:Connect(
-function()self:SelectTab(ax)end)ax.Page=ad.create('CanvasGroup',{Name=ax.Name,Size=UDim2.fromScale(1,1),
-BackgroundTransparency=1,GroupTransparency=1,Visible=false,Parent=self.Pages})ax.Scroll=ad.create('ScrollingFrame',{Name
-='Scroll',Size=UDim2.fromScale(1,1),ScrollBarThickness=0,AutomaticCanvasSize=Enum.AutomaticSize.None,Parent=ax.Page})ax.
-Scroll:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()if ax.Scroll.Parent then ax:_layout()end end)table.
-insert(self.Tabs,ax)if not self.ActiveTab then self:SelectTab(ax)end return ax end function av:SelectTab(aw)if type(aw)
-=='string'then for ax,ay in self.Tabs do if ay.Name==aw then aw=ay end end end if type(aw)~='table'or self.ActiveTab==aw
+0.03,function()ad.tween(ax.Scale,{Scale=1},0.45,am)end)end end end function au:SetTop(av)local aw=if self.Window.Compact
+then 12 else 14 if not self.TopFrame then self.TopFrame=ad.create('Frame',{Name='TopPinned',Position=UDim2.fromOffset(aw
+,8),Size=UDim2.new(1,-aw*2,0,av),BackgroundTransparency=1,ZIndex=5,Parent=self.Page})end self.TopHeight=av+14 self.
+TopFrame.Size=UDim2.new(1,-aw*2,0,av)self.Scroll.Position=UDim2.fromOffset(0,self.TopHeight)self.Scroll.Size=UDim2.new(1
+,0,1,-self.TopHeight)return self.TopFrame end function au:_setActive(av)local aw=self.Button if av then self._activeAt=
+os.clock()self.Page.Visible=true self.Page.GroupTransparency=1 self:_layout()local ax=self.TopHeight or 0 self.Scroll.
+Position=UDim2.fromOffset(0,ax+16)ad.tween(self.Page,{GroupTransparency=0},0.25)ad.tween(self.Scroll,{Position=UDim2.
+fromOffset(0,ax)},0.5)self:_intro()ad.tween(aw,{Size=UDim2.fromOffset(self.ActiveW,self.Window.BtnH),
+BackgroundTransparency=0},0.38,Enum.EasingStyle.Quint)ad.tween(self.Label,{TextTransparency=0},0.3)self.Icon:SetColor(ak
+.Black,true)else ad.tween(self.Page,{GroupTransparency=1},0.15)task.delay(0.16,function()if self.Window.ActiveTab~=self
+then self.Page.Visible=false end end)ad.tween(aw,{Size=UDim2.fromOffset(self.Window.BtnH,self.Window.BtnH),
+BackgroundTransparency=1},0.4)ad.tween(self.Label,{TextTransparency=1},0.12)self.Icon:SetColor(ak.Dim,true)end end local
+av={}av.__index=av av.Tab=au local function toVector(aw,ax)if typeof(aw)=='Vector2'or(type(aw)=='table'and type(aw.X)==
+'number'and type(aw.Y)=='number')then return aw end if typeof(aw)=='UDim2'then return Vector2.new(aw.X.Offset,aw.Y.
+Offset)end return ax end function av.new(aw,ax)ax=ax or{}local ay=setmetatable({},av)ay.Lib=aw ay.Title=ax.Title or
+'Window'ay.Key=ax.Id or ay.Title ay.Compact=ax.Compact==true ay.IconName=ax.Icon local az=if ay.Compact then 50 else an
+local aA=if ay.Compact then 12 else ao ay.HeaderH=az ay.BtnH=if ay.Compact then 34 else 40 ay.Tabs={}ay.Visible=false ay
+.Minimized=false ay.MinSize=toVector(ax.MinSize,Vector2.new(460,360))ay._conns={}local aB=toVector(ax.Size,Vector2.new(
+720,540))local aC=workspace.CurrentCamera.ViewportSize local aD=(#aw.Windows%5)*34 local aE=toVector(ax.Position,Vector2
+.new(math.floor((aC.X-aB.X)/2)+aD-50,math.floor((aC.Y-aB.Y)/2)+aD-50))if ax.Center then aE=Vector2.new(math.floor((aC.X-
+aB.X)/2),math.floor((aC.Y-aB.Y)/2))end ay.DefaultSize,ay.DefaultPos=aB,aE local aF=aw.Recall and aw:Recall('windows',ay.
+Key)if type(aF)=='table'and tonumber(aF.w)and tonumber(aF.h)then aB=Vector2.new(math.clamp(aF.w,ay.MinSize.X,math.max(ay
+.MinSize.X,aC.X)),math.clamp(aF.h,ay.MinSize.Y,math.max(ay.MinSize.Y,aC.Y)))if tonumber(aF.x)and tonumber(aF.y)then aE=
+Vector2.new(math.clamp(aF.x,-(aB.X-110),math.max(aC.X-110,0)),math.clamp(aF.y,0,math.max(aC.Y-44,0)))end end ay.Root=ad.
+create('Frame',{Name=ay.Title,BackgroundTransparency=1,Size=UDim2.fromOffset(aB.X,aB.Y),Position=UDim2.fromOffset(aE.X,
+aE.Y),Visible=false,Parent=aw.Gui})ay.Shadow=ad.shadow(ay.Root,30,44,0.6,12)ay.Shadow.GroupTransparency=1 local aG=ad.
+create('CanvasGroup',{Name='Body',AnchorPoint=Vector2.new(0.5,0.5),Position=UDim2.fromScale(0.5,0.5),Size=UDim2.
+fromScale(1,1),BackgroundColor3=ak.Black,GroupTransparency=1,Active=true,ZIndex=1,Parent=ay.Root})ay.Body=aG ay.
+_bodyCorner=ad.corner(aG,if ay.Compact then 20 else 28)ay._ring=ad.ring(aG,if ay.Compact then 20 else 28,0.62,0.9)ay.
+Scale=ad.create('UIScale',{Scale=0.94,Parent=aG})ay.Pages=ad.create('Frame',{Name='Pages',Position=UDim2.fromOffset(0,az
+),Size=UDim2.new(1,0,1,-az),BackgroundTransparency=1,ClipsDescendants=true,Parent=aG})local aH=ad.create('Frame',{
+AnchorPoint=Vector2.new(0,1),Position=UDim2.fromScale(0,1),Size=UDim2.new(1,0,0,100),BackgroundColor3=ak.Black,ZIndex=5,
+Parent=aG})ad.gradient(aH,nil,90,NumberSequence.new({NumberSequenceKeypoint.new(0,1),NumberSequenceKeypoint.new(0.55,
+0.15),NumberSequenceKeypoint.new(1,0)}))local aI=ad.create('TextButton',{Name='Header',Size=UDim2.new(1,0,0,az),
+BackgroundColor3=ak.Black,BackgroundTransparency=0,ZIndex=8,Parent=aG})local aJ=ad.create('Frame',{AnchorPoint=Vector2.
+new(0.5,0),Position=UDim2.new(0.5,0,0,if ay.Compact then 5 else 9),Size=UDim2.fromOffset(if ay.Compact then 28 else 38,
+if ay.Compact then 4 else 5),BackgroundColor3=ak.Raised,ZIndex=9,Parent=aI})ad.corner(aJ,3)ay._grab=aJ ay._kicker=ad.
+create('TextLabel',{Position=UDim2.fromOffset(aA,20),Visible=not ay.Compact,Size=UDim2.new(1,if ax.Minimizable~=false
+then-160 else-120,0,14),Text=string.upper(ay.Title),Font=al.Semibold,TextSize=11,TextColor3=ak.TextMuted,TextXAlignment=
+Enum.TextXAlignment.Left,ZIndex=9,Parent=aI})ay.TitleLabel=ad.create('TextLabel',{Position=UDim2.fromOffset(aA+(if ay.
+Compact then 2 else 0),if ay.Compact then 11 else 34),Size=UDim2.new(1,if ax.Minimizable~=false then-140 else-100,0,if
+ay.Compact then 26 else 32),Font=al.Bold,RichText=ay.Compact,TextSize=if ay.Compact then 17 else 26,TextXAlignment=Enum.
+TextXAlignment.Left,ZIndex=9,Parent=aI})ay.DescLabel=ad.create('TextLabel',{Position=UDim2.fromOffset(aA,64),Visible=not
+ay.Compact,Size=UDim2.new(1,if ax.Minimizable~=false then-160 else-120,0,18),TextSize=12,TextColor3=ak.Dim,
+TextXAlignment=Enum.TextXAlignment.Left,ZIndex=9,Parent=aI})local aK=ad.create('Frame',{Position=UDim2.fromScale(0,1),
+Size=UDim2.new(1,0,0,18),BackgroundColor3=ak.Black,ZIndex=8,Parent=aI})ad.gradient(aK,nil,90,NumberSequence.new(0,1))
+local aL=ad.create('TextButton',{Name='Close',AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-aA,0,if ay.Compact then
+11 else 24),Size=UDim2.fromOffset(if ay.Compact then 28 else 32,if ay.Compact then 28 else 32),BackgroundTransparency=0,
+BackgroundColor3=ak.Tile,ZIndex=10,Parent=aI})ad.corner(aL,16)ay._close=aL ay._badge=ad.create('Frame',{Position=UDim2.
+fromOffset(14,11),Size=UDim2.fromOffset(30,30),BackgroundColor3=ak.Raised,Visible=false,ZIndex=9,Parent=aI})ad.corner(ay
+._badge,15)if ay.Compact and ay.IconName then ay._badgeAlways=true ay._badge.Visible=true ay._badgeIcon=ad.icon(ay.
+_badge,ay.IconName,ak.Dim,16)ay._badgeIcon.Frame.Position=UDim2.fromOffset(7,7)ay._badgeIcon.Frame.ZIndex=10 ay.
+TitleLabel.Position=UDim2.fromOffset(54,11)ay.TitleLabel.Size=UDim2.new(1,if ax.Minimizable~=false then-(54+82)else-(54+
+42),0,30)ay.TitleLabel.TextSize=14 end local aM={}for aN,aO in{45,-45}do local aP=ad.create('Frame',{AnchorPoint=Vector2
+.new(0.5,0.5),Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(14,3),Rotation=aO,BackgroundColor3=ak.Dim,ZIndex=
+11,Parent=aL})ad.corner(aP,2)table.insert(aM,aP)end aL.MouseEnter:Connect(function()ad.tween(aL,{BackgroundColor3=ak.Red
+},0.2)for aN,aO in aM do ad.tween(aO,{BackgroundColor3=ak.White},0.2)end end)aL.MouseLeave:Connect(function()ad.tween(aL
+,{BackgroundColor3=ak.Tile},0.25)for aN,aO in aM do ad.tween(aO,{BackgroundColor3=ak.Dim},0.25)end end)aL.
+MouseButton1Click:Connect(function()ay:Hide()if ax.OnClose then task.spawn(ax.OnClose)end end)ay.TabBar=ad.create(
+'Frame',{Name='TabBar',Active=true,AnchorPoint=Vector2.new(0.5,1),Position=UDim2.new(0.5,0,1,if ay.Compact then-10 else-
+16),Size=UDim2.fromOffset(0,if ay.Compact then 44 else 52),AutomaticSize=Enum.AutomaticSize.X,BackgroundColor3=ak.Tile,
+ZIndex=12,Parent=aG})ad.corner(ay.TabBar,if ay.Compact then 22 else 26)ad.edge(ay.TabBar,0.72,0.92)ad.padding(ay.TabBar,
+5,5,5,5)ad.list(ay.TabBar,3,Enum.FillDirection.Horizontal,Enum.HorizontalAlignment.Center,Enum.VerticalAlignment.Center)
+if ax.NoTabBar then ay.TabBar.Visible=false aH.Visible=false end ay._handles={}ay.Minimizable=ax.Minimizable~=false if
+ay.Minimizable then local aN,aO=ad.minButton(aI,if ay.Compact then 28 else 32,{AnchorPoint=Vector2.new(1,0),Position=
+UDim2.new(1,-(aA+(if ay.Compact then 34 else 40)),0,if ay.Compact then 11 else 24),ZIndex=10})ay._setMinIcon=aO ay.
+_minBtn=aN aN.MouseButton1Click:Connect(function()ay:Minimize(not ay.Minimized)end)if type(aF)=='table'and aF.minimized
+==true then ay.Minimized=true ay._fullH,ay._fullW=aB.Y,aB.X ay._setMinIcon(true,false)if ay._handles then for aP,aQ in
+ay._handles do aQ.Visible=false end end ay.Root.Size=UDim2.fromOffset(math.min(aB.X,ar),as)ay.TabBar.Position=at ay:
+_miniLook(true,false)end end ay.Drag=ae.new(aI,ay.Root,{OnEnd=function()task.delay(0.5,function()if ay.Root.Parent then
+ay:_remember()end end)end})local aN local function rect()local aO,aP=ay.Root.Position,ay.Root.Size return{x=aO.X.Offset,
+y=aO.Y.Offset,w=aP.X.Offset,h=aP.Y.Offset}end local aO={{-1,-1,UDim2.fromOffset(-6,-6),UDim2.fromOffset(22,22)},{1,-1,
+UDim2.new(1,-16,0,-6),UDim2.fromOffset(22,22)},{-1,1,UDim2.new(0,-6,1,-16),UDim2.fromOffset(22,22)},{1,1,UDim2.new(1,-16
+,1,-16),UDim2.fromOffset(22,22)},{0,-1,UDim2.new(0,16,0,-5),UDim2.new(1,-32,0,10)},{0,1,UDim2.new(0,16,1,-5),UDim2.new(1
+,-32,0,10)},{-1,0,UDim2.new(0,-5,0,16),UDim2.new(0,10,1,-32)},{1,0,UDim2.new(1,-5,0,16),UDim2.new(0,10,1,-32)}}ay.
+_handles={}for aP,aQ in aO do local aR,aS=aQ[1],aQ[2]local aT=ad.create('TextButton',{Name='Resize',Position=aQ[3],Size=
+aQ[4],BackgroundColor3=ak.White,BackgroundTransparency=1,ZIndex=30,Parent=ay.Root})ad.corner(aT,5)table.insert(ay.
+_handles,aT)aT.MouseEnter:Connect(function()ad.tween(aT,{BackgroundTransparency=0.94},0.15)end)aT.MouseLeave:Connect(
+function()if not(aN and aN.handle==aT)then ad.tween(aT,{BackgroundTransparency=1},0.25)end end)aT.InputBegan:Connect(
+function(aU)if ad.isPress(aU)then local aV=rect()aN={dx=aR,dy=aS,origin=ad.pointer(aU),start=aV,target=table.clone(aV),
+cur=table.clone(aV),handle=aT}ad.tween(aT,{BackgroundTransparency=0.88},0.1)end end)ad.trackDrag(aT,function(aU)if not
+aN or aN.handle~=aT then return end local aV=aU-aN.origin local aW,aX=aN.start,aN.target if aR==1 then aX.w=math.max(ay.
+MinSize.X,aW.w+aV.X)elseif aR==-1 then aX.w=math.max(ay.MinSize.X,aW.w-aV.X)aX.x=aW.x+aW.w-aX.w end if aS==1 then aX.h=
+math.max(ay.MinSize.Y,aW.h+aV.Y)elseif aS==-1 then aX.h=math.max(ay.MinSize.Y,aW.h-aV.Y)aX.y=aW.y+aW.h-aX.h end end,
+function()if aN then ad.tween(aN.handle,{BackgroundTransparency=1},0.3)aN.done=true end end)end ay._rzConn=game:
+GetService('RunService').RenderStepped:Connect(function(aP)if not aN then return end local aQ=1-(1-0.22)^(aP*60)local aR
+,aS=aN.cur,aN.target local aT=true for aU,aV in{'x','y','w','h'}do aR[aV]+=(aS[aV]-aR[aV])*aQ if math.abs(aS[aV]-aR[aV])
+<0.3 then aR[aV]=aS[aV]else aT=false end end ay.Root.Position=UDim2.fromOffset(math.floor(aR.x+0.5),math.floor(aR.y+0.5)
+)ay.Root.Size=UDim2.fromOffset(math.floor(aR.w+0.5),math.floor(aR.h+0.5))if aN.done and aT then aN=nil ay:_remember()end
+end)return ay end function av:_remember()local aw=self.Lib if not aw.Remember then return end local ax,ay=self.Root.
+Position,self.Root.Size local az=aw:Recall('windows',self.Key)or{}local aA={x=ax.X.Offset,y=ax.Y.Offset,w=az.w,h=az.h}if
+not self.Minimized then aA.w,aA.h=ay.X.Offset,ay.Y.Offset end if aA.w and aA.h then aA.minimized=self.Minimized==true aw
+:Remember('windows',self.Key,aA)end end function av:SetTop(aw)local ax=self.HeaderH if not self.TopFrame then self.
+TopFrame=ad.create('CanvasGroup',{Name='Top',Position=UDim2.fromOffset(0,ax),Size=UDim2.new(1,0,0,aw),
+BackgroundTransparency=1,ZIndex=9,Parent=self.Body})end self.TopFrame.Size=UDim2.new(1,0,0,aw)if self.Minimized then
+self.TopFrame.GroupTransparency=1 end self.Pages.Position=UDim2.fromOffset(0,ax+aw)self.Pages.Size=UDim2.new(1,0,1,-(ax+
+aw))return self.TopFrame end function av:CreateTab(aw)if type(aw)=='string'then aw={Name=aw}end local ax=setmetatable({
+Window=self,Name=aw.Name or'Tab',Title=aw.Title or aw.Name or'Tab',Description=aw.Description or'',IconName=aw.Icon,
+Tiles={}},au)local ay=ab:GetTextSize(ax.Name,if self.Compact then 12 else 14,Enum.Font.GothamSemibold,Vector2.new(400,30
+)).X ax.ActiveW=math.ceil(if self.Compact then 30+ay+12 else 36+ay+16)ax.Button=ad.create('TextButton',{Name=ax.Name,
+Active=true,Size=UDim2.fromOffset(self.BtnH,self.BtnH),BackgroundTransparency=1,BackgroundColor3=ak.White,
+ClipsDescendants=true,LayoutOrder=#self.Tabs+1,ZIndex=13,Parent=self.TabBar})ad.corner(ax.Button,self.BtnH//2)local az=
+if self.Compact then 18 else 20 ax.Icon=ad.icon(ax.Button,aw.Icon or string.upper(string.sub(ax.Name,1,1)),ak.Dim,az)ax.
+Icon.Frame.Position=UDim2.fromOffset((self.BtnH-az)//2,(self.BtnH-az)//2)ax.Icon.Frame.ZIndex=14 ax.Label=ad.create(
+'TextLabel',{Position=UDim2.fromOffset(if self.Compact then 30 else 36,0),Size=UDim2.new(1,-(if self.Compact then 30
+else 36),1,0),Text=ax.Name,Font=al.Semibold,TextSize=if self.Compact then 12 else 13,TextColor3=ak.Black,
+TextTransparency=1,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=14,Parent=ax.Button})ax.Button.MouseEnter:Connect(
+function()if self.ActiveTab~=ax then ax.Icon:SetColor(ak.Text,true)end end)ax.Button.MouseLeave:Connect(function()if
+self.ActiveTab~=ax then ax.Icon:SetColor(ak.Dim,true)end end)ax.Button.MouseButton1Click:Connect(function()self:
+SelectTab(ax)end)ax.Page=ad.create('CanvasGroup',{Name=ax.Name,Size=UDim2.fromScale(1,1),BackgroundTransparency=1,
+GroupTransparency=1,Visible=false,Parent=self.Pages})ax.Scroll=ad.create('ScrollingFrame',{Name='Scroll',Size=UDim2.
+fromScale(1,1),ScrollBarThickness=0,AutomaticCanvasSize=Enum.AutomaticSize.None,Parent=ax.Page})ax.Scroll:
+GetPropertyChangedSignal('AbsoluteSize'):Connect(function()if ax.Scroll.Parent then ax:_layout()end end)table.insert(
+self.Tabs,ax)if not self.ActiveTab then self:SelectTab(ax)end return ax end function av:SelectTab(aw)if type(aw)==
+'string'then for ax,ay in self.Tabs do if ay.Name==aw then aw=ay end end end if type(aw)~='table'or self.ActiveTab==aw
 then return end aw:Build()local ax=self.ActiveTab self.ActiveTab=aw if ax then ax:_setActive(false)end aw:_setActive(
 true)self.TitleLabel.Text=if self.Compact then self.Title else aw.Title self.DescLabel.Text=aw.Description self.
 TitleLabel.TextTransparency=1 self.DescLabel.TextTransparency=1 ad.tween(self.TitleLabel,{TextTransparency=0},0.4)ad.
@@ -1833,173 +1881,263 @@ GetEnumItems()end)if as and type(at)=='table'then for av,aw in at do if aw.Name 
 insert(as,av)end end table.sort(as,function(at,av)return string.lower(at)<string.lower(av)end)table.insert(as,1,
 'Default')ao.Fonts=as end local function fontPair(as)if as and as~=''and as~='Default'then local at=enumFont(as)if at
 then return at,at end end return Enum.Font.GothamBold,Enum.Font.GothamMedium end local function isDownloadable(as)return
-as~=nil and as~='Default'and enumFont(as)==nil and af.has(as)end ao.Verbose=true ao.DEFAULT_ICON=ac.Brand.Icon ao.
-DEFAULT_BACKGROUND=ac.Brand.Background local function source(as,at)if as==nil or as==''then return at end if as==false
-or as=='avatar'or as=='none'then return false end if type(as)=='number'or tonumber(as)then return'rbxassetid://'..
-tostring(as)end return tostring(as)end function ao.new(as,at)at=at or{}local av=setmetatable({},ao)av.Lib=as av.Player=
-at.Player or aa.LocalPlayer av.Title=at.Title or'Lumen User'av.Key=at.Key or'1'av.DefaultTitle=at.DefaultTitle or at.
-Title or'Lumen User'av.FontName=if type(at.Font)=='string'and at.Font~=''then at.Font else'Default'av.Raw={Title=at.
-Title,Name=at.Name,Icon=at.Icon,Background=at.Background,Font=at.Font}av.Name=if at.Name==''then nil else at.Name av.
-Icon=source(at.Icon,ao.DEFAULT_ICON)av.Background=source(at.Background,ao.DEFAULT_BACKGROUND)av.Offset=at.Offset or 2.2
-av.Distance=at.MaxDistance or 400 av.MiniDistance=at.MiniDistance or 30 av.Enabled=true av._token=0 av._t=0 av._goal=0
-av._conn=av.Player.CharacterAdded:Connect(function()task.wait(0.4)av:_build()end)av._beat=ag.Heartbeat:Connect(function(
-aw)av:_step(aw)end)task.spawn(function()av:_build()end)return av end function ao:_username()return self.Name or self.
-Player.Name end function ao:_width()local as,at local av=self._mw if self._faces and av and av.Title==self.Title and av.
-Name==self:_username()then as,at=av.A,av.B else local aw,ax=fontPair(self.FontName)as=ab:GetTextSize(self.Title,14,aw,
-Vector2.new(400,20)).X at=ab:GetTextSize(self:_username(),11,ax,Vector2.new(400,20)).X if self._faces then as,at=math.
-max(as,#self.Title*8.4),math.max(at,#self:_username()*6.6)end end return math.clamp(math.max(as,at)+al+36,136,300)end
-function ao:_measure()local as=self._faces if not as then return end local at,av=self.Title,self:_username()task.spawn(
-function()local function size(aw,ax,ay)local az,aA=pcall(function()local az=Instance.new('GetTextBoundsParams')az.Text,
-az.Font,az.Size,az.Width=aw,ax,ay,1000 return ab:GetTextBoundsAsync(az).X end)return if az and type(aA)=='number'then aA
-else#aw*ay*0.6 end local aw,ax=size(at,as.Title,14),size(av,as.Body,11)if self._faces==as then self._mw={Title=at,Name=
-av,A=aw,B=ax}self:_resize()end end)end function ao:_applyFont()if not self.TitleLabel then return end self._fontGen=(
-self._fontGen or 0)+1 local as=self._fontGen local at,av=fontPair(self.FontName)self.TitleLabel.Font,self.NameLabel.Font
-=at,av self._faces,self._mw=nil,nil if not isDownloadable(self.FontName)then self:_resize()return end af.load(self.
-FontName,function(aw,ax)if as~=self._fontGen or not self.TitleLabel then return end if not aw then warn('[Lumen] font '
-..tostring(self.FontName)..' not loaded: '..tostring(ax))if self.Lib and self.Lib.Notify and not self._fontWarned then
-self._fontWarned=true self.Lib:Notify({Title='Font not loaded',Content=tostring(ax),Type='warning',Duration=4})end
-return end self.TitleLabel.FontFace,self.NameLabel.FontFace=aw.Title,aw.Body self._faces=aw self:_measure()end)end
-function ao:_distance()local as=workspace.CurrentCamera local at=self.Gui and self.Gui.Adornee if not(as and at)then
-return 0 end local av,aw=pcall(function()return(as.CFrame.Position-at.Position).Magnitude end)return if av then aw else
-0 end local function lerp(as,at,av)return as+(at-as)*av end function ao:_layout(as)local at=self._parts if not at then
-return end local av=math.floor(lerp(self:_width(),an,as)+0.5)local aw=math.floor(lerp(aj,ak,as)+0.5)local ax=math.floor(
-lerp(al,am,as)+0.5)self.Gui.Size=UDim2.fromOffset(av,aw)at.Disc.Position=UDim2.fromOffset(math.floor(lerp(4,(an-am)/2,as
-)+0.5),(aw-ax)//2)at.Disc.Size=UDim2.fromOffset(ax,ax)local ay=math.floor(ax*lerp(0.78,1,as)+0.5)self.IconImage.Size=
-UDim2.fromOffset(ay,ay)self.IconImage.Position=UDim2.fromOffset((ax-ay)//2,(ax-ay)//2)if self._ready then local az=math.
-clamp(1-as*2.4,0,1)self.TitleLabel.TextTransparency=1-az self.NameLabel.TextTransparency=1-az self.TitleLabel.
-TextStrokeTransparency=1-az*0.6 self.NameLabel.TextStrokeTransparency=1-az*0.6 end end function ao:_step(as)if not self.
-Gui then return end local at=self:_distance()if self._goal==0 and at>self.MiniDistance then self._goal=1 elseif self.
+as~=nil and as~='Default'and enumFont(as)==nil and af.has(as)end function ao.PreviewFont(as,at,av)if as==nil or as==
+'Default'then return end local aw=enumFont(as)if aw then at.Font=aw elseif av and isDownloadable(as)then af.load(as,
+function(ax)if ax and at.Parent then at.FontFace=ax.Body end end)end end function ao.toHex(as)return string.format(
+'#%02x%02x%02x',math.floor(as.R*255+0.5),math.floor(as.G*255+0.5),math.floor(as.B*255+0.5))end function ao.fromHex(as)
+local at,av,aw=string.match(tostring(as or''),'^#(%x%x)(%x%x)(%x%x)$')if not at then return nil end return Color3.
+fromRGB(tonumber(at,16),tonumber(av,16),tonumber(aw,16))end function ao.parseGradient(as)if type(as)~='string'or as==''
+then return nil end local at={}for av in string.gmatch(as,'#%x%x%x%x%x%x')do local aw=ao.fromHex(av)if aw then table.
+insert(at,aw)end end return if#at>=2 then at else nil end function ao.encodeGradient(as)if not as or#as<2 then return''
+end local at={}for av,aw in as do table.insert(at,ao.toHex(aw))end return table.concat(at,',')end ao.TextEffects={'none'
+,'typewriter','glitch','wave','bounce','pulse'}ao.Verbose=true ao.DEFAULT_ICON=ac.Brand.Icon ao.DEFAULT_BACKGROUND=ac.
+Brand.Background local function source(as,at)if as==nil or as==''then return at end if as==false or as=='avatar'or as==
+'none'then return false end if type(as)=='number'or tonumber(as)then return'rbxassetid://'..tostring(as)end return
+tostring(as)end function ao.new(as,at)at=at or{}local av=setmetatable({},ao)av.Lib=as av.Player=at.Player or aa.
+LocalPlayer av.Title=at.Title or'Lumen User'av.Key=at.Key or'1'av.DefaultTitle=at.DefaultTitle or at.Title or
+'Lumen User'av.FontName=if type(at.Font)=='string'and at.Font~=''then at.Font else'Default'av.Raw={Title=at.Title,Name=
+at.Name,Icon=at.Icon,Background=at.Background,Font=at.Font,Stroke=at.Stroke,TextColor=at.TextColor,Gradient=at.Gradient,
+GradientRot=at.GradientRot,TextEffect=at.TextEffect}av.StrokeColor=ao.fromHex(at.Stroke)av.TextColor=ao.fromHex(at.
+TextColor)av.GradientColors=ao.parseGradient(at.Gradient)av.GradientRot=tonumber(at.GradientRot)or 0 av.TextEffect=at.
+TextEffect or'none'av.Name=if at.Name==''then nil else at.Name av.Icon=source(at.Icon,ao.DEFAULT_ICON)av.Background=
+source(at.Background,ao.DEFAULT_BACKGROUND)av.Offset=at.Offset or 2.2 av.Distance=at.MaxDistance or 400 av.MiniDistance=
+at.MiniDistance or 30 av.Enabled=true av.Host=at.Host av.OnClick=at.OnClick if av.OnClick then local aw=game:GetService(
+'UserInputService')av._click=aw.InputBegan:Connect(function(ax,ay)if ay or not av.OnClick then return end local az=ax.
+UserInputType local aA if az==Enum.UserInputType.MouseButton1 then aA=aw:GetMouseLocation()elseif az==Enum.UserInputType
+.Touch then local aB=game:GetService('GuiService'):GetGuiInset()aA=Vector2.new(ax.Position.X+aB.X,ax.Position.Y+aB.Y)
+else return end if av:_hit(aA)then av.OnClick(av.Player)end end)end av._token=0 av._t=0 av._goal=0 av._effectTime=0 if
+not av.Host then av._conn=av.Player.CharacterAdded:Connect(function()task.wait(0.4)av:_build()end)end av._beat=ag.
+Heartbeat:Connect(function(aw)av:_step(aw)end)task.spawn(function()av:_build()end)return av end function ao:_hit(as)
+local at=self.Gui if self.Host or not at or not self.Enabled then return false end local av=workspace.CurrentCamera
+local aw=self.Player.Character local ax=aw and aw:FindFirstChild('Head')if not av or not ax then return false end local
+ay=ax.Position local az,aA=av:WorldToViewportPoint(Vector3.new(ay.X,ay.Y+self.Offset,ay.Z))if not aA or az.Z<=0 then
+return false end return math.abs(as.X-az.X)<=at.Size.X.Offset/2 and math.abs(as.Y-az.Y)<=at.Size.Y.Offset/2 end function
+ao:_username()return self.Name or self.Player.Name end function ao:_width()local as,at local av=self._mw if self._faces
+and av and av.Title==self.Title and av.Name==self:_username()then as,at=av.A,av.B else local aw,ax=fontPair(self.
+FontName)as=ab:GetTextSize(self.Title,14,aw,Vector2.new(400,20)).X at=ab:GetTextSize(self:_username(),11,ax,Vector2.new(
+400,20)).X if self._faces then as,at=math.max(as,#self.Title*8.4),math.max(at,#self:_username()*6.6)end end return math.
+clamp(math.max(as,at)+al+36,136,300)end function ao:_measure()local as=self._faces if not as then return end local at,av
+=self.Title,self:_username()task.spawn(function()local function size(aw,ax,ay)local az,aA=pcall(function()local az=
+Instance.new('GetTextBoundsParams')az.Text,az.Font,az.Size,az.Width=aw,ax,ay,1000 return ab:GetTextBoundsAsync(az).X end
+)return if az and type(aA)=='number'then aA else#aw*ay*0.6 end local aw,ax=size(at,as.Title,14),size(av,as.Body,11)if
+self._faces==as then self._mw={Title=at,Name=av,A=aw,B=ax}self:_resize()end end)end function ao:_applyFont()if not self.
+TitleLabel then return end self._fontGen=(self._fontGen or 0)+1 local as=self._fontGen local at,av=fontPair(self.
+FontName)self.TitleLabel.Font,self.NameLabel.Font=at,av self._faces,self._mw=nil,nil if not isDownloadable(self.FontName
+)then self:_resize()return end af.load(self.FontName,function(aw,ax)if as~=self._fontGen or not self.TitleLabel then
+return end if not aw then warn('[Lumen] font '..tostring(self.FontName)..' not loaded: '..tostring(ax))if self.Lib and
+self.Lib.Notify and not self._fontWarned then self._fontWarned=true self.Lib:Notify({Title='Font not loaded',Content=
+tostring(ax),Type='warning',Duration=4})end return end self.TitleLabel.FontFace,self.NameLabel.FontFace=aw.Title,aw.Body
+self._faces=aw self:_measure()end)end function ao:_distance()if self.Host or not self.Gui or not self.Gui:IsA(
+'BillboardGui')then return 0 end local as=workspace.CurrentCamera local at=self.Gui.Adornee if not(as and at)then return
+0 end local av,aw=pcall(function()return(as.CFrame.Position-at.Position).Magnitude end)return if av then aw else 0 end
+local function lerp(as,at,av)return as+(at-as)*av end function ao:_layout(as)local at=self._parts if not at then return
+end local av=math.floor(lerp(self:_width(),an,as)+0.5)local aw=math.floor(lerp(aj,ak,as)+0.5)local ax=math.floor(lerp(al
+,am,as)+0.5)self.Gui.Size=UDim2.fromOffset(av,aw)at.Disc.Position=UDim2.fromOffset(math.floor(lerp(4,(an-am)/2,as)+0.5),
+(aw-ax)//2)at.Disc.Size=UDim2.fromOffset(ax,ax)local ay=math.floor(ax*lerp(0.78,1,as)+0.5)self.IconImage.Size=UDim2.
+fromOffset(ay,ay)self.IconImage.Position=UDim2.fromOffset((ax-ay)//2,(ax-ay)//2)if self._ready then local az=math.clamp(
+1-as*2.4,0,1)self.TitleLabel.TextTransparency=1-az self.NameLabel.TextTransparency=1-az self.TitleLabel.
+TextStrokeTransparency=1 self.NameLabel.TextStrokeTransparency=1 end end function ao:_step(as)if not self.Gui then
+return end if self._anims then for at,av in self._anims do av.acc+=as if av.acc>=av.delay then local aw=math.floor(av.
+acc/av.delay)av.acc-=aw*av.delay av.i=(av.i+aw)%av.frames at.ImageRectOffset=Vector2.new((av.i%av.cols)*av.w,(av.i//av.
+cols)*av.h)end end end local at=self:_distance()if self._goal==0 and at>self.MiniDistance then self._goal=1 elseif self.
 _goal==1 and at<self.MiniDistance-5 then self._goal=0 end if math.abs(self._goal-self._t)>0.002 then self._t+=(self.
 _goal-self._t)*(1-math.exp(-as*10))self:_layout(self._t)elseif self._t~=self._goal then self._t=self._goal self:_layout(
-self._t)end end function ao:_build()if self.Gui then self.Gui:Destroy()self.Gui=nil end local as=self.Player.Character
-local at=as and(as:FindFirstChild('Head')or as:WaitForChild('Head',5))if not at or not self.Enabled then return end if
-self.Gui then self.Gui:Destroy()self.Gui=nil end for av,aw in at:GetChildren()do if aw.Name=='LumenNametag'then aw:
-Destroy()end end self._dying=nil self._token+=1 local av=self._token self._ready=false local aw=self:_width()local ax=
-Instance.new('BillboardGui')ax.Name='LumenNametag'ax.AlwaysOnTop=true ax.LightInfluence=0 ax.MaxDistance=self.Distance
-ax.Size=UDim2.fromOffset(aw,aj)ax.StudsOffset=Vector3.zero ax.StudsOffsetWorldSpace=Vector3.new(0,self.Offset,0)ax.
-ExtentsOffset=Vector3.zero ax.ResetOnSpawn=false ax.Parent=at ax.Adornee=at self.Gui=ax self._t=if self:_distance()>self
-.MiniDistance then 1 else 0 self._goal=self._t local ay=self._t<0.5 if self._t>0 then ax.Size=UDim2.fromOffset(an,ak)end
-local az={}local function fade(aA,aB,aC)aA[aB]=1 table.insert(az,{aA,aB,aC})end local function pill(aA)return ad.create(
-'UICorner',{CornerRadius=UDim.new(0.5,0),Parent=aA})end local aA=ad.create('Frame',{Name='Card',AnchorPoint=Vector2.new(
-0.5,0.5),Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromScale(1,1),BackgroundColor3=ah.Black,Parent=ax})pill(aA)fade(
-aA,'BackgroundTransparency',0)local aB=ad.create('UIScale',{Scale=0.8,Parent=aA})self.Card=aA self._fades=az self.
-BgImage=ad.create('ImageLabel',{Name='Background',Size=UDim2.fromScale(1,1),Image='',ScaleType=Enum.ScaleType.Crop,
-ZIndex=1,Parent=aA})pill(self.BgImage)fade(self.BgImage,'ImageTransparency',0)self._bgFallback=ad.create('Frame',{Name=
-'BackgroundFallback',Size=UDim2.fromScale(1,1),BackgroundColor3=ah.White,Visible=false,ZIndex=1,Parent=aA})pill(self.
-_bgFallback)ad.gradient(self._bgFallback,nil,0,NumberSequence.new({NumberSequenceKeypoint.new(0,0.82),
-NumberSequenceKeypoint.new(1,0.97)}))local aC=ad.create('Frame',{Name='IconDisc',Position=UDim2.fromOffset(4,(aj-al)//2)
-,Size=UDim2.fromOffset(al,al),BackgroundTransparency=1,ZIndex=3,Parent=aA})local aD=math.floor(al*0.74+0.5)self.
-IconImage=ad.create('ImageLabel',{Name='Icon',Position=UDim2.fromOffset((al-aD)//2,(al-aD)//2),Size=UDim2.fromOffset(aD,
-aD),ScaleType=Enum.ScaleType.Fit,ZIndex=4,Parent=aC})fade(self.IconImage,'ImageTransparency',0)self._parts={Disc=aC}self
-:_loadBackground(av)self:_loadIcon(av)local aE=al+14 self.TitleLabel=ad.create('TextLabel',{Position=UDim2.fromOffset(aE
-,7),Size=UDim2.new(1,-(aE+14),0,18),Text=self.Title,Font=(fontPair(self.FontName)),TextSize=14,TextXAlignment=Enum.
-TextXAlignment.Left,TextTruncate=Enum.TextTruncate.AtEnd,TextStrokeColor3=Color3.new(0,0,0),TextStrokeTransparency=1,
-ZIndex=3,Parent=aA})fade(self.TitleLabel,'TextTransparency',if ay then 0 else 1)self.NameLabel=ad.create('TextLabel',{
-Position=UDim2.fromOffset(aE,25),Size=UDim2.new(1,-(aE+14),0,16),Text=self:_username(),Font=select(2,fontPair(self.
-FontName)),TextSize=11,TextColor3=Color3.fromRGB(215,215,222),TextXAlignment=Enum.TextXAlignment.Left,TextTruncate=Enum.
-TextTruncate.AtEnd,TextStrokeColor3=Color3.new(0,0,0),TextStrokeTransparency=1,ZIndex=3,Parent=aA})fade(self.NameLabel,
-'TextTransparency',if ay then 0 else 1)self:_applyFont()local aF=ad.ring(aA,aj//2,0.5,0.86)aF.ZIndex=10 local aG=aF:
-FindFirstChildOfClass('UICorner')if aG then aG.CornerRadius=UDim.new(0.5,0)end for aH,aI in aF:GetDescendants()do if aI:
-IsA('UIStroke')then fade(aI,'Transparency',0)end end self:_layout(self._t)for aH,aI in az do ad.tween(aI[1],{[aI[2] ]=aI
-[3]},0.5)end ad.tween(aB,{Scale=1},0.7,Enum.EasingStyle.Back)task.delay(0.6,function()if self.Gui==ax then self._ready=
-true self:_layout(self._t)end end)end local function place(as,at,av,aw,ax,ay)if string.match(as,'^https?://')then ae.
-image(as,'assets/nametag',function(az,aA,aB)if at==av._token and aw.Parent then ax(az,aA,aB)end end,ay)else ax(as)end
-end function ao:_avatar(as)local at=self.IconImage task.spawn(function()local av,aw=pcall(function()return aa:
-GetUserThumbnailAsync(self.Player.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size150x150)end)if av and as==
-self._token and at.Parent then at.ScaleType=Enum.ScaleType.Crop at.Image=aw end end)end function ao:_loadIcon(as)local
-at=self.IconImage if not at then return end at.ScaleType=Enum.ScaleType.Fit if not self.Icon then at.Image=''self:
-_avatar(as)return end place(self.Icon,as,self,at,function(av,aw)if av then at.Image=av else warn(
-'[Lumen] nametag icon not loaded: '..tostring(aw))self:_avatar(as)end end)end local as={}function ao:_report(at,av,aw)if
-not ao.Verbose or as[tostring(self.Background)..aw]then return end as[tostring(self.Background)..aw]=true if self.Lib
-and self.Lib.Notify then self.Lib:Notify({Title=at,Content=av,Type=aw,Duration=5})end end function ao:_loadBackground(at
-)local av=self.BgImage if not av then return end av.Image=''if not self.Background then return end place(self.Background
-,at,self,av,function(aw,ax,ay)if aw then av.Image=aw av.ImageTransparency=0 if self._bgFallback then self._bgFallback.
-Visible=false end else warn('[Lumen] nametag background not loaded: '..tostring(ax))if self._bgFallback then self.
-_bgFallback.Visible=true end self:_report('Background failed',tostring(ax),'error')end end,{convert=true,width=512})end
-function ao:_resize()if self.Gui then self:_layout(self._t)end end function ao:_persist(at,av)av=if av==nil then''else
-tostring(av)self.Raw[at]=av if self.Lib and self.Lib.Remember then local aw={}for ax,ay in self.Raw do aw[ax]=ay end
-self.Lib:Remember('nametag',self.Key,aw)end end function ao:_changed()if self.OnChange then self.OnChange(self)end end
-function ao:Reset()self.Title=self.DefaultTitle self.Name=nil self.Icon=source(nil,ao.DEFAULT_ICON)self.Background=
-source(nil,ao.DEFAULT_BACKGROUND)self.Raw={}self.FontName='Default'if self.Lib and self.Lib.Remember then self.Lib:
-Remember('nametag',self.Key,nil)end if self.TitleLabel then self.TitleLabel.Text=self.Title self.NameLabel.Text=self:
-_username()self:_loadIcon(self._token)self:_loadBackground(self._token)self:_applyFont()end self:_resize()self:_changed(
-)end function ao:SetFont(at)self:_persist('Font',at)self.FontName=if at==nil or at==''then'Default'else at self:
-_applyFont()self:_resize()self:_changed()end function ao:SetTitle(at)self:_persist('Title',at)self.Title=at or''if self.
-TitleLabel then self.TitleLabel.Text=self.Title end self:_measure()self:_resize()self:_changed()end function ao:SetName(
-at)self:_persist('Name',at)self.Name=if at==''then nil else at if self.NameLabel then self.NameLabel.Text=self:
-_username()end self:_measure()self:_resize()self:_changed()end function ao:SetIcon(at)self:_persist('Icon',at)self.Icon=
-source(at,ao.DEFAULT_ICON)self:_loadIcon(self._token)self:_changed()end function ao:SetBackground(at)self:_persist(
-'Background',at)self.Background=source(at,ao.DEFAULT_BACKGROUND)self:_loadBackground(self._token)self:_changed()end
-function ao:SetEnabled(at)if at==self.Enabled and(self.Gui~=nil)==at then return end self.Enabled=at if at then if self.
-_dying then self._dying:Destroy()self._dying=nil end self:_build()elseif self.Gui then local av=self.Gui self.Gui=nil
-self._dying=av self._token+=1 if self._fades then for aw,ax in self._fades do pcall(function()ad.tween(ax[1],{[ax[2] ]=1
-},0.25)end)end end task.delay(0.28,function()av:Destroy()if self._dying==av then self._dying=nil end end)end end
-function ao:Destroy()self._conn:Disconnect()self._beat:Disconnect()if self.Gui then self.Gui:Destroy()self.Gui=nil end
-end return ao end function a.t()local aa=a.cache.t if not aa then aa={c=__modImpl()}a.cache.t=aa end return aa.c end end
-do local function __modImpl()return'0.1.3'end function a.u()local aa=a.cache.u if not aa then aa={c=__modImpl()}a.cache.
-u=aa end return aa.c end end do local function __modImpl()local aa=game:GetService('HttpService')local ab=game:
-GetService('Players')local ac=a.t()local ad=a.u()local ae={}ae.__index=ae ae.URL='wss://lumen-biscuit.duckdns.org/ws'ae.
-RETRY={5,10,20,40,60}ae.MAX_TAGS=60 local af={['raw.githubusercontent.com']=true,['i.imgur.com']=true,[
-'cdn.discordapp.com']=true,['media.discordapp.net']=true,['i.postimg.cc']=true,['tr.rbxcdn.com']=true}function ae.
-configured(ag)return type(ag)=='string'and ag~=''and not string.find(ag,'example.invalid',1,true)end local function 
-clean(ag,ah)if type(ag)~='string'then return''end ag=string.gsub(ag,'[%c\u{200e}\u{200f}\u{202a}-\u{202e}]','')return
-string.sub(ag,1,ah)end local function image(ag)ag=clean(ag,300)if ag==''or ag=='none'or ag=='avatar'then return ag end
-if string.match(ag,'^%d+$')and#ag<=16 then return ag end if string.match(ag,'^rbxassetid://%d+$')and#ag<=28 then return
-ag end local ah=string.match(ag,'^https://([^/%?#@:]+)[/%?#]')or string.match(ag,'^https://([^/%?#@:]+)$')if ah and af[
-string.lower(ah)]then return ag end return''end ae.image=image local ag local function validFont(ah)if not ag then ag={}
-for ai,aj in ac.Fonts do ag[aj]=true end end return if ag[ah]then ah else'Default'end function ae.cleanTag(ah)ah=if
-type(ah)=='table'then ah else{}return{Title=clean(ah.title,24),Name=clean(ah.name,24),Icon=image(ah.icon),Background=
-image(ah.bg),Font=validFont(clean(ah.font,40))}end function ae.new(ah,ai)ai=ai or{}local aj=getgenv and getgenv()or _G
-local ak=setmetatable({Lib=ah,Url=ai.Url or aj.LumenServer or ae.URL,Own=ai.Tag,Connect=ai.Connect or(WebSocket and
-WebSocket.connect),Peers={},Connected=false,_wanted=false},ae)ak.Online=ae.configured(ak.Url)and ak.Connect~=nil return
-ak end function ae:Shares()return self.Lib:Recall('settings','shareTag')~=false end function ae:_payload()local ah=self.
-Own if not ah then return{}end return{title=ah.Title,name=ah.Name or'',icon=ah.Raw.Icon or'',bg=ah.Raw.Background or'',
-font=ah.FontName}end function ae:_send(ah)if self.Connected and self._ws then pcall(function()self._ws:Send(aa:
-JSONEncode(ah))end)end end function ae:_remove(ah)local ai=self.Peers[ah]self.Peers[ah]=nil if ai and ai.Tag then local
-aj=table.find(self.Lib.Nametags,ai.Tag)if aj then table.remove(self.Lib.Nametags,aj)end ai.Tag:Destroy()end end function
-ae:_clear()for ah in table.clone(self.Peers)do self:_remove(ah)end end function ae:_build(ah)local ai=self.Peers[ah]if
-not ai or ai.Tag then return end local aj=ab:GetPlayerByUserId(tonumber(ah))if not aj then return end local ak=ac.new(
-nil,{Player=aj,Title=ai.Cfg.Title,Name=ai.Cfg.Name,Icon=ai.Cfg.Icon,Background=ai.Cfg.Background,Font=ai.Cfg.Font})ai.
-Tag=ak table.insert(self.Lib.Nametags,ak)if self.Lib.NametagsVisible==false then ak:SetEnabled(false)end end function ae
-:_add(ah)if type(ah)~='table'or type(ah.id)~='string'or not string.match(ah.id,'^%d+$')then return end local ai=ab.
-LocalPlayer if ai and tostring(ai.UserId)==ah.id then return end local aj=0 for ak in self.Peers do aj+=1 end if aj>=ae.
-MAX_TAGS and not self.Peers[ah.id]then return end self:_remove(ah.id)self.Peers[ah.id]={Cfg=ae.cleanTag(ah.tag)}self:
-_build(ah.id)end function ae:_update(ah,ai)local aj=self.Peers[ah]if not aj then return end aj.Cfg=ae.cleanTag(ai)if aj.
-Tag then local ak=aj.Cfg aj.Tag:SetTitle(ak.Title)aj.Tag:SetName(ak.Name)aj.Tag:SetIcon(ak.Icon)aj.Tag:SetBackground(ak.
-Background)aj.Tag:SetFont(ak.Font)end end function ae:_onMessage(ah)local ai,aj=pcall(function()return aa:JSONDecode(ah)
-end)if not ai or type(aj)~='table'then return end if aj.t=='welcome'then self:_clear()if type(aj.peers)=='table'then for
-ak,al in aj.peers do self:_add(al)end end elseif aj.t=='join'then self:_add(aj.peer)elseif aj.t=='leave'and type(aj.id)
-=='string'then self:_remove(aj.id)elseif aj.t=='tag'and type(aj.id)=='string'then self:_update(aj.id,aj.tag)elseif aj.t
-=='announce'then local ak=clean(aj.text,200)if ak~=''then local al=if aj.type=='success'or aj.type=='warning'or aj.type
-=='error'then aj.type else'info'self.Lib:Notify({Title=clean(aj.title,40),Content=ak,Type=al,Duration=8})end elseif aj.t
-=='kick'then self._wanted=false self:_clear()local ak=clean(aj.reason,120)pcall(function()game:GetService('StarterGui'):
-SetCore('SendNotification',{Title='Lumen',Text='You were removed from Lumen.'..(if ak~=''then' '..ak else''),Duration=8}
-)end)if self.Lib.Unload then self.Lib:Unload()end elseif aj.t=='banned'then self._wanted=false self:_clear()local ak=if
-type(aj.reason)=='string'then clean(aj.reason,120)else''pcall(function()game:GetService('StarterGui'):SetCore(
-'SendNotification',{Title='Lumen',Text='This account is banned from Lumen.'..(if ak~=''then' '..ak else''),Duration=8})
-end)if self.Lib.Unload then self.Lib:Unload()end end end function ae:_hello()local ah=ab.LocalPlayer if not self.
-_gameName then local ai,aj=pcall(function()return game:GetService('MarketplaceService'):GetProductInfo(game.PlaceId)end)
-self._gameName=if ai and type(aj)=='table'and type(aj.Name)=='string'then aj.Name else''end return{t='hello',id=
-tostring(ah.UserId),name=ah.Name,display=ah.DisplayName,place=tostring(game.PlaceId),job=game.JobId,game=self._gameName,
-ver=ad,share=self:Shares(),tag=self:_payload()}end function ae:_alive()return self._wanted and self.Lib.Gui~=nil and
-self.Lib.Gui.Parent~=nil and not self.Lib._unloading end function ae:Start()if self._wanted or not self.Online or not ab
-.LocalPlayer then return end self._wanted=true if self.Own then self.Own.OnChange=function()self:_send({t='tag',tag=self
-:_payload()})end end self._added=ab.PlayerAdded:Connect(function(ah)self:_build(tostring(ah.UserId))end)self._removing=
-ab.PlayerRemoving:Connect(function(ah)local ai=self.Peers[tostring(ah.UserId)]if ai and ai.Tag then self:_remove(
-tostring(ah.UserId))end end)table.insert(self.Lib.Cleanups,function()self:Stop()end)task.spawn(function()local ah=0
-while self:_alive()do local ai,aj=pcall(self.Connect,self.Url)if ai and aj then ah=0 self._ws,self.Connected=aj,true
-local ak=false pcall(function()aj.OnMessage:Connect(function(al)self:_onMessage(al)end)aj.OnClose:Connect(function()ak=
-true end)end)self:_send(self:_hello())while self:_alive()and not ak do task.wait(1)end self.Connected,self._ws=false,nil
-self:_clear()pcall(function()aj:Close()end)else ah+=1 end if self:_alive()then task.wait(ae.RETRY[math.min(math.max(ah,1
-),#ae.RETRY)])end end end)end function ae:SetShared(ah)self.Lib:Remember('settings','shareTag',ah)self:_send({t='share',
-on=ah})if not ah then self:_clear()end end function ae:Stop()if not self._wanted then return end self._wanted=false for
-ah,ai in{self._added,self._removing}do ai:Disconnect()end self._added,self._removing=nil,nil if self._ws then pcall(
-function()self._ws:Close()end)end self:_clear()self.Connected,self._ws=false,nil end return ae end function a.v()local
-aa=a.cache.v if not aa then aa={c=__modImpl()}a.cache.v=aa end return aa.c end end do local function __modImpl()local aa
-=game:GetService('RunService')local ab=game:GetService('TextService')local ac=a.a()local ad=a.c()local ae=a.e()local af=
-a.k()local ag,ah=ac.Colors,ac.Fonts local ai=Enum.EasingStyle.Back local aj,ak=392,244 local al=64 local am=100 local an
-=am+36 local function fmt(ao)local ap=math.max(0,math.floor(ao/1000))return string.format('%d:%02d',ap//60,ap%60)end
-local ao={}ao.__index=ao local function flatButton(ap,aq,ar,as,at)local av=ad.create('TextButton',{Size=UDim2.
+self._t)end self:_stepEffects(as)end local as={'!','@','#','$','%','&','*','?','/','X','Z','0','1','<','>','~'}function
+ao:_stepEffects(at)local av=self.TextEffect local aw=self.TitleLabel if not aw or not aw.Parent then return end local ax
+=self.Title or''if av==nil or av=='none'or av==''then if aw.Text~=ax then aw.Text=ax end if aw.Position.Y.Offset~=7 then
+aw.Position=UDim2.fromOffset(aw.Position.X.Offset,7)end return end self._effectTime=(self._effectTime or 0)+at local ay=
+self._effectTime if av=='typewriter'then local az=#ax if az==0 then aw.Text=''return end local aA=6 local aB=(az/aA)+2
+local aC=ay%aB local aD=math.clamp(math.floor(aC*aA),0,az)local aE=if(aC<az/aA)and(math.floor(ay*3)%2==0)then'_'else''aw
+.Text=string.sub(ax,1,aD)..aE if aw.Position.Y.Offset~=7 then aw.Position=UDim2.fromOffset(aw.Position.X.Offset,7)end
+elseif av=='glitch'then local az=0.08 if not self._glitchNext or ay>=self._glitchNext then self._glitchNext=ay+az if
+math.random()<0.45 and#ax>0 then local aA={}for aB=1,#ax do local aC=string.sub(ax,aB,aB)if math.random()<0.22 and aC~=
+' 'then aC=as[math.random(1,#as)]end table.insert(aA,aC)end aw.Text=table.concat(aA)else aw.Text=ax end local aA=if math
+.random()<0.25 then math.random(-1,1)else 0 aw.Position=UDim2.fromOffset(aw.Position.X.Offset,7+aA)end elseif av=='wave'
+then if aw.Text~=ax then aw.Text=ax end local az=math.floor(math.sin(ay*4.5)*2.5+0.5)aw.Position=UDim2.fromOffset(aw.
+Position.X.Offset,7+az)elseif av=='bounce'then if aw.Text~=ax then aw.Text=ax end local az=-math.floor(math.abs(math.
+sin(ay*5))*3.5+0.5)aw.Position=UDim2.fromOffset(aw.Position.X.Offset,7+az)elseif av=='pulse'then if aw.Text~=ax then aw.
+Text=ax end if aw.Position.Y.Offset~=7 then aw.Position=UDim2.fromOffset(aw.Position.X.Offset,7)end local az=aw:
+FindFirstChild('EffectScale')if not az then az=ad.create('UIScale',{Name='EffectScale',Parent=aw})end az.Scale=1+math.
+sin(ay*5)*0.08 end end function ao:_build()self._anims={}if self.Gui then self.Gui:Destroy()self.Gui=nil end local at=
+self.Host local av=self.Player.Character local aw=if at then nil else(av and(av:FindFirstChild('Head')or av:
+WaitForChild('Head',5)))if(not at and not aw)or not self.Enabled then return end if self.Gui then self.Gui:Destroy()self
+.Gui=nil end if aw then for ax,ay in aw:GetChildren()do if ay.Name=='LumenNametag'then ay:Destroy()end end end self.
+_dying=nil self._token+=1 local ax=self._token self._ready=false local ay=self:_width()local az if at then az=Instance.
+new('Frame')az.Name='LumenNametagPreview'az.BackgroundTransparency=1 az.AnchorPoint=Vector2.new(0.5,0.5)az.Position=
+UDim2.fromScale(0.5,0.5)az.Size=UDim2.fromOffset(ay,aj)az.Parent=at ad.create('UIScale',{Scale=1.35,Parent=az})else az=
+Instance.new('BillboardGui')az.Name='LumenNametag'az.AlwaysOnTop=true az.LightInfluence=0 az.MaxDistance=self.Distance
+az.Size=UDim2.fromOffset(ay,aj)az.StudsOffset=Vector3.zero az.StudsOffsetWorldSpace=Vector3.new(0,self.Offset,0)az.
+ExtentsOffset=Vector3.zero az.ResetOnSpawn=false az.Parent=aw az.Adornee=aw end self.Gui=az self._t=if self:_distance()>
+self.MiniDistance then 1 else 0 self._goal=self._t local aA=self._t<0.5 if self._t>0 then az.Size=UDim2.fromOffset(an,ak
+)end local aB={}local function fade(aC,aD,aE)aC[aD]=1 table.insert(aB,{aC,aD,aE})end local function pill(aC)return ad.
+create('UICorner',{CornerRadius=UDim.new(0.5,0),Parent=aC})end local aC=ad.create('Frame',{Name='Card',AnchorPoint=
+Vector2.new(0.5,0.5),Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromScale(1,1),BackgroundColor3=ah.Black,Parent=az})
+pill(aC)fade(aC,'BackgroundTransparency',0)local aD=ad.create('UIScale',{Scale=0.8,Parent=aC})self.Card=aC self._fades=
+aB self.BgImage=ad.create('ImageLabel',{Name='Background',Size=UDim2.fromScale(1,1),Image='',ScaleType=Enum.ScaleType.
+Crop,ZIndex=1,Parent=aC})pill(self.BgImage)fade(self.BgImage,'ImageTransparency',0)self._bgFallback=ad.create('Frame',{
+Name='BackgroundFallback',Size=UDim2.fromScale(1,1),BackgroundColor3=ah.White,Visible=false,ZIndex=1,Parent=aC})pill(
+self._bgFallback)ad.gradient(self._bgFallback,nil,0,NumberSequence.new({NumberSequenceKeypoint.new(0,0.82),
+NumberSequenceKeypoint.new(1,0.97)}))local aE=ad.create('Frame',{Name='IconDisc',Position=UDim2.fromOffset(4,(aj-al)//2)
+,Size=UDim2.fromOffset(al,al),BackgroundTransparency=1,ZIndex=3,Parent=aC})local aF=math.floor(al*0.74+0.5)self.
+IconImage=ad.create('ImageLabel',{Name='Icon',Position=UDim2.fromOffset((al-aF)//2,(al-aF)//2),Size=UDim2.fromOffset(aF,
+aF),ScaleType=Enum.ScaleType.Fit,ZIndex=4,Parent=aE})fade(self.IconImage,'ImageTransparency',0)ad.create('UICorner',{
+CornerRadius=UDim.new(0.5,0),Parent=self.IconImage})self._parts={Disc=aE}self:_loadBackground(ax)self:_loadIcon(ax)local
+aG=al+14 self.TitleLabel=ad.create('TextLabel',{Position=UDim2.fromOffset(aG,7),Size=UDim2.new(1,-(aG+14),0,18),Text=
+self.Title,Font=(fontPair(self.FontName)),TextSize=14,TextXAlignment=Enum.TextXAlignment.Left,TextTruncate=Enum.
+TextTruncate.AtEnd,TextStrokeTransparency=1,ZIndex=3,Parent=aC})fade(self.TitleLabel,'TextTransparency',if aA then 0
+else 1)self.NameLabel=ad.create('TextLabel',{Position=UDim2.fromOffset(aG,25),Size=UDim2.new(1,-(aG+14),0,16),Text=self:
+_username(),Font=select(2,fontPair(self.FontName)),TextSize=11,TextColor3=Color3.fromRGB(215,215,222),TextXAlignment=
+Enum.TextXAlignment.Left,TextTruncate=Enum.TextTruncate.AtEnd,TextStrokeTransparency=1,ZIndex=3,Parent=aC})fade(self.
+NameLabel,'TextTransparency',if aA then 0 else 1)self:_applyFont()local aH=ad.create('Frame',{Name='Ring',Position=UDim2
+.fromScale(0,0),Size=UDim2.fromScale(1,1),BackgroundTransparency=1,ZIndex=10,Parent=aC})pill(aH)local aI=ad.stroke(aH,
+0.68,self.StrokeColor or ah.White,1.5)aI.ApplyStrokeMode=Enum.ApplyStrokeMode.Border fade(aI,'Transparency',0)self._ring
+=aH self:_applyColors()self:_layout(self._t)for aJ,aK in aB do ad.tween(aK[1],{[aK[2] ]=aK[3]},0.5)end ad.tween(aD,{
+Scale=1},0.7,Enum.EasingStyle.Back)task.delay(0.6,function()if self.Gui==az then self._ready=true self:_layout(self._t)
+end end)end ao.GifService='https://lumen-biscuit.duckdns.org/gif'local at={}local function isGif(av)if ao.GifService==''
+then return false end local aw=string.lower(string.match(av,'^([^%?#]*)')or'')return string.match(aw,'^https://')~=nil
+and string.match(aw,'%.gif$')~=nil end local function sheetFor(av,aw)local ax=aw..'|'..av if at[ax]then return at[ax]end
+local ay=game:GetService('HttpService')local az,aA,aB=ae.request({Url=ao.GifService..'?kind='..aw..'&url='..ay:
+UrlEncode(av),Method='GET'})local aC,aD=pcall(function()return ay:JSONDecode(aB)end)if not az or aA~=200 or not aC or
+type(aD)~='table'then local aE=if aC and type(aD)=='table'and type(aD.error)=='string'then aD.error else
+'the server could not convert it'return nil,aE end if type(aD.sheet)~='string'or not tonumber(aD.frames)or not tonumber(
+aD.w)or not tonumber(aD.h)or not tonumber(aD.cols)then return nil,'the server answered with something unexpected'end aD.
+url=(string.match(ao.GifService,'^(https://[^/]+)')or'')..aD.sheet at[ax]=aD return aD end local function place(av,aw,ax
+,ay,az,aA,aB)if string.match(av,'^https?://')then local function finish(aC,aD,aE)if aw==ax._token and ay.Parent then az(
+aC,aD,aE)end end if aB and isGif(av)then task.spawn(function()local aC,aD=sheetFor(av,aB)if not aC then return finish(
+nil,aD)end ae.image(aC.url,'assets/nametag',function(aE,aF)finish(aE,aF,if aE then{Sheet=aC}else nil)end)end)return end
+ae.image(av,'assets/nametag',finish,aA)else az(av)end end function ao:_setSheet(av,aw)self._anims=self._anims or{}if not
+aw then self._anims[av]=nil av.ImageRectSize=Vector2.new(0,0)av.ImageRectOffset=Vector2.new(0,0)return end local ax,ay=
+tonumber(aw.w),tonumber(aw.h)av.ImageRectSize=Vector2.new(ax,ay)av.ImageRectOffset=Vector2.new(0,0)self._anims[av]={
+frames=math.max(1,tonumber(aw.frames)),cols=math.max(1,tonumber(aw.cols)),w=ax,h=ay,delay=math.max(0.02,(tonumber(aw.
+delay)or 100)/1000),i=0,acc=0}end function ao:_avatar(av)local aw=self.IconImage task.spawn(function()local ax,ay=pcall(
+function()return aa:GetUserThumbnailAsync(self.Player.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size150x150)
+end)if ax and av==self._token and aw.Parent then aw.ScaleType=Enum.ScaleType.Crop aw.Image=ay end end)end function ao:
+_loadIcon(av)local aw=self.IconImage if not aw then return end aw.ScaleType=Enum.ScaleType.Fit self:_setSheet(aw,nil)if
+not self.Icon then aw.Image=''self:_avatar(av)return end place(self.Icon,av,self,aw,function(ax,ay,az)if ax then aw.
+Image=ax self:_setSheet(aw,az and az.Sheet)else warn('[Lumen] nametag icon not loaded: '..tostring(ay))self:_avatar(av)
+end end,nil,'icon')end local av={}function ao:_report(aw,ax,ay)if not ao.Verbose or av[tostring(self.Background)..ay]
+then return end av[tostring(self.Background)..ay]=true if self.Lib and self.Lib.Notify then self.Lib:Notify({Title=aw,
+Content=ax,Type=ay,Duration=5})end end function ao:_loadBackground(aw)local ax=self.BgImage if not ax then return end ax
+.Image=''self:_setSheet(ax,nil)if not self.Background then return end place(self.Background,aw,self,ax,function(ay,az,aA
+)if ay then ax.Image=ay self:_setSheet(ax,aA and aA.Sheet)ax.ImageTransparency=0 if self._bgFallback then self.
+_bgFallback.Visible=false end else warn('[Lumen] nametag background not loaded: '..tostring(az))if self._bgFallback then
+self._bgFallback.Visible=true end self:_report('Background failed',tostring(az),'error')end end,{convert=true,width=512}
+,'bg')end function ao:_resize()if self.Gui then self:_layout(self._t)end end function ao:_persist(aw,ax)ax=if ax==nil
+then''else tostring(ax)self.Raw[aw]=ax if self.Lib and self.Lib.Remember then local ay={}for az,aA in self.Raw do ay[az]
+=aA end self.Lib:Remember('nametag',self.Key,ay)end end function ao:_changed()if self.OnChange then self.OnChange(self)
+end end function ao:Snapshot()local aw=self.Raw return{Title=self.Title,Name=aw.Name or'',Icon=aw.Icon or'',Background=
+aw.Background or'',Font=self.FontName,Stroke=aw.Stroke or'',TextColor=aw.TextColor or'',Gradient=aw.Gradient or'',
+GradientRot=aw.GradientRot or'0',TextEffect=aw.TextEffect or'none'}end function ao:Apply(aw)local ax=self.OnChange self.
+OnChange=nil self:SetTitle(aw.Title)self:SetName(aw.Name)self:SetIcon(aw.Icon)self:SetBackground(aw.Background)self:
+SetFont(aw.Font)self:SetStrokeColor(aw.Stroke)self:SetTextColor(aw.TextColor)self:SetGradient(aw.Gradient,aw.GradientRot
+)self:SetTextEffect(aw.TextEffect)self.OnChange=ax self:_changed()end function ao:_applyColors()if self._ring then for
+aw,ax in self._ring:GetDescendants()do if ax:IsA('UIStroke')then ax.Color=self.StrokeColor or Color3.new(1,1,1)end end
+end local aw=self.TitleLabel if aw then aw.TextColor3=self.TextColor or Color3.new(1,1,1)local ax=aw:FindFirstChild(
+'TitleGradient')if self.GradientColors and#self.GradientColors>=2 then if not ax then ax=Instance.new('UIGradient')ax.
+Name='TitleGradient'ax.Parent=aw end local ay={}local az=#self.GradientColors for aA,aB in self.GradientColors do local
+aC=(aA-1)/(az-1)table.insert(ay,ColorSequenceKeypoint.new(aC,aB))end ax.Color=ColorSequence.new(ay)ax.Rotation=self.
+GradientRot or 0 aw.TextColor3=Color3.new(1,1,1)elseif ax then ax:Destroy()end end end function ao:SetGradient(aw,ax)if
+type(aw)=='string'then self.GradientColors=ao.parseGradient(aw)self:_persist('Gradient',aw)elseif type(aw)=='table'then
+self.GradientColors=if#aw>=2 then aw else nil self:_persist('Gradient',ao.encodeGradient(aw))else self.GradientColors=
+nil self:_persist('Gradient','')end if ax~=nil then self.GradientRot=tonumber(ax)or 0 self:_persist('GradientRot',
+tostring(self.GradientRot))end self:_applyColors()self:_changed()end function ao:SetGradientRotation(aw)self.GradientRot
+=tonumber(aw)or 0 self:_persist('GradientRot',tostring(self.GradientRot))self:_applyColors()self:_changed()end function
+ao:SetTextEffect(aw)aw=tostring(aw or'none')self.TextEffect=aw self._effectTime=0 self:_persist('TextEffect',aw)if self.
+TitleLabel then self.TitleLabel.Text=self.Title or''self.TitleLabel.Position=UDim2.fromOffset(self.TitleLabel.Position.X
+.Offset,7)local ax=self.TitleLabel:FindFirstChild('EffectScale')if ax then ax.Scale=1 end end self:_changed()end
+function ao:SetStrokeColor(aw)local ax=if type(aw)=='string'then ao.fromHex(aw)else aw self.StrokeColor=ax self:
+_persist('Stroke',if ax then ao.toHex(ax)else'')self:_applyColors()self:_changed()end function ao:SetTextColor(aw)local
+ax=if type(aw)=='string'then ao.fromHex(aw)else aw self.TextColor=ax self:_persist('TextColor',if ax then ao.toHex(ax)
+else'')self:_applyColors()self:_changed()end function ao:Reset()self.Title=self.DefaultTitle self.Name=nil self.Icon=
+source(nil,ao.DEFAULT_ICON)self.Background=source(nil,ao.DEFAULT_BACKGROUND)self.Raw={}self.StrokeColor,self.TextColor=
+nil,nil self.GradientColors=nil self.GradientRot=0 self.TextEffect='none'self.FontName='Default'if self.Lib and self.Lib
+.Remember then self.Lib:Remember('nametag',self.Key,nil)end if self.TitleLabel then self.TitleLabel.Text=self.Title self
+.NameLabel.Text=self:_username()self:_loadIcon(self._token)self:_loadBackground(self._token)self:_applyFont()self:
+_applyColors()end self:_resize()self:_changed()end function ao:SetFont(aw)self:_persist('Font',aw)self.FontName=if aw==
+nil or aw==''then'Default'else aw self:_applyFont()self:_resize()self:_changed()end function ao:SetTitle(aw)self:
+_persist('Title',aw)self.Title=aw or''if self.TitleLabel then self.TitleLabel.Text=self.Title end self:_measure()self:
+_resize()self:_changed()end function ao:SetName(aw)self:_persist('Name',aw)self.Name=if aw==''then nil else aw if self.
+NameLabel then self.NameLabel.Text=self:_username()end self:_measure()self:_resize()self:_changed()end function ao:
+SetIcon(aw)self:_persist('Icon',aw)self.Icon=source(aw,ao.DEFAULT_ICON)self:_loadIcon(self._token)self:_changed()end
+function ao:SetBackground(aw)self:_persist('Background',aw)self.Background=source(aw,ao.DEFAULT_BACKGROUND)self:
+_loadBackground(self._token)self:_changed()end function ao:SetEnabled(aw)if aw==self.Enabled and(self.Gui~=nil)==aw then
+return end self.Enabled=aw if aw then if self._dying then self._dying:Destroy()self._dying=nil end self:_build()elseif
+self.Gui then local ax=self.Gui self.Gui=nil self._dying=ax self._token+=1 if self._fades then for ay,az in self._fades
+do pcall(function()ad.tween(az[1],{[az[2] ]=1},0.25)end)end end task.delay(0.28,function()ax:Destroy()if self._dying==ax
+then self._dying=nil end end)end end function ao:Destroy()if self._click then self._click:Disconnect()end self._conn:
+Disconnect()self._beat:Disconnect()if self.Gui then self.Gui:Destroy()self.Gui=nil end end return ao end function a.t()
+local aa=a.cache.t if not aa then aa={c=__modImpl()}a.cache.t=aa end return aa.c end end do local function __modImpl()
+return'0.1.3'end function a.u()local aa=a.cache.u if not aa then aa={c=__modImpl()}a.cache.u=aa end return aa.c end end
+do local function __modImpl()local aa=game:GetService('HttpService')local ab=game:GetService('Players')local ac=a.t()
+local ad=a.u()local ae={}ae.__index=ae ae.URL='wss://lumen-biscuit.duckdns.org/ws'ae.RETRY={5,10,20,40,60}ae.MAX_TAGS=60
+local af={['raw.githubusercontent.com']=true,['i.imgur.com']=true,['cdn.discordapp.com']=true,['media.discordapp.net']=
+true,['i.postimg.cc']=true,['tr.rbxcdn.com']=true}function ae.configured(ag)return type(ag)=='string'and ag~=''and not
+string.find(ag,'example.invalid',1,true)end local function clean(ag,ah)if type(ag)~='string'then return''end ag=string.
+gsub(ag,'[%c\u{200e}\u{200f}\u{202a}-\u{202e}]','')return string.sub(ag,1,ah)end local function image(ag)ag=clean(ag,300
+)if ag==''or ag=='none'or ag=='avatar'then return ag end if string.match(ag,'^%d+$')and#ag<=16 then return ag end if
+string.match(ag,'^rbxassetid://%d+$')and#ag<=28 then return ag end local ah=string.match(ag,
+'^https://([^/%?#@:]+)[/%?#]')or string.match(ag,'^https://([^/%?#@:]+)$')if ah and af[string.lower(ah)]then return ag
+end return''end ae.image=image local ag local function validFont(ah)if not ag then ag={}for ai,aj in ac.Fonts do ag[aj]=
+true end end return if ag[ah]then ah else'Default'end function ae.cleanTag(ah)ah=if type(ah)=='table'then ah else{}local
+ai=clean(ah.gradient,200)local aj=tonumber(ah.grad_rot)or 0 local ak=clean(ah.effect,20)return{Title=clean(ah.title,24),
+Name=clean(ah.name,24),Icon=image(ah.icon),Background=image(ah.bg),Font=validFont(clean(ah.font,40)),Stroke=if type(ah.
+stroke)=='string'and string.match(ah.stroke,'^#%x%x%x%x%x%x$')then ah.stroke else'',TextColor=if type(ah.color)==
+'string'and string.match(ah.color,'^#%x%x%x%x%x%x$')then ah.color else'',Gradient=ai,GradientRot=tostring(aj),TextEffect
+=ak}end function ae.new(ah,ai)ai=ai or{}local aj=getgenv and getgenv()or _G local ak=setmetatable({Lib=ah,Url=ai.Url or
+aj.LumenServer or ae.URL,Own=ai.Tag,Connect=ai.Connect or(WebSocket and WebSocket.connect),OnTagClick=ai.OnTagClick,
+Peers={},Connected=false,_wanted=false},ae)ak.Online=ae.configured(ak.Url)and ak.Connect~=nil return ak end function ae:
+Shares()return self.Lib:Recall('settings','shareTag')~=false end function ae:_payload()local ah=self.Own if not ah then
+return{}end return{title=ah.Title,name=ah.Name or'',icon=ah.Raw.Icon or'',bg=ah.Raw.Background or'',font=ah.FontName,
+stroke=ah.Raw.Stroke or'',color=ah.Raw.TextColor or'',gradient=ah.Raw.Gradient or'',grad_rot=ah.Raw.GradientRot or'0',
+effect=ah.Raw.TextEffect or'none'}end function ae:_send(ah)if self.Connected and self._ws then pcall(function()self._ws:
+Send(aa:JSONEncode(ah))end)end end function ae:_remove(ah)local ai=self.Peers[ah]self.Peers[ah]=nil if ai and ai.Tag
+then local aj=table.find(self.Lib.Nametags,ai.Tag)if aj then table.remove(self.Lib.Nametags,aj)end ai.Tag:Destroy()end
+end function ae:_clear()for ah in table.clone(self.Peers)do self:_remove(ah)end end function ae:_build(ah)local ai=self.
+Peers[ah]if not ai or ai.Tag then return end local aj=ab:GetPlayerByUserId(tonumber(ah))if not aj then return end local
+ak=ac.new(nil,{Player=aj,Title=ai.Cfg.Title,Name=ai.Cfg.Name,Icon=ai.Cfg.Icon,Background=ai.Cfg.Background,Font=ai.Cfg.
+Font,Stroke=ai.Cfg.Stroke,TextColor=ai.Cfg.TextColor,Gradient=ai.Cfg.Gradient,GradientRot=ai.Cfg.GradientRot,TextEffect=
+ai.Cfg.TextEffect,OnClick=function(ak)if self.OnTagClick then self.OnTagClick(ak)end end})ai.Tag=ak table.insert(self.
+Lib.Nametags,ak)if self.Lib.NametagsVisible==false then ak:SetEnabled(false)end end function ae:_add(ah)if type(ah)~=
+'table'or type(ah.id)~='string'or not string.match(ah.id,'^%d+$')then return end local ai=ab.LocalPlayer if ai and
+tostring(ai.UserId)==ah.id then return end local aj=0 for ak in self.Peers do aj+=1 end if aj>=ae.MAX_TAGS and not self.
+Peers[ah.id]then return end self:_remove(ah.id)self.Peers[ah.id]={Cfg=ae.cleanTag(ah.tag)}self:_build(ah.id)end function
+ae:_update(ah,ai)local aj=self.Peers[ah]if not aj then return end aj.Cfg=ae.cleanTag(ai)if aj.Tag then local ak=aj.Cfg
+aj.Tag:SetTitle(ak.Title)aj.Tag:SetName(ak.Name)aj.Tag:SetIcon(ak.Icon)aj.Tag:SetBackground(ak.Background)aj.Tag:
+SetFont(ak.Font)aj.Tag:SetStrokeColor(ak.Stroke)aj.Tag:SetTextColor(ak.TextColor)aj.Tag:SetGradient(ak.Gradient,ak.
+GradientRot)aj.Tag:SetTextEffect(ak.TextEffect)end end function ae:_onMessage(ah)local ai,aj=pcall(function()return aa:
+JSONDecode(ah)end)if not ai or type(aj)~='table'then return end if aj.t=='welcome'then self:_clear()if type(aj.peers)==
+'table'then for ak,al in aj.peers do self:_add(al)end end elseif aj.t=='join'then self:_add(aj.peer)elseif aj.t=='leave'
+and type(aj.id)=='string'then self:_remove(aj.id)elseif aj.t=='tag'and type(aj.id)=='string'then self:_update(aj.id,aj.
+tag)elseif aj.t=='announce'then local ak=clean(aj.text,200)if ak~=''then local al=if aj.type=='success'or aj.type==
+'warning'or aj.type=='error'then aj.type else'info'self.Lib:Notify({Title=clean(aj.title,40),Content=ak,Type=al,Duration
+=8})end elseif aj.t=='kick'then self._wanted=false self:_clear()local ak=clean(aj.reason,120)pcall(function()game:
+GetService('StarterGui'):SetCore('SendNotification',{Title='Lumen',Text='You were removed from Lumen.'..(if ak~=''then
+' '..ak else''),Duration=8})end)if self.Lib.Unload then self.Lib:Unload()end elseif aj.t=='banned'then self._wanted=
+false self:_clear()local ak=if type(aj.reason)=='string'then clean(aj.reason,120)else''pcall(function()game:GetService(
+'StarterGui'):SetCore('SendNotification',{Title='Lumen',Text='This account is banned from Lumen.'..(if ak~=''then' '..ak
+else''),Duration=8})end)if self.Lib.Unload then self.Lib:Unload()end end end function ae:_hello()local ah=ab.LocalPlayer
+if not self._gameName then local ai,aj=pcall(function()return game:GetService('MarketplaceService'):GetProductInfo(game.
+PlaceId)end)self._gameName=if ai and type(aj)=='table'and type(aj.Name)=='string'then aj.Name else''end return{t='hello'
+,id=tostring(ah.UserId),name=ah.Name,display=ah.DisplayName,place=tostring(game.PlaceId),job=game.JobId,game=self.
+_gameName,ver=ad,share=self:Shares(),tag=self:_payload()}end function ae:_alive()return self._wanted and self.Lib.Gui~=
+nil and self.Lib.Gui.Parent~=nil and not self.Lib._unloading end function ae:Start()if self._wanted or not self.Online
+or not ab.LocalPlayer then return end self._wanted=true if self.Own then self.Own.OnChange=function()self:_send({t='tag'
+,tag=self:_payload()})end end self._added=ab.PlayerAdded:Connect(function(ah)self:_build(tostring(ah.UserId))end)self.
+_removing=ab.PlayerRemoving:Connect(function(ah)local ai=self.Peers[tostring(ah.UserId)]if ai and ai.Tag then self:
+_remove(tostring(ah.UserId))end end)table.insert(self.Lib.Cleanups,function()self:Stop()end)task.spawn(function()local
+ah=0 while self:_alive()do local ai,aj=pcall(self.Connect,self.Url)if ai and aj then ah=0 self._ws,self.Connected=aj,
+true local ak=false pcall(function()aj.OnMessage:Connect(function(al)self:_onMessage(al)end)aj.OnClose:Connect(function(
+)ak=true end)end)self:_send(self:_hello())while self:_alive()and not ak do task.wait(1)end self.Connected,self._ws=false
+,nil self:_clear()pcall(function()aj:Close()end)else ah+=1 end if self:_alive()then task.wait(ae.RETRY[math.min(math.
+max(ah,1),#ae.RETRY)])end end end)end function ae:SetShared(ah)self.Lib:Remember('settings','shareTag',ah)self:_send({t=
+'share',on=ah})if not ah then self:_clear()end end function ae:Stop()if not self._wanted then return end self._wanted=
+false for ah,ai in{self._added,self._removing}do ai:Disconnect()end self._added,self._removing=nil,nil if self._ws then
+pcall(function()self._ws:Close()end)end self:_clear()self.Connected,self._ws=false,nil end return ae end function a.v()
+local aa=a.cache.v if not aa then aa={c=__modImpl()}a.cache.v=aa end return aa.c end end do local function __modImpl()
+local aa=game:GetService('RunService')local ab=game:GetService('TextService')local ac=a.a()local ad=a.c()local ae=a.e()
+local af=a.k()local ag,ah=ac.Colors,ac.Fonts local ai=Enum.EasingStyle.Back local aj,ak=392,244 local al=64 local am=100
+local an=am+36 local function fmt(ao)local ap=math.max(0,math.floor(ao/1000))return string.format('%d:%02d',ap//60,ap%60
+)end local ao={}ao.__index=ao local function flatButton(ap,aq,ar,as,at)local av=ad.create('TextButton',{Size=UDim2.
 fromOffset(ar,ar),BackgroundTransparency=1,ZIndex=5,Parent=ap})local aw=ad.create('UIScale',{Parent=av})local ax=ad.
 icon(av,aq,at or ag.White,as)ax.Frame.AnchorPoint=Vector2.new(0.5,0.5)ax.Frame.Position=UDim2.fromScale(0.5,0.5)ax.Frame
 .ZIndex=6 av.MouseEnter:Connect(function()ad.tween(aw,{Scale=1.12},0.22,ai)end)av.MouseLeave:Connect(function()ad.tween(
@@ -2021,18 +2159,23 @@ Recall and ap:Recall('cards','MiniPlayer')if type(av)=='table'and tonumber(av.x)
 at.Y),Size=UDim2.fromOffset(aj,ak),BackgroundTransparency=1,Visible=false,ZIndex=6,Parent=ap.Gui})aq.Scale=ad.create(
 'UIScale',{Scale=0.6,Parent=aq.Root})aq.Body=ad.create('CanvasGroup',{Size=UDim2.fromScale(1,1),BackgroundColor3=ag.
 Black,GroupTransparency=1,Parent=aq.Root})ad.corner(aq.Body,32)ad.ring(aq.Body,32,0.62,0.9)aq.Wash=ad.create(
-'ImageLabel',{Size=UDim2.fromScale(1,1),ScaleType=Enum.ScaleType.Crop,ImageTransparency=0.25,Parent=aq.Body})local aw=ad
+'ImageLabel',{Size=UDim2.fromScale(1,1),ScaleType=Enum.ScaleType.Crop,ImageTransparency=0.72,Parent=aq.Body})local aw=ad
 .create('Frame',{Size=UDim2.fromScale(1,1),BackgroundColor3=ag.Black,ZIndex=2,Parent=aq.Body})ad.gradient(aw,nil,90,
-NumberSequence.new({NumberSequenceKeypoint.new(0,0.6),NumberSequenceKeypoint.new(0.55,0.42),NumberSequenceKeypoint.new(1
-,0.1)}))local ax=ad.create('TextButton',{Size=UDim2.fromScale(1,1),ZIndex=3,Parent=aq.Body})aq.Drag=ae.new(ax,aq.Root,{
-OnEnd=function()task.delay(0.5,function()if aq.Root.Parent and ap.Remember then ap:Remember('cards','MiniPlayer',{x=aq.
-Root.Position.X.Offset,y=aq.Root.Position.Y.Offset,minimized=aq.Minimized==true})end end)end})aq.Lower=ad.create(
-'CanvasGroup',{Size=UDim2.fromScale(1,1),BackgroundTransparency=1,ZIndex=4,Parent=aq.Body})aq.ArtHolder=ad.create(
-'Frame',{Position=UDim2.fromOffset(18,18),Size=UDim2.fromOffset(am,am),BackgroundTransparency=1,ZIndex=4,Parent=aq.Body}
-)aq.ArtScale=ad.create('UIScale',{Scale=0.94,Parent=aq.ArtHolder})aq.Art=ad.create('ImageLabel',{Size=UDim2.fromScale(1,
-1),BackgroundColor3=ag.Raised,BackgroundTransparency=0,ScaleType=Enum.ScaleType.Crop,ZIndex=4,Parent=aq.ArtHolder})ad.
-create('UICorner',{CornerRadius=UDim.new(0.22,0),Parent=aq.Art})aq.ArtNext=ad.create('ImageLabel',{Size=UDim2.fromScale(
-1,1),BackgroundTransparency=1,ImageTransparency=1,ScaleType=Enum.ScaleType.Crop,ZIndex=5,Parent=aq.ArtHolder})ad.create(
+NumberSequence.new({NumberSequenceKeypoint.new(0,0.8),NumberSequenceKeypoint.new(0.5,0.65),NumberSequenceKeypoint.new(1,
+0.3)}))aq.LyricsHolder=ad.create('Frame',{Name='LiveLyrics',Position=UDim2.fromOffset(0,0),Size=UDim2.fromScale(1,1),
+BackgroundTransparency=1,ClipsDescendants=true,ZIndex=2,Visible=false,Parent=aq.Body})ad.gradient(aq.LyricsHolder,nil,90
+,NumberSequence.new({NumberSequenceKeypoint.new(0,1),NumberSequenceKeypoint.new(0.18,0),NumberSequenceKeypoint.new(0.82,
+0),NumberSequenceKeypoint.new(1,1)}))aq.LyricsTrack=ad.create('Frame',{Name='Track',Position=UDim2.fromOffset(0,0),Size=
+UDim2.new(1,0,1,0),BackgroundTransparency=1,ZIndex=2,Parent=aq.LyricsHolder})aq._lyricItems={}local ax=ad.create(
+'TextButton',{Size=UDim2.fromScale(1,1),ZIndex=3,Parent=aq.Body})aq.Drag=ae.new(ax,aq.Root,{OnEnd=function()task.delay(
+0.5,function()if aq.Root.Parent and ap.Remember then ap:Remember('cards','MiniPlayer',{x=aq.Root.Position.X.Offset,y=aq.
+Root.Position.Y.Offset,minimized=aq.Minimized==true})end end)end})aq.Lower=ad.create('CanvasGroup',{Size=UDim2.
+fromScale(1,1),BackgroundTransparency=1,ZIndex=4,Parent=aq.Body})aq.ArtHolder=ad.create('Frame',{Position=UDim2.
+fromOffset(18,18),Size=UDim2.fromOffset(am,am),BackgroundTransparency=1,ZIndex=4,Parent=aq.Body})aq.ArtScale=ad.create(
+'UIScale',{Scale=0.94,Parent=aq.ArtHolder})aq.Art=ad.create('ImageLabel',{Size=UDim2.fromScale(1,1),BackgroundColor3=ag.
+Raised,BackgroundTransparency=0,ScaleType=Enum.ScaleType.Crop,ZIndex=4,Parent=aq.ArtHolder})ad.create('UICorner',{
+CornerRadius=UDim.new(0.22,0),Parent=aq.Art})aq.ArtNext=ad.create('ImageLabel',{Size=UDim2.fromScale(1,1),
+BackgroundTransparency=1,ImageTransparency=1,ScaleType=Enum.ScaleType.Crop,ZIndex=5,Parent=aq.ArtHolder})ad.create(
 'UICorner',{CornerRadius=UDim.new(0.22,0),Parent=aq.ArtNext})aq.ArtIcon=ad.icon(aq.Art,'music',ag.TextMuted,32)aq.
 ArtIcon.Frame.Position=UDim2.fromOffset((am-32)//2,(am-32)//2)aq.ArtIcon.Frame.ZIndex=6 local ay=ad.create('Frame',{Size
 =UDim2.fromScale(1,1),BackgroundTransparency=1,ZIndex=7,Parent=aq.ArtHolder})ad.create('UICorner',{CornerRadius=UDim.
@@ -2052,52 +2195,62 @@ new(aq.Body,{Bars=4,Width=3,Gap=2,Height=14,Color=ag.Dim})aq.Eq.Frame.AnchorPoin
 UDim2.new(1,-22,0,95)aq.Eq.Frame.ZIndex=5 local aB=ad.closeButton(aq.Body,28,{AnchorPoint=Vector2.new(1,0),Position=
 UDim2.new(1,-14,0,14),ZIndex=7})aB.MouseButton1Click:Connect(function()aq:Hide()end)local aC,aD=ad.minButton(aq.Body,28,
 {AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-48,0,14),ZIndex=7})aq.CloseBtn,aq.MinBtn,aq._setMinIcon=aB,aC,aD aC.
-MouseButton1Click:Connect(function()aq:Minimize(not aq.Minimized)end)local aE,aF=flatButton(aq.Body,'play',28,20)aE.
-AnchorPoint=Vector2.new(1,0)aE.Position=UDim2.new(1,-82,0,18)aE.ZIndex=7 aE.Visible=false aq.QPlay,aq.QPlayIcon=aE,aF aq
-.QPauseIcon=ad.icon(aE,'pause',ag.White,20)aq.QPauseIcon.Frame.AnchorPoint=Vector2.new(0.5,0.5)aq.QPauseIcon.Frame.
-Position=UDim2.fromScale(0.5,0.5)aq.QPauseIcon.Frame.ZIndex=6 aq.QPauseIcon.Frame.Visible=false aE.MouseButton1Click:
-Connect(function()if aq.Spotify then aq.Spotify:TogglePlay()end end)if type(av)=='table'and av.minimized==true then aq.
-Minimized=true aq._m=1 aq._mGoal=1 aq._setMinIcon(true,false)aq:_layout(1)end local aG,aH,aI,aJ,aK=slim(aq.Body,{
-Position=UDim2.fromOffset(18,130),Size=UDim2.new(1,-36,0,22)},5)table.insert(as,aK)aq.BarHit,aq.Bar,aq.Fill=aG,aH,aI aq.
-Elapsed=ad.create('TextLabel',{Position=UDim2.fromOffset(18,150),Size=UDim2.fromOffset(44,12),Text='0:00',Font=ah.Medium
-,TextSize=10,TextColor3=ag.TextMuted,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=4,Parent=aq.Body})aq.Remaining=ad.
-create('TextLabel',{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-18,0,150),Size=UDim2.fromOffset(48,12),Text=
-'-0:00',Font=ah.Medium,TextSize=10,TextColor3=ag.TextMuted,TextXAlignment=Enum.TextXAlignment.Right,ZIndex=4,Parent=aq.
-Body})aG.MouseEnter:Connect(function()aJ(true)end)aG.MouseLeave:Connect(function()if not aq._seeking then aJ(false)end
-end)ad.trackDrag(aG,function(aL)local aM=aq.Spotify and aq.Spotify.State.Track if not aM then return end aq._seeking=
-true aq._seekFrac=fracAt(aL,aH)aI.Size=UDim2.fromScale(aq._seekFrac,1)aq.Elapsed.Text=fmt(aq._seekFrac*aM.Duration)aq.
-Remaining.Text='-'..fmt((1-aq._seekFrac)*aM.Duration)end,function()local aL=aq.Spotify and aq.Spotify.State.Track if aq.
-_seeking and aL then aq.Spotify:Seek(aq._seekFrac*aL.Duration)end aq._seeking=false aq._lastFill=-1 aJ(false)end)local
-aL=ad.create('Frame',{Position=UDim2.fromOffset(0,166),Size=UDim2.new(1,0,0,44),BackgroundTransparency=1,ZIndex=5,Parent
-=aq.Body})ad.list(aL,22,Enum.FillDirection.Horizontal,Enum.HorizontalAlignment.Center,Enum.VerticalAlignment.Center)
-local function dotted(aM)local aN=ad.create('Frame',{AnchorPoint=Vector2.new(0.5,0),Position=UDim2.new(0.5,0,1,-3),Size=
-UDim2.fromOffset(4,4),BackgroundColor3=ag.Accent,BackgroundTransparency=1,ZIndex=6,Parent=aM})ad.corner(aN,2)table.
-insert(as,ac.bind(function(aO)aN.BackgroundColor3=aO end))return aN end local aM,aN=flatButton(aL,'shuffle',32,20,ag.Dim
-)aM.LayoutOrder=1 aq.ShuffleIcon,aq.ShuffleDot=aN,dotted(aM)local aO=flatButton(aL,'prev',36,26)aO.LayoutOrder=2 local
-aP,aQ=flatButton(aL,'play',48,36)aP.LayoutOrder=3 aQ.Frame.Position=UDim2.new(0.5,2,0.5,0)aq.PlayIcon=aQ aq.PauseIcon=ad
-.icon(aP,'pause',ag.White,36)aq.PauseIcon.Frame.AnchorPoint=Vector2.new(0.5,0.5)aq.PauseIcon.Frame.Position=UDim2.
-fromScale(0.5,0.5)aq.PauseIcon.Frame.ZIndex=6 aq.PauseIcon.Frame.Visible=false local aR=flatButton(aL,'next',36,26)aR.
-LayoutOrder=4 local aS,aT=flatButton(aL,'loop',32,20,ag.Dim)aS.LayoutOrder=5 aq.RepeatIcon,aq.RepeatDot=aT,dotted(aS)aq.
-Repeat1Icon=ad.icon(aS,'repeat1',ag.Dim,20)aq.Repeat1Icon.Frame.AnchorPoint=Vector2.new(0.5,0.5)aq.Repeat1Icon.Frame.
-Position=UDim2.fromScale(0.5,0.5)aq.Repeat1Icon.Frame.ZIndex=6 aq.Repeat1Icon.Frame.Visible=false local function sp()
-return aq.Spotify end aO.MouseButton1Click:Connect(function()if sp()then sp():Previous()end end)aR.MouseButton1Click:
-Connect(function()if sp()then sp():Next()end end)aP.MouseButton1Click:Connect(function()if sp()then sp():TogglePlay()end
-end)aM.MouseButton1Click:Connect(function()if sp()then sp():ToggleShuffle()end end)aS.MouseButton1Click:Connect(function
-()if sp()then sp():CycleRepeat()end end)aq.Volume=ad.create('Frame',{Position=UDim2.fromOffset(0,212),Size=UDim2.new(1,0
-,0,24),BackgroundTransparency=1,ZIndex=5,Parent=aq.Body})local aU=ad.create('TextButton',{Position=UDim2.fromOffset(18,0
-),Size=UDim2.fromOffset(26,24),ZIndex=6,Parent=aq.Volume})aq.VolIcon=ad.icon(aU,'volume',ag.Dim,18)aq.VolIcon.Frame.
-Position=UDim2.fromOffset(0,3)aq.MuteIcon=ad.icon(aU,'mute',ag.Dim,18)aq.MuteIcon.Frame.Position=UDim2.fromOffset(0,3)aq
-.MuteIcon.Frame.Visible=false local aV,aW,aX,aY,aZ=slim(aq.Volume,{Position=UDim2.fromOffset(52,0),Size=UDim2.new(1,-52-
-58,1,0)},6)table.insert(as,aZ)aq.VolFill=aX aq.VolPct=ad.create('TextLabel',{AnchorPoint=Vector2.new(1,0),Position=UDim2
-.new(1,-18,0,0),Size=UDim2.fromOffset(34,24),Text='50%',Font=ah.Semibold,TextSize=11,TextColor3=ag.Dim,TextXAlignment=
-Enum.TextXAlignment.Right,ZIndex=6,Parent=aq.Volume})aV.MouseEnter:Connect(function()aY(true)end)aV.MouseLeave:Connect(
-function()if not aq._volDragging then aY(false)end end)ad.trackDrag(aV,function(a_)if not sp()then return end aq.
-_volDragging=true local a0=fracAt(a_,aW)aX.Size=UDim2.fromScale(a0,1)aq.VolPct.Text=math.floor(a0*100+0.5)..'%'sp():
-SetVolume(a0*100)end,function()aq._volDragging=false aY(false)end)aU.MouseButton1Click:Connect(function()local a_=sp()if
-not a_ then return end local a0=a_.State.Volume or 0 if a0>0 then aq._preMute=a0 a_:SetVolume(0)else a_:SetVolume(aq.
-_preMute or 50)end end)for a_,a0 in{aq.Album,aq.DeviceChip,aq.Eq.Frame,aG,aq.Elapsed,aq.Remaining,aL,aq.Volume}do a0.
+MouseButton1Click:Connect(function()aq:Minimize(not aq.Minimized)end)local aE=ad.create('TextButton',{Name=
+'LiveLyricsToggle',AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-82,0,14),Size=UDim2.fromOffset(28,28),
+BackgroundColor3=ag.Tile,BackgroundTransparency=0,ZIndex=7,Parent=aq.Body})ad.corner(aE,14)local aF=ad.icon(aE,'list',ag
+.Dim,14)aF.Frame.AnchorPoint=Vector2.new(0.5,0.5)aF.Frame.Position=UDim2.fromScale(0.5,0.5)aF.Frame.ZIndex=8 aq.
+LiveLyrics=if type(av)=='table'and av.lyrics~=nil then av.lyrics==true else true local function updateLyrBtn()local aG=
+aq.LiveLyrics==true aq.LyricsHolder.Visible=aG and not aq.Minimized ad.tween(aE,{BackgroundColor3=if aG then ag.Raised
+else ag.Tile},0.2)aF:SetColor(if aG then ag.White else ag.Dim,true)end aE.MouseEnter:Connect(function()ad.tween(aE,{
+BackgroundColor3=ag.Raised},0.15)aF:SetColor(ag.White,true)end)aE.MouseLeave:Connect(function()updateLyrBtn()end)aE.
+MouseButton1Click:Connect(function()aq.LiveLyrics=not aq.LiveLyrics updateLyrBtn()if ap.Remember then ap:Remember(
+'cards','MiniPlayer',{x=aq.Root.Position.X.Offset,y=aq.Root.Position.Y.Offset,minimized=aq.Minimized==true,lyrics=aq.
+LiveLyrics})end end)aq.LyrBtn=aE updateLyrBtn()local aG,aH=flatButton(aq.Body,'play',28,20)aG.AnchorPoint=Vector2.new(1,
+0)aG.Position=UDim2.new(1,-116,0,18)aG.ZIndex=7 aG.Visible=false aq.QPlay,aq.QPlayIcon=aG,aH aq.QPauseIcon=ad.icon(aG,
+'pause',ag.White,20)aq.QPauseIcon.Frame.AnchorPoint=Vector2.new(0.5,0.5)aq.QPauseIcon.Frame.Position=UDim2.fromScale(0.5
+,0.5)aq.QPauseIcon.Frame.ZIndex=6 aq.QPauseIcon.Frame.Visible=false aG.MouseButton1Click:Connect(function()if aq.Spotify
+then aq.Spotify:TogglePlay()end end)if type(av)=='table'and av.minimized==true then aq.Minimized=true aq._m=1 aq._mGoal=
+1 aq._setMinIcon(true,false)aq:_layout(1)end local aI,aJ,aK,aL,aM=slim(aq.Body,{Position=UDim2.fromOffset(18,130),Size=
+UDim2.new(1,-36,0,22)},5)table.insert(as,aM)aq.BarHit,aq.Bar,aq.Fill=aI,aJ,aK aq.Elapsed=ad.create('TextLabel',{Position
+=UDim2.fromOffset(18,150),Size=UDim2.fromOffset(44,12),Text='0:00',Font=ah.Medium,TextSize=10,TextColor3=ag.TextMuted,
+TextXAlignment=Enum.TextXAlignment.Left,ZIndex=4,Parent=aq.Body})aq.Remaining=ad.create('TextLabel',{AnchorPoint=Vector2
+.new(1,0),Position=UDim2.new(1,-18,0,150),Size=UDim2.fromOffset(48,12),Text='-0:00',Font=ah.Medium,TextSize=10,
+TextColor3=ag.TextMuted,TextXAlignment=Enum.TextXAlignment.Right,ZIndex=4,Parent=aq.Body})aI.MouseEnter:Connect(function
+()aL(true)end)aI.MouseLeave:Connect(function()if not aq._seeking then aL(false)end end)ad.trackDrag(aI,function(aN)local
+aO=aq.Spotify and aq.Spotify.State.Track if not aO then return end aq._seeking=true aq._seekFrac=fracAt(aN,aJ)aK.Size=
+UDim2.fromScale(aq._seekFrac,1)aq.Elapsed.Text=fmt(aq._seekFrac*aO.Duration)aq.Remaining.Text='-'..fmt((1-aq._seekFrac)*
+aO.Duration)end,function()local aN=aq.Spotify and aq.Spotify.State.Track if aq._seeking and aN then aq.Spotify:Seek(aq.
+_seekFrac*aN.Duration)end aq._seeking=false aq._lastFill=-1 aL(false)end)local aN=ad.create('Frame',{Position=UDim2.
+fromOffset(0,166),Size=UDim2.new(1,0,0,44),BackgroundTransparency=1,ZIndex=5,Parent=aq.Body})ad.list(aN,22,Enum.
+FillDirection.Horizontal,Enum.HorizontalAlignment.Center,Enum.VerticalAlignment.Center)local function dotted(aO)local aP
+=ad.create('Frame',{AnchorPoint=Vector2.new(0.5,0),Position=UDim2.new(0.5,0,1,-3),Size=UDim2.fromOffset(4,4),
+BackgroundColor3=ag.Accent,BackgroundTransparency=1,ZIndex=6,Parent=aO})ad.corner(aP,2)table.insert(as,ac.bind(function(
+aQ)aP.BackgroundColor3=aQ end))return aP end local aO,aP=flatButton(aN,'shuffle',32,20,ag.Dim)aO.LayoutOrder=1 aq.
+ShuffleIcon,aq.ShuffleDot=aP,dotted(aO)local aQ=flatButton(aN,'prev',36,26)aQ.LayoutOrder=2 local aR,aS=flatButton(aN,
+'play',48,36)aR.LayoutOrder=3 aS.Frame.Position=UDim2.new(0.5,2,0.5,0)aq.PlayIcon=aS aq.PauseIcon=ad.icon(aR,'pause',ag.
+White,36)aq.PauseIcon.Frame.AnchorPoint=Vector2.new(0.5,0.5)aq.PauseIcon.Frame.Position=UDim2.fromScale(0.5,0.5)aq.
+PauseIcon.Frame.ZIndex=6 aq.PauseIcon.Frame.Visible=false local aT=flatButton(aN,'next',36,26)aT.LayoutOrder=4 local aU,
+aV=flatButton(aN,'loop',32,20,ag.Dim)aU.LayoutOrder=5 aq.RepeatIcon,aq.RepeatDot=aV,dotted(aU)aq.Repeat1Icon=ad.icon(aU,
+'repeat1',ag.Dim,20)aq.Repeat1Icon.Frame.AnchorPoint=Vector2.new(0.5,0.5)aq.Repeat1Icon.Frame.Position=UDim2.fromScale(
+0.5,0.5)aq.Repeat1Icon.Frame.ZIndex=6 aq.Repeat1Icon.Frame.Visible=false local function sp()return aq.Spotify end aQ.
+MouseButton1Click:Connect(function()if sp()then sp():Previous()end end)aT.MouseButton1Click:Connect(function()if sp()
+then sp():Next()end end)aR.MouseButton1Click:Connect(function()if sp()then sp():TogglePlay()end end)aO.MouseButton1Click
+:Connect(function()if sp()then sp():ToggleShuffle()end end)aU.MouseButton1Click:Connect(function()if sp()then sp():
+CycleRepeat()end end)aq.Volume=ad.create('Frame',{Position=UDim2.fromOffset(0,212),Size=UDim2.new(1,0,0,24),
+BackgroundTransparency=1,ZIndex=5,Parent=aq.Body})local aW=ad.create('TextButton',{Position=UDim2.fromOffset(18,0),Size=
+UDim2.fromOffset(26,24),ZIndex=6,Parent=aq.Volume})aq.VolIcon=ad.icon(aW,'volume',ag.Dim,18)aq.VolIcon.Frame.Position=
+UDim2.fromOffset(0,3)aq.MuteIcon=ad.icon(aW,'mute',ag.Dim,18)aq.MuteIcon.Frame.Position=UDim2.fromOffset(0,3)aq.MuteIcon
+.Frame.Visible=false local aX,aY,aZ,a_,a0=slim(aq.Volume,{Position=UDim2.fromOffset(52,0),Size=UDim2.new(1,-52-58,1,0)},
+6)table.insert(as,a0)aq.VolFill=aZ aq.VolPct=ad.create('TextLabel',{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-
+18,0,0),Size=UDim2.fromOffset(34,24),Text='50%',Font=ah.Semibold,TextSize=11,TextColor3=ag.Dim,TextXAlignment=Enum.
+TextXAlignment.Right,ZIndex=6,Parent=aq.Volume})aX.MouseEnter:Connect(function()a_(true)end)aX.MouseLeave:Connect(
+function()if not aq._volDragging then a_(false)end end)ad.trackDrag(aX,function(a1)if not sp()then return end aq.
+_volDragging=true local a2=fracAt(a1,aY)aZ.Size=UDim2.fromScale(a2,1)aq.VolPct.Text=math.floor(a2*100+0.5)..'%'sp():
+SetVolume(a2*100)end,function()aq._volDragging=false a_(false)end)aW.MouseButton1Click:Connect(function()local a1=sp()if
+not a1 then return end local a2=a1.State.Volume or 0 if a2>0 then aq._preMute=a2 a1:SetVolume(0)else a1:SetVolume(aq.
+_preMute or 50)end end)for a1,a2 in{aq.Album,aq.DeviceChip,aq.Eq.Frame,aI,aq.Elapsed,aq.Remaining,aN,aq.Volume}do a2.
 Parent=aq.Lower end aq.Minimized=false aq._m,aq._mGoal=0,0 aq:_layout(0)aq._unbinds=as aq._conn=aa.Heartbeat:Connect(
-function(a_)aq:_step(a_)end)aq.Root.Destroying:Connect(function()aq._conn:Disconnect()for a_,a0 in as do a0()end end)
+function(a1)aq:_step(a1)end)aq.Root.Destroying:Connect(function()aq._conn:Disconnect()for a1,a2 in as do a2()end end)
 return aq end function ao:SetSpotify(ap)if self.Spotify==ap then return end self.Spotify=ap ap.Changed:Connect(function(
 )self:_paint()end)ap.ConnectionChanged:Connect(function()self:_paint()end)self:_paint()end function ao:_paint()local ap=
 self.Spotify if not ap then return end local aq=ap.State local ar=aq.Track if ar~=self._painted then local as=self.
@@ -2109,219 +2262,239 @@ Artist,{TextTransparency=1},0.16)ad.tween(self.Album,{TextTransparency=1},0.16)t
 _fadeGen==ax and self.Title.Parent then self.Title.Text=at self.Artist.Text=av self.Album.Text=aw ad.tween(self.Title,{
 TextTransparency=0},0.22)ad.tween(self.Artist,{TextTransparency=0},0.22)ad.tween(self.Album,{TextTransparency=0},0.22)
 end end)else self.Title.Text=at self.Artist.Text=av self.Album.Text=aw self.Title.TextTransparency=0 self.Artist.
-TextTransparency=0 self.Album.TextTransparency=0 end self._lastFill,self._lastSecond=-1,-1 if ar and ar.Art then local
-ax=ar.Art ap:GetArt(ax,function(ay)local az=ap.State.Track if az and az.Art==ax and self.Art.Parent then if self.Art.
-Image~=''and self.Art.Image~=ay then self.ArtNext.Image=ay self.ArtNext.ImageTransparency=1 ad.tween(self.ArtNext,{
-ImageTransparency=0},0.35)task.delay(0.36,function()if self.Art.Parent and self.ArtNext.Image==ay then self.Art.Image=ay
-self.Wash.Image=ay self.ArtNext.ImageTransparency=1 self.ArtNext.Image=''end end)else self.Art.Image,self.Wash.Image=ay,
-ay self.Art.ImageTransparency=0 self.ArtNext.Image=''self.ArtNext.ImageTransparency=1 end self.ArtIcon.Frame.Visible=
-false end end)else ad.tween(self.Art,{ImageTransparency=1},0.2)task.delay(0.2,function()if not self._painted or not self
-._painted.Art then self.Art.Image,self.Wash.Image='',''self.ArtIcon.Frame.Visible=true end end)end end self.PlayIcon.
-Frame.Visible=not aq.Playing self.PauseIcon.Frame.Visible=aq.Playing self.QPlayIcon.Frame.Visible=not aq.Playing self.
-QPauseIcon.Frame.Visible=aq.Playing ad.tween(self.ArtScale,{Scale=if aq.Playing then 1 else 0.94},0.5,ai)local as=aq.
-Device self.DeviceChip.Visible=as~=nil and as~=''if as and as~=self._device then self._device=as self.DeviceText.Text=as
-local at=ab:GetTextSize(as,11,Enum.Font.GothamMedium,Vector2.new(400,20)).X self.DeviceChip.Size=UDim2.fromOffset(math.
-clamp(math.ceil(at)+38,60,aj-an-60),24)end local at,av=ag.Accent,ag.Dim self.ShuffleIcon:SetColor(if aq.Shuffle then at
-else av,true)ad.tween(self.ShuffleDot,{BackgroundTransparency=if aq.Shuffle then 0 else 1},0.2)local aw=aq.Repeat self.
-RepeatIcon.Frame.Visible=aw~='track'self.Repeat1Icon.Frame.Visible=aw=='track'local ax=if aw=='off'then av else at self.
-RepeatIcon:SetColor(ax,true)self.Repeat1Icon:SetColor(ax,true)ad.tween(self.RepeatDot,{BackgroundTransparency=if aw==
-'off'then 1 else 0},0.2)if not self._volDragging and aq.Volume then ad.tween(self.VolFill,{Size=UDim2.fromScale(aq.
-Volume/100,1)},0.25)self.VolPct.Text=math.floor(aq.Volume+0.5)..'%'self.VolIcon.Frame.Visible=aq.Volume>0 self.MuteIcon.
-Frame.Visible=aq.Volume<=0 end end local function lerp(ap,aq,ar)return ap+(aq-ap)*ar end function ao:_layout(ap)self.
-Root.Size=UDim2.fromOffset(aj,math.floor(lerp(ak,al,ap)+0.5))local aq=math.floor(lerp(am,44,ap)+0.5)local ar=math.floor(
-lerp(18,10,ap)+0.5)self.ArtHolder.Position=UDim2.fromOffset(ar,ar)self.ArtHolder.Size=UDim2.fromOffset(aq,aq)self.
-ArtIcon.Frame.Position=UDim2.fromOffset((aq-32)//2,(aq-32)//2)local as=math.floor(lerp(an,64,ap)+0.5)local at=math.
-floor(lerp(88,128,ap)+0.5)self.Title.Position=UDim2.fromOffset(as,math.floor(lerp(18,11,ap)+0.5))self.Title.Size=UDim2.
-new(1,-(as+at),0,24)self.Title.TextSize=math.floor(lerp(17,14,ap)+0.5)self.Artist.Position=UDim2.fromOffset(as,math.
-floor(lerp(43,32,ap)+0.5))self.Artist.Size=UDim2.new(1,-(as+math.floor(lerp(18,128,ap)+0.5)),0,18)self.Artist.TextSize=
-math.floor(lerp(13,12,ap)+0.5)local av=math.floor(lerp(14,18,ap)+0.5)self.CloseBtn.Position=UDim2.new(1,-14,0,av)self.
-MinBtn.Position=UDim2.new(1,-48,0,av)self.QPlay.Visible=ap>0.6 self.Lower.GroupTransparency=math.clamp(ap*2.2,0,1)self.
-Lower.Visible=ap<0.98 end function ao:Minimize(ap)ap=ap==true if ap==self.Minimized then return end self.Minimized=ap
-self._mGoal=if ap then 1 else 0 self._setMinIcon(ap,true)if self.Lib.Remember then self.Lib:Remember('cards',
-'MiniPlayer',{x=self.Root.Position.X.Offset,y=self.Root.Position.Y.Offset,minimized=ap})end end function ao:_animate(ap)
-local aq=self._mGoal if self._m==aq then return end self._m+=(aq-self._m)*(1-math.exp(-ap*11))if math.abs(aq-self._m)<
-0.002 then self._m=aq end self:_layout(self._m)end function ao:_step(ap)if not self.Visible then return end self:
-_animate(ap)local aq=self.Spotify if not aq then return end local ar=aq.State self.Eq:Step(ap,ar.Playing)local as=ar.
-Track if as and not self._seeking then local at=aq:GetProgress()local av=if as.Duration>0 then at/as.Duration else 0 if
-math.abs(av-self._lastFill)>0.0006 then self._lastFill=av self.Fill.Size=UDim2.fromScale(av,1)end local aw=math.floor(at
-/1000)if aw~=self._lastSecond then self._lastSecond=aw self.Elapsed.Text=fmt(at)self.Remaining.Text='-'..fmt(as.Duration
--at)end end end function ao:_present(ap)if ap==self.Visible then return end self.Visible=ap self._gen=(self._gen or 0)+1
-local aq=self._gen if ap then self.Root.Visible=true self.Scale.Scale=0.6 self.Body.GroupTransparency=1 self:_paint()ad.
-tween(self.Scale,{Scale=1},0.55,ai)ad.tween(self.Body,{GroupTransparency=0},0.22,Enum.EasingStyle.Quad)else ad.tween(
-self.Scale,{Scale=0.86},0.2,Enum.EasingStyle.Quint,Enum.EasingDirection.In)ad.tween(self.Body,{GroupTransparency=1},0.18
-,Enum.EasingStyle.Quad,Enum.EasingDirection.In)task.delay(0.22,function()if self._gen==aq then self.Root.Visible=false
-end end)end self.Lib.WindowChanged:Fire(self,ap)end function ao:Show()self.Wanted=true if not self._suppressed then self
-:_present(true)end end function ao:Hide()self.Wanted=false self:_present(false)end function ao:Toggle()if self.Wanted
-then self:Hide()else self:Show()end end function ao:ResetLayout(ap)if not self.DefaultPos then return end if self.Drag
-then self.Drag:Stop()end local aq=UDim2.fromOffset(self.DefaultPos.X,self.DefaultPos.Y)if self.Visible then task.delay(
-ap or 0,function()ad.tween(self.Root,{Position=aq},0.9,Enum.EasingStyle.Cubic,Enum.EasingDirection.InOut)end)else self.
-Root.Position=aq end end function ao:Suppress(ap)self._suppressed=ap if ap then self:_present(false)elseif self.Wanted
-then self:_present(true)end end function ao:Destroy()self.Drag:Destroy()self.Root:Destroy()end return ao end function a.
-w()local aa=a.cache.w if not aa then aa={c=__modImpl()}a.cache.w=aa end return aa.c end end do local function __modImpl(
-)local aa=game:GetService('UserInputService')local ab=a.a()local ac=a.c()local ad=a.b()local ae,af=ab.Colors,ab.Fonts
-local ag=Enum.EasingStyle.Back local ah=Enum.EasingStyle.Quint local ai=Enum.EasingStyle.Sine local aj,ak=440,340 local
-al=74 local am={}am.__index=am function am.new(an)return setmetatable({Lib=an,page=0,alive=true,conns={}},am)end local 
-function text(an,ao)ao.BackgroundTransparency=1 ao.TextWrapped=true ao.Parent=an return ac.create('TextLabel',ao)end
-local function block(an,ao,ap,aq)return ac.create('CanvasGroup',{AnchorPoint=Vector2.new(0.5,0),Position=UDim2.new(0.5,0
-,0,ao),Size=UDim2.fromOffset(ap,aq),BackgroundTransparency=1,GroupTransparency=1,Parent=an})end function am:_pages()
-local an=self.Lib local ao=an.ToggleKey and an.ToggleKey.Name or'G'return{function(ap)local aq={}local ar=block(ap,44,88
-,88)ar.Name='Mark'local as=ac.icon(ar,'bolt',ae.White,44)as.Frame.AnchorPoint=Vector2.new(0.5,0.5)as.Frame.Position=
-UDim2.fromScale(0.5,0.5)local at=ab.Brand.Icon if at then ad.image(at,'assets/nametag',function(av)if av and ar.Parent
-then ac.create('ImageLabel',{AnchorPoint=Vector2.new(0.5,0.5),Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(84
-,84),Image=av,Parent=ar})as.Frame.Visible=false end end)end table.insert(aq,ar)local av=block(ap,152,aj-60,36)text(av,{
-Size=UDim2.fromScale(1,1),Text='Welcome to Lumen',Font=af.Bold,TextSize=27,TextColor3=ae.Text})table.insert(aq,av)local
-aw=block(ap,192,aj-90,44)text(aw,{Size=UDim2.fromScale(1,1),Text=
-[[A clean toolkit that lives on top of your game. Here is a quick look around.]],Font=af.Regular,TextSize=13,TextColor3=
-ae.Dim,TextYAlignment=Enum.TextYAlignment.Top})table.insert(aq,aw)return aq end,function(ap)local aq={}local ar=block(ap
-,44,104,80)local as=ac.create('Frame',{Size=UDim2.fromScale(1,1),BackgroundColor3=ae.TileHi,Parent=ar})ac.corner(as,20)
-ac.ring(as,20,0.5,0.85)text(as,{Size=UDim2.fromScale(1,1),Text=string.upper(ao),Font=af.Bold,TextSize=if#ao>4 then 18
-else 30,TextColor3=ae.Text})table.insert(aq,ar)local at=block(ap,150,aj-60,36)text(at,{Size=UDim2.fromScale(1,1),Text=
-'Hide it with '..ao,Font=af.Bold,TextSize=24,TextColor3=ae.Text})table.insert(aq,at)local av=block(ap,190,aj-90,44)text(
-av,{Size=UDim2.fromScale(1,1),Text=[[Press the key any time to show or hide Lumen. You can change it in Settings.]],Font
-=af.Regular,TextSize=13,TextColor3=ae.Dim,TextYAlignment=Enum.TextYAlignment.Top})table.insert(aq,av)return aq end,
-function(ap)local aq={}local ar=block(ap,26,aj-60,34)text(ar,{Size=UDim2.fromScale(1,1),Text='Make it yours',Font=af.
-Bold,TextSize=24,TextColor3=ae.Text})table.insert(aq,ar)local as={{'open','Pop out anything',
-'Float any toggle as a small card'},{'keyboard','Bind keys','Tap the key chip next to a toggle'},{'gear','Settings',
-'Accent colour, keys and nametag'}}for at,av in as do local aw=block(ap,74+(at-1)*54,aj-56,46)local ax=ac.create('Frame'
-,{Size=UDim2.fromScale(1,1),BackgroundColor3=ae.Tile,Parent=aw})ac.corner(ax,14)ac.ring(ax,14,0.8,0.94)local ay=ac.icon(
-ax,av[1],ae.White,18)ay.Frame.AnchorPoint=Vector2.new(0,0.5)ay.Frame.Position=UDim2.new(0,16,0.5,0)text(ax,{Position=
-UDim2.fromOffset(48,6),Size=UDim2.new(1,-60,0,18),Text=av[2],Font=af.Semibold,TextSize=13,TextColor3=ae.Text,
-TextXAlignment=Enum.TextXAlignment.Left})text(ax,{Position=UDim2.fromOffset(48,24),Size=UDim2.new(1,-60,0,16),Text=av[3]
-,Font=af.Regular,TextSize=11.5,TextColor3=ae.Dim,TextXAlignment=Enum.TextXAlignment.Left})table.insert(aq,aw)end return
-aq end}end local function shift(an,ao,ap)return UDim2.new(an.X.Scale,an.X.Offset+ao,an.Y.Scale,an.Y.Offset+ap)end local 
-function rise(an,ao)for ap,aq in an do aq.GroupTransparency=1 local ar=aq.Position aq.Position=shift(ar,ao or 0,14)task.
-delay(0.07*(ap-1),function()if aq.Parent then ac.tween(aq,{GroupTransparency=0,Position=ar},0.5,ah)end end)end end
-function am:Show(an)local ao=self.Lib self.onDone=an local ap=ac.create('ScreenGui',{Name='LumenIntro',ResetOnSpawn=
-false,IgnoreGuiInset=true,ZIndexBehavior=Enum.ZIndexBehavior.Sibling,DisplayOrder=2000})ac.protect(ap)ap.Parent=ac.
-getGuiParent()self.Screen=ap if ao.Gui then ao.Gui.Enabled=false end local aq=ac.create('Frame',{Name='Intro',Size=UDim2
-.fromScale(1,1),BackgroundTransparency=1,Parent=ap})self.Gui=aq local ar=ac.create('TextButton',{Size=UDim2.fromScale(1,
-1),BackgroundColor3=ae.Black,BackgroundTransparency=1,AutoButtonColor=false,Active=true,Text='',Parent=aq})ac.tween(ar,{
-BackgroundTransparency=0.35},0.6,Enum.EasingStyle.Quad)local as=ac.create('CanvasGroup',{AnchorPoint=Vector2.new(0.5,0.5
-),Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(aj,ak),BackgroundColor3=ae.Tile,GroupTransparency=1,Parent=aq}
-)ac.corner(as,30)ac.ring(as,30,0.55,0.88)local at=ac.create('UIScale',{Scale=0.86,Parent=as})self.Card,self.cardScale=as
-,at ac.tween(as,{GroupTransparency=0},0.35,Enum.EasingStyle.Quad)ac.tween(at,{Scale=1},0.7,ag)local av=ac.create('Frame'
-,{Size=UDim2.new(1,0,1,-al),BackgroundTransparency=1,ClipsDescendants=true,Parent=as})local aw=ac.create('Frame',{
-AnchorPoint=Vector2.new(0,1),Position=UDim2.fromScale(0,1),Size=UDim2.new(1,0,0,al),BackgroundTransparency=1,Parent=as})
-local ax=ac.create('TextButton',{Position=UDim2.fromOffset(24,18),Size=UDim2.fromOffset(70,38),Text='Skip',Font=af.
-Medium,TextSize=13,TextColor3=ae.Dim,TextXAlignment=Enum.TextXAlignment.Left,Parent=aw})local ay=self:_pages()local az={
-}local aA=ac.create('Frame',{AnchorPoint=Vector2.new(0.5,0.5),Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(60
-,8),BackgroundTransparency=1,Parent=aw})ac.list(aA,6,Enum.FillDirection.Horizontal,Enum.HorizontalAlignment.Center,Enum.
-VerticalAlignment.Center)for aB=1,#ay do local aC=ac.create('Frame',{Size=UDim2.fromOffset(8,8),BackgroundColor3=ae.
-Raised,LayoutOrder=aB,Parent=aA})ac.corner(aC,4)az[aB]=aC end local aB=ac.create('TextButton',{AnchorPoint=Vector2.new(1
-,0),Position=UDim2.new(1,-24,0,18),Size=UDim2.fromOffset(124,38),BackgroundTransparency=0,BackgroundColor3=ae.White,Text
-='',Parent=aw})ac.corner(aB,19)local aC=ac.create('UIScale',{Parent=aB})local aD=text(aB,{Size=UDim2.fromScale(1,1),Text
-='Continue',Font=af.Semibold,TextSize=13,TextColor3=ae.Black})local aE=ab.bind(function(aE)aB.BackgroundColor3=aE aD.
-TextColor3=ab.onAccent(aE)end)self.unbind=aE local aF,aG={},{}local aH=0 local aI=false local function paint(aJ)for aK,
-aL in az do ac.tween(aL,{Size=UDim2.fromOffset(if aK==aJ then 22 else 8,8),BackgroundColor3=if aK==aJ then ae.Accent
-else ae.Raised},0.4,ah)end aD.Text=if aJ==#ay then'Get started'else'Continue'ac.tween(ax,{TextTransparency=if aJ==#ay
-then 1 else 0},0.25)ax.Active=aJ~=#ay end local function go(aJ)if aI or not self.alive then return end aI=true local aK=
-aF[aH]local aL=if aJ>aH then 1 else-1 if aK then for aM,aN in aG[aH]do ac.tween(aN,{GroupTransparency=1,Position=shift(
-aN.Position,-18*aL,0)},0.25,ah)end task.delay(0.28,function()aK.Visible=false end)end local aM=aF[aJ]if not aM then aM=
-ac.create('Frame',{Size=UDim2.fromScale(1,1),BackgroundTransparency=1,Visible=false,Parent=av})aF[aJ]=aM aG[aJ]=ay[aJ](
-aM)end aH=aJ self.page=aJ paint(aJ)task.delay(if aK then 0.18 else 0.35,function()if not self.alive then return end aM.
-Visible=true rise(aG[aJ],18*aL)local aN=aM:FindFirstChild('Mark')if aN then local aO=ac.create('UIScale',{Scale=0.7,
-Parent=aN})ac.tween(aO,{Scale=1},0.8,ag)end aI=false end)end self.go=go local function press(aJ,aK)aJ.MouseEnter:
-Connect(function()ac.tween(aK,{Scale=1.04},0.2,ah)end)aJ.MouseLeave:Connect(function()ac.tween(aK,{Scale=1},0.2,ah)end)
-end press(aB,aC)local function advance()if aI then return end if aH>=#ay then self:Finish()else go(aH+1)end end aB.
-MouseButton1Click:Connect(advance)ax.MouseButton1Click:Connect(function()self:Finish()end)table.insert(self.conns,aa.
-InputBegan:Connect(function(aJ)if aJ.UserInputType~=Enum.UserInputType.Keyboard then return end if aJ.KeyCode==Enum.
-KeyCode.Return or aJ.KeyCode==Enum.KeyCode.Right then advance()elseif aJ.KeyCode==Enum.KeyCode.Escape then self:Finish()
-end end))table.insert(ao.Cleanups,function()self:Destroy()end)go(1)return self end function am:Finish()if not self.alive
-or self.finishing then return end self.finishing=true local an=self.Lib an:Remember('intro','seen',true)ac.tween(self.
-cardScale,{Scale=0.94},0.4,ah,Enum.EasingDirection.In)ac.tween(self.Card,{GroupTransparency=1},0.35,Enum.EasingStyle.
-Quad)for ao,ap in self.Gui:GetChildren()do if ap:IsA('TextButton')then ac.tween(ap,{BackgroundTransparency=1},0.5,Enum.
-EasingStyle.Quad)elseif ap~=self.Card then ac.tween(ap,{BackgroundTransparency=1},0.4,Enum.EasingStyle.Quad)end end task
-.delay(0.55,function()local ao=self.onDone self:Destroy()if ao then task.spawn(ao)end end)end function am:Destroy()self.
-alive=false for an,ao in self.conns do ao:Disconnect()end table.clear(self.conns)if self.unbind then self.unbind()self.
-unbind=nil end if self.Screen then self.Screen:Destroy()self.Screen,self.Gui=nil,nil end local an=self.Lib if an.Gui and
-an.Gui.Parent then an.Gui.Enabled=true end end return am end function a.x()local aa=a.cache.x if not aa then aa={c=
-__modImpl()}a.cache.x=aa end return aa.c end end do local function __modImpl()local aa=game:GetService('RunService')
-local ab=game:GetService('Stats')local ac=a.a()local ad=a.c()local ae=a.e()local af=a.b()local ag,ah=ac.Colors,ac.Fonts
-local ai,aj,ak=ag.Text,ag.Orange,ag.Red local al=34 local am={}am.__index=am local function fpsColor(an)return if an>=50
-then ai elseif an>=30 then aj else ak end local function pingColor(an)return if an<100 then ai elseif an<200 then aj
-else ak end local function memColor(an)return if an<2000 then ai elseif an<3200 then aj else ak end local an={{id='fps',
-name='FPS',unit='fps',color=fpsColor},{id='ping',name='Ping',unit='ms',color=pingColor},{id='mem',name='Memory',unit=
-'MB',color=memColor}}am.STATS=an function am.new(ao)local ap=setmetatable({Lib=ao,alive=true,conns={},stats={},parts={}}
-,am)ap.Shown=ao:Recall('watermark','show')~=false for aq,ar in an do ap.stats[ar.id]=ao:Recall('watermark',ar.id)~=false
-end local aq=workspace.CurrentCamera.ViewportSize local ar,as=224,18 local at,av=ao:Recall('watermark','x'),ao:Recall(
-'watermark','y')if tonumber(at)and tonumber(av)then ar,as=math.clamp(at,0,math.max(aq.X-80,0)),math.clamp(av,0,math.max(
-aq.Y-40,0))end local aw=ad.create('CanvasGroup',{Name='Watermark',Position=UDim2.fromOffset(ar,as),Size=UDim2.
-fromOffset(0,al),AutomaticSize=Enum.AutomaticSize.X,BackgroundColor3=ag.Black,BackgroundTransparency=0.06,
-GroupTransparency=if ap.Shown then 0 else 1,Active=true,Visible=ap.Shown,ZIndex=50,Parent=ao.Gui})ad.corner(aw,al//2)ap.
-Root=aw ap.Pop=ad.create('UIScale',{Parent=aw})local ax=ad.create('Frame',{Size=UDim2.fromOffset(0,al),AutomaticSize=
-Enum.AutomaticSize.X,BackgroundTransparency=1,Parent=aw})ad.padding(ax,11,0,15,0)ad.list(ax,0,Enum.FillDirection.
-Horizontal,Enum.HorizontalAlignment.Left,Enum.VerticalAlignment.Center)local ay=ad.create('Frame',{Position=UDim2.
-fromOffset(1,1),Size=UDim2.fromOffset(60,al-2),BackgroundTransparency=1,ZIndex=5,Parent=aw})ad.corner(ay,al//2-1)ad.
-edge(ay,0.7,0.9)ax:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()ay.Size=UDim2.fromOffset(math.max(ax.
-AbsoluteSize.X-2,0),al-2)end)local az=ad.create('Frame',{Size=UDim2.fromOffset(22,22),BackgroundTransparency=1,
-LayoutOrder=1,Parent=ax})local aA=ad.icon(az,'bolt',ag.White,16)aA.Frame.AnchorPoint=Vector2.new(0.5,0.5)aA.Frame.
-Position=UDim2.fromScale(0.5,0.5)if ac.Brand.Icon then af.image(ac.Brand.Icon,'assets/nametag',function(aB)if aB and az.
-Parent then ad.create('ImageLabel',{Size=UDim2.fromScale(1,1),Image=aB,Parent=az})aA.Frame.Visible=false end end)end for
-aB,aC in an do local aD=ad.create('Frame',{Size=UDim2.fromOffset(0,20),AutomaticSize=Enum.AutomaticSize.X,
-BackgroundTransparency=1,ClipsDescendants=true,LayoutOrder=1+aB,Visible=ap.stats[aC.id],Parent=ax})local aE=ad.create(
-'CanvasGroup',{Size=UDim2.fromOffset(0,20),AutomaticSize=Enum.AutomaticSize.X,BackgroundTransparency=1,Parent=aD})ad.
-padding(aE,12,0,0,0)ad.list(aE,5,Enum.FillDirection.Horizontal,Enum.HorizontalAlignment.Left,Enum.VerticalAlignment.
-Center)ad.create('Frame',{Size=UDim2.fromOffset(1,14),BackgroundColor3=ag.Raised,LayoutOrder=1,Parent=aE})ad.create(
-'Frame',{Size=UDim2.fromOffset(2,1),BackgroundTransparency=1,LayoutOrder=2,Parent=aE})local aF=ad.create('TextLabel',{
-Size=UDim2.fromOffset(0,20),AutomaticSize=Enum.AutomaticSize.X,Text='--',Font=ah.Bold,TextSize=13,TextColor3=ag.Text,
-LayoutOrder=3,Parent=aE})local aG=ad.create('TextLabel',{Size=UDim2.fromOffset(0,20),AutomaticSize=Enum.AutomaticSize.X,
-Text=aC.unit,Font=ah.Medium,TextSize=11,TextColor3=ag.Dim,LayoutOrder=4,Parent=aE})ap.parts[aC.id]={slot=aD,box=aE,value
-=aF,unit=aG,color=aC.color,gen=0}end if ap.Shown then ap.Pop.Scale=0.9 aw.GroupTransparency=1 ad.tween(aw,{
-GroupTransparency=0},0.3,Enum.EasingStyle.Quad)ad.tween(ap.Pop,{Scale=1},0.5,Enum.EasingStyle.Back)end ap.Drag=ae.new(aw
-,aw,{OnEnd=function()task.delay(0.5,function()if ap.alive and aw.Parent then ao:Remember('watermark','x',aw.Position.X.
-Offset)ao:Remember('watermark','y',aw.Position.Y.Offset)end end)end})local aB=0 table.insert(ap.conns,aa.Heartbeat:
-Connect(function()aB+=1 end))task.spawn(function()local aC=os.clock()while ap.alive and aw.Parent do task.wait(0.5)local
-aD=os.clock()local aE=math.floor(aB/math.max(aD-aC,1e-3)+0.5)aB,aC=0,aD ap:_set('fps',aE,tostring(aE))if ap.stats.ping
-then local aF=0 pcall(function()aF=math.floor(ab.Network.ServerStatsItem['Data Ping']:GetValue()+0.5)end)ap:_set('ping',
-aF,tostring(aF))end if ap.stats.mem then local aF=0 pcall(function()aF=math.floor(ab:GetTotalMemoryUsageMb()+0.5)end)if
-aF>=1000 then ap:_set('mem',aF,string.format('%.1f',aF/1000),'GB')else ap:_set('mem',aF,tostring(aF),'MB')end end end
-end)table.insert(ao.Cleanups,function()ap:Destroy()end)return ap end function am:_set(ao,ap,aq,ar)local as=self.parts[ao
-]if as and self.stats[ao]then as.value.Text=aq as.value.TextColor3=as.color(ap)if ar then as.unit.Text=ar end end end
-function am:ResetPosition()if self.Drag then self.Drag:Stop()end self.Lib:Remember('watermark','x',nil)self.Lib:
-Remember('watermark','y',nil)ad.tween(self.Root,{Position=UDim2.fromOffset(224,18)},0.9,Enum.EasingStyle.Cubic,Enum.
-EasingDirection.InOut)end function am:SetShown(ao)ao=ao==true self.Shown=ao self._showGen=(self._showGen or 0)+1 local
-ap=self._showGen self.Lib:Remember('watermark','show',ao)if ao then self.Root.Visible=true self.Pop.Scale=0.9 ad.tween(
-self.Root,{GroupTransparency=0},0.3,Enum.EasingStyle.Quad)ad.tween(self.Pop,{Scale=1},0.5,Enum.EasingStyle.Back)else ad.
-tween(self.Root,{GroupTransparency=1},0.25,Enum.EasingStyle.Quad)ad.tween(self.Pop,{Scale=0.92},0.25,Enum.EasingStyle.
-Quint)task.delay(0.27,function()if self._showGen==ap and self.alive then self.Root.Visible=false end end)end end
-function am:SetStat(ao,ap)local aq=self.parts[ao]if not aq then return end ap=ap==true self.stats[ao]=ap self.Lib:
-Remember('watermark',ao,ap)aq.gen+=1 local ar=aq.gen local as,at=aq.slot,aq.box local av=at.AbsoluteSize.X local 
-function settle(aw)as.AutomaticSize=Enum.AutomaticSize.X as.Size=UDim2.fromOffset(0,20)as.Visible=aw at.
-GroupTransparency=if aw then 0 else 1 end if av<=0 and not ap then return settle(false)end if ap then as.Visible=true av
-=at.AbsoluteSize.X if av<=0 then return settle(true)end as.AutomaticSize=Enum.AutomaticSize.None as.Size=UDim2.
-fromOffset(0,20)at.GroupTransparency=1 ad.tween(as,{Size=UDim2.fromOffset(av,20)},0.45,Enum.EasingStyle.Quint)ad.tween(
-at,{GroupTransparency=0},0.35,Enum.EasingStyle.Quad)task.delay(0.47,function()if aq.gen==ar then settle(true)end end)
-else as.AutomaticSize=Enum.AutomaticSize.None as.Size=UDim2.fromOffset(av,20)ad.tween(at,{GroupTransparency=1},0.25,Enum
-.EasingStyle.Quad)ad.tween(as,{Size=UDim2.fromOffset(0,20)},0.4,Enum.EasingStyle.Quint,Enum.EasingDirection.InOut)task.
-delay(0.42,function()if aq.gen==ar then settle(false)end end)end end function am:Destroy()if not self.alive then return
-end self.alive=false for ao,ap in self.conns do ap:Disconnect()end table.clear(self.conns)if self.Root then self.Root:
-Destroy()end end return am end function a.y()local aa=a.cache.y if not aa then aa={c=__modImpl()}a.cache.y=aa end return
-aa.c end end do local function __modImpl()local aa=a.c()local ab={}ab.__index=ab function ab.new(ac,ad,ae)local af=
-setmetatable({Lib=ac,Tab=ad,Cfg=ae,active={},pinned={},conns={}},ab)table.insert(af.conns,ac.ToggleAdded:Connect(
-function(ag)af:_watch(ag)end))table.insert(ac.Cleanups,function()af:Destroy()end)af:_updateEmpty()return af end function
-ab:_place(ac,ad)local ae=self.Tab.Tiles local af=table.find(ae,ac)if af then table.remove(ae,af)end table.insert(ae,
-table.find(ae,ad)or(#ae+1),ac)self.Tab:_queueLayout(true)end function ab:_mirror(ac,ad)local ae ae=self.Tab:AddToggle({
-Name=ac.Name,Icon=ac.IconName,Default=ac.Value,PopOut=false,NoKey=true,Pin=false,Mirror=true,Callback=function(af)ac:
-Set(af)end})ae:SetVisible(false)self:_place(ae.Rec,ad)table.insert(self.conns,ac.Synced:Connect(function(af)ae:Set(af,
-true)end))table.insert(ac._cleanup,function()ae:Destroy()end)return ae end local function anyShown(ac)for ad,ae in ac do
-if ae.Rec.Frame.Visible and not ae.Rec.Hidden then return true end end return false end function ab:_updateEmpty()local
-ac=self.Cfg if ac.ActiveEmpty then ac.ActiveEmpty:SetVisible(not anyShown(self.active))end if ac.PinnedEmpty then ac.
-PinnedEmpty:SetVisible(not anyShown(self.pinned))end end function ab:_setShown(ac,ad)local ae=(ac._shownGen or 0)+1 ac.
-_shownGen=ae local af=ac.Rec.Scale if ad then if af and ac.Rec.Frame.Visible then aa.tween(af,{Scale=1},0.3,Enum.
-EasingStyle.Back)end ac:SetVisible(true)elseif af and ac.Rec.Frame.Visible then aa.tween(af,{Scale=0.8},0.16,Enum.
-EasingStyle.Quint,Enum.EasingDirection.In)task.delay(0.17,function()if ac._shownGen==ae then ac:SetVisible(false)af.
-Scale=1 self:_updateEmpty()end end)else ac:SetVisible(false)end end function ab:_syncActive(ac)local ad=self.active[ac]
-if ac.Value and not ad then ad=self:_mirror(ac,self.Cfg.PinnedHeader)self.active[ac]=ad end if ad then self:_setShown(ad
-,ac.Value)end self:_updateEmpty()end function ab:_syncPinned(ac)local ad=self.pinned[ac]if ac.Pinned and not ad then ad=
-self:_mirror(ac,self.Cfg.ShortcutsHeader)self.pinned[ac]=ad end if ad then self:_setShown(ad,ac.Pinned)end self:
-_updateEmpty()end function ab:_watch(ac)if not ac.Pinnable then return end table.insert(self.conns,ac.Synced:Connect(
-function()self:_syncActive(ac)end))table.insert(self.conns,ac.PinChanged:Connect(function()self:_syncPinned(ac)end))if
-self.Lib:Recall('pins',ac.Name)==true then ac:SetPinned(true,true)self:_syncPinned(ac)end if ac.Value then self:
-_syncActive(ac)end end function ab:Destroy()for ac,ad in self.conns do ad:Disconnect()end table.clear(self.conns)end
-return ab end function a.z()local aa=a.cache.z if not aa then aa={c=__modImpl()}a.cache.z=aa end return aa.c end end do
-local function __modImpl()local aa=game:GetService('HttpService')local ab=game:GetService('RunService')local ac=game:
-GetService('TextService')local ad=game:GetService('UserInputService')local ae=a.a()local af=a.c()local ag=a.b()local ah,
-ai=ae.Colors,ae.Fonts local aj=Enum.EasingStyle.Quint local ak=
+TextTransparency=0 self.Album.TextTransparency=0 end self._lyricsData=nil self._lyricsTrack=ar self._currentLineIdx=nil
+self._lineTops=nil for ax,ay in self._lyricItems do ay.Label:Destroy()end table.clear(self._lyricItems)if ar and self.
+Lib and self.Lib.GetLyrics then local ax=self.Lib:GetLyrics()if ax and ax._fetch then ax:_fetch(ar,function(ay)if self.
+_painted==ar and ay and ay.lines and#ay.lines>0 then self._lyricsData=ay.lines self:_buildLyrics(ay.lines)end end)end
+end self._lastFill,self._lastSecond=-1,-1 if ar and ar.Art then local ax=ar.Art ap:GetArt(ax,function(ay)local az=ap.
+State.Track if az and az.Art==ax and self.Art.Parent then if self.Art.Image~=''and self.Art.Image~=ay then self.ArtNext.
+Image=ay self.ArtNext.ImageTransparency=1 ad.tween(self.ArtNext,{ImageTransparency=0},0.35)task.delay(0.36,function()if
+self.Art.Parent and self.ArtNext.Image==ay then self.Art.Image=ay self.Wash.Image=ay self.ArtNext.ImageTransparency=1
+self.ArtNext.Image=''end end)else self.Art.Image,self.Wash.Image=ay,ay self.Art.ImageTransparency=0 self.ArtNext.Image=
+''self.ArtNext.ImageTransparency=1 end self.ArtIcon.Frame.Visible=false end end)else ad.tween(self.Art,{
+ImageTransparency=1},0.2)task.delay(0.2,function()if not self._painted or not self._painted.Art then self.Art.Image,self
+.Wash.Image='',''self.ArtIcon.Frame.Visible=true end end)end end self.PlayIcon.Frame.Visible=not aq.Playing self.
+PauseIcon.Frame.Visible=aq.Playing self.QPlayIcon.Frame.Visible=not aq.Playing self.QPauseIcon.Frame.Visible=aq.Playing
+ad.tween(self.ArtScale,{Scale=if aq.Playing then 1 else 0.94},0.5,ai)local as=aq.Device self.DeviceChip.Visible=as~=nil
+and as~=''if as and as~=self._device then self._device=as self.DeviceText.Text=as local at=ab:GetTextSize(as,11,Enum.
+Font.GothamMedium,Vector2.new(400,20)).X self.DeviceChip.Size=UDim2.fromOffset(math.clamp(math.ceil(at)+38,60,aj-an-60),
+24)end local at,av=ag.Accent,ag.Dim self.ShuffleIcon:SetColor(if aq.Shuffle then at else av,true)ad.tween(self.
+ShuffleDot,{BackgroundTransparency=if aq.Shuffle then 0 else 1},0.2)local aw=aq.Repeat self.RepeatIcon.Frame.Visible=aw
+~='track'self.Repeat1Icon.Frame.Visible=aw=='track'local ax=if aw=='off'then av else at self.RepeatIcon:SetColor(ax,true
+)self.Repeat1Icon:SetColor(ax,true)ad.tween(self.RepeatDot,{BackgroundTransparency=if aw=='off'then 1 else 0},0.2)if not
+self._volDragging and aq.Volume then ad.tween(self.VolFill,{Size=UDim2.fromScale(aq.Volume/100,1)},0.25)self.VolPct.Text
+=math.floor(aq.Volume+0.5)..'%'self.VolIcon.Frame.Visible=aq.Volume>0 self.MuteIcon.Frame.Visible=aq.Volume<=0 end end
+local function lerp(ap,aq,ar)return ap+(aq-ap)*ar end function ao:_layout(ap)self.Root.Size=UDim2.fromOffset(aj,math.
+floor(lerp(ak,al,ap)+0.5))local aq=math.floor(lerp(am,44,ap)+0.5)local ar=math.floor(lerp(18,10,ap)+0.5)self.ArtHolder.
+Position=UDim2.fromOffset(ar,ar)self.ArtHolder.Size=UDim2.fromOffset(aq,aq)self.ArtIcon.Frame.Position=UDim2.fromOffset(
+(aq-32)//2,(aq-32)//2)local as=math.floor(lerp(an,64,ap)+0.5)local at=math.floor(lerp(122,160,ap)+0.5)self.Title.
+Position=UDim2.fromOffset(as,math.floor(lerp(18,11,ap)+0.5))self.Title.Size=UDim2.new(1,-(as+at),0,24)self.Title.
+TextSize=math.floor(lerp(17,14,ap)+0.5)self.Artist.Position=UDim2.fromOffset(as,math.floor(lerp(43,32,ap)+0.5))self.
+Artist.Size=UDim2.new(1,-(as+math.floor(lerp(18,160,ap)+0.5)),0,18)self.Artist.TextSize=math.floor(lerp(13,12,ap)+0.5)
+local av=math.floor(lerp(14,18,ap)+0.5)self.CloseBtn.Position=UDim2.new(1,-14,0,av)self.MinBtn.Position=UDim2.new(1,-48,
+0,av)if self.LyrBtn then self.LyrBtn.Position=UDim2.new(1,-82,0,av)end self.QPlay.Position=UDim2.new(1,-116,0,av)self.
+QPlay.Visible=ap>0.6 self.Lower.GroupTransparency=math.clamp(ap*2.2,0,1)self.Lower.Visible=ap<0.98 if self.LyricsHolder
+then self.LyricsHolder.Visible=(self.LiveLyrics==true)and(ap<0.5)end end function ao:Minimize(ap)ap=ap==true if ap==self
+.Minimized then return end self.Minimized=ap self._mGoal=if ap then 1 else 0 self._setMinIcon(ap,true)if self.Lib.
+Remember then self.Lib:Remember('cards','MiniPlayer',{x=self.Root.Position.X.Offset,y=self.Root.Position.Y.Offset,
+minimized=ap})end end function ao:_animate(ap)local aq=self._mGoal if self._m==aq then return end self._m+=(aq-self._m)*
+(1-math.exp(-ap*11))if math.abs(aq-self._m)<0.002 then self._m=aq end self:_layout(self._m)end function ao:_buildLyrics(
+ap)for aq,ar in self._lyricItems do ar.Label:Destroy()end table.clear(self._lyricItems)self._lineTops={}self.
+_currentLineIdx=nil local aq=0 local ar=34 for as,at in ipairs(ap)do local av=ad.create('TextLabel',{Name='Line'..as,
+Position=UDim2.fromOffset(24,aq),Size=UDim2.new(1,-48,0,ar),Font=ah.Bold,TextSize=14,TextColor3=Color3.fromRGB(255,255,
+255),TextTransparency=0.88,TextXAlignment=Enum.TextXAlignment.Center,TextTruncate=Enum.TextTruncate.AtEnd,Text=at.text
+or'',ZIndex=2,Parent=self.LyricsTrack})table.insert(self._lyricItems,{Label=av,Y=aq})table.insert(self._lineTops,aq)aq+=
+ar+6 end self.LyricsTrack.Position=UDim2.fromOffset(0,(ak/2)-(ar/2))end function ao:_scrollLyrics(ap,aq)local ar=self.
+_lineTops if not ar or not ar[ap]then return end local as=34 local at=(ak/2)-ar[ap]-(as/2)local av=self.LyricsTrack.
+Position.Y.Offset local aw=at-av if math.abs(aw)>0.5 then self.LyricsTrack.Position=UDim2.fromOffset(0,av+aw*(1-math.
+exp(-aq*8)))else self.LyricsTrack.Position=UDim2.fromOffset(0,at)end end function ao:_step(ap)if not self.Visible then
+return end self:_animate(ap)local aq=self.Spotify if not aq then return end local ar=aq.State self.Eq:Step(ap,ar.Playing
+)local as=ar.Track if as and not self._seeking then local at=aq:GetProgress()local av=if as.Duration>0 then at/as.
+Duration else 0 if math.abs(av-self._lastFill)>0.0006 then self._lastFill=av self.Fill.Size=UDim2.fromScale(av,1)end
+local aw=math.floor(at/1000)if aw~=self._lastSecond then self._lastSecond=aw self.Elapsed.Text=fmt(at)self.Remaining.
+Text='-'..fmt(as.Duration-at)end if self.LiveLyrics and self.LyricsHolder.Visible and self._lyricsData and#self.
+_lyricsData>0 then local ax=self._lyricsData local ay,az,aA=1,#ax,1 while ay<=az do local aB=(ay+az)//2 if ax[aB].t<=at+
+160 then aA=aB ay=aB+1 else az=aB-1 end end self:_scrollLyrics(aA,ap)if aA~=self._currentLineIdx then self.
+_currentLineIdx=aA for aB,aC in ipairs(self._lyricItems)do local aD=math.abs(aB-aA)local aE,aF if aD==0 then aE=0.35 aF=
+1 elseif aD==1 then aE=0.75 aF=0.94 else aE=0.92 aF=0.9 end ad.tween(aC.Label,{TextTransparency=aE},0.28)local aG=aC.
+Label:FindFirstChild('LineScale')if not aG then aG=ad.create('UIScale',{Name='LineScale',Parent=aC.Label})end ad.tween(
+aG,{Scale=aF},0.28)end end end end end function ao:_present(ap)if ap==self.Visible then return end self.Visible=ap self.
+_gen=(self._gen or 0)+1 local aq=self._gen if ap then self.Root.Visible=true self.Scale.Scale=0.6 self.Body.
+GroupTransparency=1 self:_paint()ad.tween(self.Scale,{Scale=1},0.55,ai)ad.tween(self.Body,{GroupTransparency=0},0.22,
+Enum.EasingStyle.Quad)else ad.tween(self.Scale,{Scale=0.86},0.2,Enum.EasingStyle.Quint,Enum.EasingDirection.In)ad.tween(
+self.Body,{GroupTransparency=1},0.18,Enum.EasingStyle.Quad,Enum.EasingDirection.In)task.delay(0.22,function()if self.
+_gen==aq then self.Root.Visible=false end end)end self.Lib.WindowChanged:Fire(self,ap)end function ao:Show()self.Wanted=
+true if not self._suppressed then self:_present(true)end end function ao:Hide()self.Wanted=false self:_present(false)end
+function ao:Toggle()if self.Wanted then self:Hide()else self:Show()end end function ao:ResetLayout(ap)if not self.
+DefaultPos then return end if self.Drag then self.Drag:Stop()end local aq=UDim2.fromOffset(self.DefaultPos.X,self.
+DefaultPos.Y)if self.Visible then task.delay(ap or 0,function()ad.tween(self.Root,{Position=aq},0.9,Enum.EasingStyle.
+Cubic,Enum.EasingDirection.InOut)end)else self.Root.Position=aq end end function ao:Suppress(ap)self._suppressed=ap if
+ap then self:_present(false)elseif self.Wanted then self:_present(true)end end function ao:Destroy()self.Drag:Destroy()
+self.Root:Destroy()end return ao end function a.w()local aa=a.cache.w if not aa then aa={c=__modImpl()}a.cache.w=aa end
+return aa.c end end do local function __modImpl()local aa=game:GetService('UserInputService')local ab=a.a()local ac=a.c(
+)local ad=a.b()local ae,af=ab.Colors,ab.Fonts local ag=Enum.EasingStyle.Back local ah=Enum.EasingStyle.Quint local ai=
+Enum.EasingStyle.Sine local aj,ak=440,340 local al=74 local am={}am.__index=am function am.new(an)return setmetatable({
+Lib=an,page=0,alive=true,conns={}},am)end local function text(an,ao)ao.BackgroundTransparency=1 ao.TextWrapped=true ao.
+Parent=an return ac.create('TextLabel',ao)end local function block(an,ao,ap,aq)return ac.create('CanvasGroup',{
+AnchorPoint=Vector2.new(0.5,0),Position=UDim2.new(0.5,0,0,ao),Size=UDim2.fromOffset(ap,aq),BackgroundTransparency=1,
+GroupTransparency=1,Parent=an})end function am:_pages()local an=self.Lib local ao=an.ToggleKey and an.ToggleKey.Name or
+'G'return{function(ap)local aq={}local ar=block(ap,44,88,88)ar.Name='Mark'local as=ac.icon(ar,'bolt',ae.White,44)as.
+Frame.AnchorPoint=Vector2.new(0.5,0.5)as.Frame.Position=UDim2.fromScale(0.5,0.5)local at=ab.Brand.Icon if at then ad.
+image(at,'assets/nametag',function(av)if av and ar.Parent then ac.create('ImageLabel',{AnchorPoint=Vector2.new(0.5,0.5),
+Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(84,84),Image=av,Parent=ar})as.Frame.Visible=false end end)end
+table.insert(aq,ar)local av=block(ap,152,aj-60,36)text(av,{Size=UDim2.fromScale(1,1),Text='Welcome to Lumen',Font=af.
+Bold,TextSize=27,TextColor3=ae.Text})table.insert(aq,av)local aw=block(ap,192,aj-90,44)text(aw,{Size=UDim2.fromScale(1,1
+),Text=[[A clean toolkit that lives on top of your game. Here is a quick look around.]],Font=af.Regular,TextSize=13,
+TextColor3=ae.Dim,TextYAlignment=Enum.TextYAlignment.Top})table.insert(aq,aw)return aq end,function(ap)local aq={}local
+ar=block(ap,44,104,80)local as=ac.create('Frame',{Size=UDim2.fromScale(1,1),BackgroundColor3=ae.TileHi,Parent=ar})ac.
+corner(as,20)ac.ring(as,20,0.5,0.85)text(as,{Size=UDim2.fromScale(1,1),Text=string.upper(ao),Font=af.Bold,TextSize=if#ao
+>4 then 18 else 30,TextColor3=ae.Text})table.insert(aq,ar)local at=block(ap,150,aj-60,36)text(at,{Size=UDim2.fromScale(1
+,1),Text='Hide it with '..ao,Font=af.Bold,TextSize=24,TextColor3=ae.Text})table.insert(aq,at)local av=block(ap,190,aj-90
+,44)text(av,{Size=UDim2.fromScale(1,1),Text=
+[[Press the key any time to show or hide Lumen. You can change it in Settings.]],Font=af.Regular,TextSize=13,TextColor3=
+ae.Dim,TextYAlignment=Enum.TextYAlignment.Top})table.insert(aq,av)return aq end,function(ap)local aq={}local ar=block(ap
+,26,aj-60,34)text(ar,{Size=UDim2.fromScale(1,1),Text='Make it yours',Font=af.Bold,TextSize=24,TextColor3=ae.Text})table.
+insert(aq,ar)local as={{'open','Pop out anything','Float any toggle as a small card'},{'keyboard','Bind keys',
+'Tap the key chip next to a toggle'},{'gear','Settings','Accent colour, keys and nametag'}}for at,av in as do local aw=
+block(ap,74+(at-1)*54,aj-56,46)local ax=ac.create('Frame',{Size=UDim2.fromScale(1,1),BackgroundColor3=ae.Tile,Parent=aw}
+)ac.corner(ax,14)ac.ring(ax,14,0.8,0.94)local ay=ac.icon(ax,av[1],ae.White,18)ay.Frame.AnchorPoint=Vector2.new(0,0.5)ay.
+Frame.Position=UDim2.new(0,16,0.5,0)text(ax,{Position=UDim2.fromOffset(48,6),Size=UDim2.new(1,-60,0,18),Text=av[2],Font=
+af.Semibold,TextSize=13,TextColor3=ae.Text,TextXAlignment=Enum.TextXAlignment.Left})text(ax,{Position=UDim2.fromOffset(
+48,24),Size=UDim2.new(1,-60,0,16),Text=av[3],Font=af.Regular,TextSize=11.5,TextColor3=ae.Dim,TextXAlignment=Enum.
+TextXAlignment.Left})table.insert(aq,aw)end return aq end}end local function shift(an,ao,ap)return UDim2.new(an.X.Scale,
+an.X.Offset+ao,an.Y.Scale,an.Y.Offset+ap)end local function rise(an,ao)for ap,aq in an do aq.GroupTransparency=1 local
+ar=aq.Position aq.Position=shift(ar,ao or 0,14)task.delay(0.07*(ap-1),function()if aq.Parent then ac.tween(aq,{
+GroupTransparency=0,Position=ar},0.5,ah)end end)end end function am:Show(an)local ao=self.Lib self.onDone=an local ap=ac
+.create('ScreenGui',{Name='LumenIntro',ResetOnSpawn=false,IgnoreGuiInset=true,ZIndexBehavior=Enum.ZIndexBehavior.Sibling
+,DisplayOrder=2000})ac.protect(ap)ap.Parent=ac.getGuiParent()self.Screen=ap if ao.Gui then ao.Gui.Enabled=false end
+local aq=ac.create('Frame',{Name='Intro',Size=UDim2.fromScale(1,1),BackgroundTransparency=1,Parent=ap})self.Gui=aq local
+ar=ac.create('TextButton',{Size=UDim2.fromScale(1,1),BackgroundColor3=ae.Black,BackgroundTransparency=1,AutoButtonColor=
+false,Active=true,Text='',Parent=aq})ac.tween(ar,{BackgroundTransparency=0.35},0.6,Enum.EasingStyle.Quad)local as=ac.
+create('CanvasGroup',{AnchorPoint=Vector2.new(0.5,0.5),Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(aj,ak),
+BackgroundColor3=ae.Tile,GroupTransparency=1,Parent=aq})ac.corner(as,30)ac.ring(as,30,0.55,0.88)local at=ac.create(
+'UIScale',{Scale=0.86,Parent=as})self.Card,self.cardScale=as,at ac.tween(as,{GroupTransparency=0},0.35,Enum.EasingStyle.
+Quad)ac.tween(at,{Scale=1},0.7,ag)local av=ac.create('Frame',{Size=UDim2.new(1,0,1,-al),BackgroundTransparency=1,
+ClipsDescendants=true,Parent=as})local aw=ac.create('Frame',{AnchorPoint=Vector2.new(0,1),Position=UDim2.fromScale(0,1),
+Size=UDim2.new(1,0,0,al),BackgroundTransparency=1,Parent=as})local ax=ac.create('TextButton',{Position=UDim2.fromOffset(
+24,18),Size=UDim2.fromOffset(70,38),Text='Skip',Font=af.Medium,TextSize=13,TextColor3=ae.Dim,TextXAlignment=Enum.
+TextXAlignment.Left,Parent=aw})local ay=self:_pages()local az={}local aA=ac.create('Frame',{AnchorPoint=Vector2.new(0.5,
+0.5),Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(60,8),BackgroundTransparency=1,Parent=aw})ac.list(aA,6,Enum
+.FillDirection.Horizontal,Enum.HorizontalAlignment.Center,Enum.VerticalAlignment.Center)for aB=1,#ay do local aC=ac.
+create('Frame',{Size=UDim2.fromOffset(8,8),BackgroundColor3=ae.Raised,LayoutOrder=aB,Parent=aA})ac.corner(aC,4)az[aB]=aC
+end local aB=ac.create('TextButton',{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-24,0,18),Size=UDim2.fromOffset(
+124,38),BackgroundTransparency=0,BackgroundColor3=ae.White,Text='',Parent=aw})ac.corner(aB,19)local aC=ac.create(
+'UIScale',{Parent=aB})local aD=text(aB,{Size=UDim2.fromScale(1,1),Text='Continue',Font=af.Semibold,TextSize=13,
+TextColor3=ae.Black})local aE=ab.bind(function(aE)aB.BackgroundColor3=aE aD.TextColor3=ab.onAccent(aE)end)self.unbind=aE
+local aF,aG={},{}local aH=0 local aI=false local function paint(aJ)for aK,aL in az do ac.tween(aL,{Size=UDim2.
+fromOffset(if aK==aJ then 22 else 8,8),BackgroundColor3=if aK==aJ then ae.Accent else ae.Raised},0.4,ah)end aD.Text=if
+aJ==#ay then'Get started'else'Continue'ac.tween(ax,{TextTransparency=if aJ==#ay then 1 else 0},0.25)ax.Active=aJ~=#ay
+end local function go(aJ)if aI or not self.alive then return end aI=true local aK=aF[aH]local aL=if aJ>aH then 1 else-1
+if aK then for aM,aN in aG[aH]do ac.tween(aN,{GroupTransparency=1,Position=shift(aN.Position,-18*aL,0)},0.25,ah)end task
+.delay(0.28,function()aK.Visible=false end)end local aM=aF[aJ]if not aM then aM=ac.create('Frame',{Size=UDim2.fromScale(
+1,1),BackgroundTransparency=1,Visible=false,Parent=av})aF[aJ]=aM aG[aJ]=ay[aJ](aM)end aH=aJ self.page=aJ paint(aJ)task.
+delay(if aK then 0.18 else 0.35,function()if not self.alive then return end aM.Visible=true rise(aG[aJ],18*aL)local aN=
+aM:FindFirstChild('Mark')if aN then local aO=ac.create('UIScale',{Scale=0.7,Parent=aN})ac.tween(aO,{Scale=1},0.8,ag)end
+aI=false end)end self.go=go local function press(aJ,aK)aJ.MouseEnter:Connect(function()ac.tween(aK,{Scale=1.04},0.2,ah)
+end)aJ.MouseLeave:Connect(function()ac.tween(aK,{Scale=1},0.2,ah)end)end press(aB,aC)local function advance()if aI then
+return end if aH>=#ay then self:Finish()else go(aH+1)end end aB.MouseButton1Click:Connect(advance)ax.MouseButton1Click:
+Connect(function()self:Finish()end)table.insert(self.conns,aa.InputBegan:Connect(function(aJ)if aJ.UserInputType~=Enum.
+UserInputType.Keyboard then return end if aJ.KeyCode==Enum.KeyCode.Return or aJ.KeyCode==Enum.KeyCode.Right then
+advance()elseif aJ.KeyCode==Enum.KeyCode.Escape then self:Finish()end end))table.insert(ao.Cleanups,function()self:
+Destroy()end)go(1)return self end function am:Finish()if not self.alive or self.finishing then return end self.finishing
+=true local an=self.Lib an:Remember('intro','seen',true)ac.tween(self.cardScale,{Scale=0.94},0.4,ah,Enum.EasingDirection
+.In)ac.tween(self.Card,{GroupTransparency=1},0.35,Enum.EasingStyle.Quad)for ao,ap in self.Gui:GetChildren()do if ap:IsA(
+'TextButton')then ac.tween(ap,{BackgroundTransparency=1},0.5,Enum.EasingStyle.Quad)elseif ap~=self.Card then ac.tween(ap
+,{BackgroundTransparency=1},0.4,Enum.EasingStyle.Quad)end end task.delay(0.55,function()local ao=self.onDone self:
+Destroy()if ao then task.spawn(ao)end end)end function am:Destroy()self.alive=false for an,ao in self.conns do ao:
+Disconnect()end table.clear(self.conns)if self.unbind then self.unbind()self.unbind=nil end if self.Screen then self.
+Screen:Destroy()self.Screen,self.Gui=nil,nil end local an=self.Lib if an.Gui and an.Gui.Parent then an.Gui.Enabled=true
+end end return am end function a.x()local aa=a.cache.x if not aa then aa={c=__modImpl()}a.cache.x=aa end return aa.c end
+end do local function __modImpl()local aa=game:GetService('RunService')local ab=game:GetService('Stats')local ac=a.a()
+local ad=a.c()local ae=a.e()local af=a.b()local ag,ah=ac.Colors,ac.Fonts local ai,aj,ak=ag.Text,ag.Orange,ag.Red local
+al=34 local am={}am.__index=am local function fpsColor(an)return if an>=50 then ai elseif an>=30 then aj else ak end
+local function pingColor(an)return if an<100 then ai elseif an<200 then aj else ak end local function memColor(an)return
+if an<2000 then ai elseif an<3200 then aj else ak end local an={{id='fps',name='FPS',unit='fps',color=fpsColor},{id=
+'ping',name='Ping',unit='ms',color=pingColor},{id='mem',name='Memory',unit='MB',color=memColor}}am.STATS=an function am.
+new(ao)local ap=setmetatable({Lib=ao,alive=true,conns={},stats={},parts={}},am)ap.Shown=ao:Recall('watermark','show')~=
+false for aq,ar in an do ap.stats[ar.id]=ao:Recall('watermark',ar.id)~=false end local aq=workspace.CurrentCamera.
+ViewportSize local ar,as=224,18 local at,av=ao:Recall('watermark','x'),ao:Recall('watermark','y')if tonumber(at)and
+tonumber(av)then ar,as=math.clamp(at,0,math.max(aq.X-80,0)),math.clamp(av,0,math.max(aq.Y-40,0))end local aw=ad.create(
+'CanvasGroup',{Name='Watermark',Position=UDim2.fromOffset(ar,as),Size=UDim2.fromOffset(0,al),AutomaticSize=Enum.
+AutomaticSize.X,BackgroundColor3=ag.Black,BackgroundTransparency=0.06,GroupTransparency=if ap.Shown then 0 else 1,Active
+=true,Visible=ap.Shown,ZIndex=50,Parent=ao.Gui})ad.corner(aw,al//2)ap.Root=aw ap.Pop=ad.create('UIScale',{Parent=aw})
+local ax=ad.create('Frame',{Size=UDim2.fromOffset(0,al),AutomaticSize=Enum.AutomaticSize.X,BackgroundTransparency=1,
+Parent=aw})ad.padding(ax,11,0,15,0)ad.list(ax,0,Enum.FillDirection.Horizontal,Enum.HorizontalAlignment.Left,Enum.
+VerticalAlignment.Center)local ay=ad.create('Frame',{Position=UDim2.fromOffset(1,1),Size=UDim2.fromOffset(60,al-2),
+BackgroundTransparency=1,ZIndex=5,Parent=aw})ad.corner(ay,al//2-1)ad.edge(ay,0.7,0.9)ax:GetPropertyChangedSignal(
+'AbsoluteSize'):Connect(function()ay.Size=UDim2.fromOffset(math.max(ax.AbsoluteSize.X-2,0),al-2)end)local az=ad.create(
+'Frame',{Size=UDim2.fromOffset(22,22),BackgroundTransparency=1,LayoutOrder=1,Parent=ax})local aA=ad.icon(az,'bolt',ag.
+White,16)aA.Frame.AnchorPoint=Vector2.new(0.5,0.5)aA.Frame.Position=UDim2.fromScale(0.5,0.5)if ac.Brand.Icon then af.
+image(ac.Brand.Icon,'assets/nametag',function(aB)if aB and az.Parent then ad.create('ImageLabel',{Size=UDim2.fromScale(1
+,1),Image=aB,Parent=az})aA.Frame.Visible=false end end)end for aB,aC in an do local aD=ad.create('Frame',{Size=UDim2.
+fromOffset(0,20),AutomaticSize=Enum.AutomaticSize.X,BackgroundTransparency=1,ClipsDescendants=true,LayoutOrder=1+aB,
+Visible=ap.stats[aC.id],Parent=ax})local aE=ad.create('CanvasGroup',{Size=UDim2.fromOffset(0,20),AutomaticSize=Enum.
+AutomaticSize.X,BackgroundTransparency=1,Parent=aD})ad.padding(aE,12,0,0,0)ad.list(aE,5,Enum.FillDirection.Horizontal,
+Enum.HorizontalAlignment.Left,Enum.VerticalAlignment.Center)ad.create('Frame',{Size=UDim2.fromOffset(1,14),
+BackgroundColor3=ag.Raised,LayoutOrder=1,Parent=aE})ad.create('Frame',{Size=UDim2.fromOffset(2,1),BackgroundTransparency
+=1,LayoutOrder=2,Parent=aE})local aF=ad.create('TextLabel',{Size=UDim2.fromOffset(0,20),AutomaticSize=Enum.AutomaticSize
+.X,Text='--',Font=ah.Bold,TextSize=13,TextColor3=ag.Text,LayoutOrder=3,Parent=aE})local aG=ad.create('TextLabel',{Size=
+UDim2.fromOffset(0,20),AutomaticSize=Enum.AutomaticSize.X,Text=aC.unit,Font=ah.Medium,TextSize=11,TextColor3=ag.Dim,
+LayoutOrder=4,Parent=aE})ap.parts[aC.id]={slot=aD,box=aE,value=aF,unit=aG,color=aC.color,gen=0}end if ap.Shown then ap.
+Pop.Scale=0.9 aw.GroupTransparency=1 ad.tween(aw,{GroupTransparency=0},0.3,Enum.EasingStyle.Quad)ad.tween(ap.Pop,{Scale=
+1},0.5,Enum.EasingStyle.Back)end ap.Drag=ae.new(aw,aw,{OnEnd=function()task.delay(0.5,function()if ap.alive and aw.
+Parent then ao:Remember('watermark','x',aw.Position.X.Offset)ao:Remember('watermark','y',aw.Position.Y.Offset)end end)
+end})local aB=0 table.insert(ap.conns,aa.Heartbeat:Connect(function()aB+=1 end))task.spawn(function()local aC=os.clock()
+while ap.alive and aw.Parent do task.wait(0.5)local aD=os.clock()local aE=math.floor(aB/math.max(aD-aC,1e-3)+0.5)aB,aC=0
+,aD ap:_set('fps',aE,tostring(aE))if ap.stats.ping then local aF=0 pcall(function()aF=math.floor(ab.Network.
+ServerStatsItem['Data Ping']:GetValue()+0.5)end)ap:_set('ping',aF,tostring(aF))end if ap.stats.mem then local aF=0
+pcall(function()aF=math.floor(ab:GetTotalMemoryUsageMb()+0.5)end)if aF>=1000 then ap:_set('mem',aF,string.format('%.1f',
+aF/1000),'GB')else ap:_set('mem',aF,tostring(aF),'MB')end end end end)table.insert(ao.Cleanups,function()ap:Destroy()end
+)return ap end function am:_set(ao,ap,aq,ar)local as=self.parts[ao]if as and self.stats[ao]then as.value.Text=aq as.
+value.TextColor3=as.color(ap)if ar then as.unit.Text=ar end end end function am:ResetPosition()if self.Drag then self.
+Drag:Stop()end self.Lib:Remember('watermark','x',nil)self.Lib:Remember('watermark','y',nil)ad.tween(self.Root,{Position=
+UDim2.fromOffset(224,18)},0.9,Enum.EasingStyle.Cubic,Enum.EasingDirection.InOut)end function am:SetShown(ao)ao=ao==true
+self.Shown=ao self._showGen=(self._showGen or 0)+1 local ap=self._showGen self.Lib:Remember('watermark','show',ao)if ao
+then self.Root.Visible=true self.Pop.Scale=0.9 ad.tween(self.Root,{GroupTransparency=0},0.3,Enum.EasingStyle.Quad)ad.
+tween(self.Pop,{Scale=1},0.5,Enum.EasingStyle.Back)else ad.tween(self.Root,{GroupTransparency=1},0.25,Enum.EasingStyle.
+Quad)ad.tween(self.Pop,{Scale=0.92},0.25,Enum.EasingStyle.Quint)task.delay(0.27,function()if self._showGen==ap and self.
+alive then self.Root.Visible=false end end)end end function am:SetStat(ao,ap)local aq=self.parts[ao]if not aq then
+return end ap=ap==true self.stats[ao]=ap self.Lib:Remember('watermark',ao,ap)aq.gen+=1 local ar=aq.gen local as,at=aq.
+slot,aq.box local av=at.AbsoluteSize.X local function settle(aw)as.AutomaticSize=Enum.AutomaticSize.X as.Size=UDim2.
+fromOffset(0,20)as.Visible=aw at.GroupTransparency=if aw then 0 else 1 end if av<=0 and not ap then return settle(false)
+end if ap then as.Visible=true av=at.AbsoluteSize.X if av<=0 then return settle(true)end as.AutomaticSize=Enum.
+AutomaticSize.None as.Size=UDim2.fromOffset(0,20)at.GroupTransparency=1 ad.tween(as,{Size=UDim2.fromOffset(av,20)},0.45,
+Enum.EasingStyle.Quint)ad.tween(at,{GroupTransparency=0},0.35,Enum.EasingStyle.Quad)task.delay(0.47,function()if aq.gen
+==ar then settle(true)end end)else as.AutomaticSize=Enum.AutomaticSize.None as.Size=UDim2.fromOffset(av,20)ad.tween(at,{
+GroupTransparency=1},0.25,Enum.EasingStyle.Quad)ad.tween(as,{Size=UDim2.fromOffset(0,20)},0.4,Enum.EasingStyle.Quint,
+Enum.EasingDirection.InOut)task.delay(0.42,function()if aq.gen==ar then settle(false)end end)end end function am:Destroy
+()if not self.alive then return end self.alive=false for ao,ap in self.conns do ap:Disconnect()end table.clear(self.
+conns)if self.Root then self.Root:Destroy()end end return am end function a.y()local aa=a.cache.y if not aa then aa={c=
+__modImpl()}a.cache.y=aa end return aa.c end end do local function __modImpl()local aa=a.c()local ab={}ab.__index=ab
+function ab.new(ac,ad,ae)local af=setmetatable({Lib=ac,Tab=ad,Cfg=ae,active={},pinned={},conns={}},ab)table.insert(af.
+conns,ac.ToggleAdded:Connect(function(ag)af:_watch(ag)end))table.insert(ac.Cleanups,function()af:Destroy()end)af:
+_updateEmpty()return af end function ab:_place(ac,ad)local ae=self.Tab.Tiles local af=table.find(ae,ac)if af then table.
+remove(ae,af)end table.insert(ae,table.find(ae,ad)or(#ae+1),ac)self.Tab:_queueLayout(true)end function ab:_mirror(ac,ad)
+local ae ae=self.Tab:AddToggle({Name=ac.Name,Icon=ac.IconName,Default=ac.Value,PopOut=false,NoKey=true,Pin=false,Mirror=
+true,Callback=function(af)ac:Set(af)end})ae:SetVisible(false)self:_place(ae.Rec,ad)table.insert(self.conns,ac.Synced:
+Connect(function(af)ae:Set(af,true)end))table.insert(ac._cleanup,function()ae:Destroy()end)return ae end local function 
+anyShown(ac)for ad,ae in ac do if ae.Rec.Frame.Visible and not ae.Rec.Hidden then return true end end return false end
+function ab:_updateEmpty()local ac=self.Cfg if ac.ActiveEmpty then ac.ActiveEmpty:SetVisible(not anyShown(self.active))
+end if ac.PinnedEmpty then ac.PinnedEmpty:SetVisible(not anyShown(self.pinned))end end function ab:_setShown(ac,ad)local
+ae=(ac._shownGen or 0)+1 ac._shownGen=ae local af=ac.Rec.Scale if ad then if af and ac.Rec.Frame.Visible then aa.tween(
+af,{Scale=1},0.3,Enum.EasingStyle.Back)end ac:SetVisible(true)elseif af and ac.Rec.Frame.Visible then aa.tween(af,{Scale
+=0.8},0.16,Enum.EasingStyle.Quint,Enum.EasingDirection.In)task.delay(0.17,function()if ac._shownGen==ae then ac:
+SetVisible(false)af.Scale=1 self:_updateEmpty()end end)else ac:SetVisible(false)end end function ab:_syncActive(ac)local
+ad=self.active[ac]if ac.Value and not ad then ad=self:_mirror(ac,self.Cfg.PinnedHeader)self.active[ac]=ad end if ad then
+self:_setShown(ad,ac.Value)end self:_updateEmpty()end function ab:_syncPinned(ac)local ad=self.pinned[ac]if ac.Pinned
+and not ad then ad=self:_mirror(ac,self.Cfg.ShortcutsHeader)self.pinned[ac]=ad end if ad then self:_setShown(ad,ac.
+Pinned)end self:_updateEmpty()end function ab:_watch(ac)if not ac.Pinnable then return end table.insert(self.conns,ac.
+Synced:Connect(function()self:_syncActive(ac)end))table.insert(self.conns,ac.PinChanged:Connect(function()self:
+_syncPinned(ac)end))if self.Lib:Recall('pins',ac.Name)==true then ac:SetPinned(true,true)self:_syncPinned(ac)end if ac.
+Value then self:_syncActive(ac)end end function ab:Destroy()for ac,ad in self.conns do ad:Disconnect()end table.clear(
+self.conns)end return ab end function a.z()local aa=a.cache.z if not aa then aa={c=__modImpl()}a.cache.z=aa end return
+aa.c end end do local function __modImpl()local aa=game:GetService('HttpService')local ab=game:GetService('RunService')
+local ac=game:GetService('TextService')local ad=game:GetService('UserInputService')local ae=a.a()local af=a.c()local ag=
+a.b()local ah,ai=ae.Colors,ae.Fonts local aj=Enum.EasingStyle.Quint local ak=
 [[https://spotify-proxy.checkleaked.cc/spotify-data/track_lyrics]]local al='https://lrclib.net/api'local am,an=320,460
 local ao=22 local ap=19 local aq=160 local ar={}ar.__index=ar local function clean(as)as=tostring(as or'')as=string.
 gsub(as,'^%s+','')as=string.gsub(as,'%s+$','')return as end function ar.parseLrc(as)local at={}if type(as)~='string'then
@@ -2481,62 +2654,63 @@ _savePending then self._savePending=true task.delay(0.8,function()if self._saveP
 end end function aw:CreateWindow(ax)ax=ax or{}local ay=ag.new(self,ax)table.insert(self.Windows,ay)if ax.Visible~=false
 then task.defer(function()ay:Show()end)end return ay end function aw:CreateNametag(ax)ax=table.clone(ax or{})ax.Key=ax.
 Key or tostring(#self.Nametags+1)ax.DefaultTitle=ax.Title local ay=self:Recall('nametag',ax.Key)if type(ay)=='table'then
-for az,aA in{'Title','Name','Icon','Background','Font'}do if type(ay[aA])=='string'then ax[aA]=ay[aA]end end end local
-az=aj.new(self,ax)table.insert(self.Nametags,az)if self.NametagsVisible==false then az:SetEnabled(false)end return az
-end function aw:SetNametagsVisible(ax)self.NametagsVisible=ax for ay,az in self.Nametags do az:SetEnabled(ax)end end
-function aw:CreateDock()self.Dock=ah.new(self)return self.Dock end function aw:ShowIntro(ax)if self._intro and self.
-_intro.alive then return self._intro end if not ax and self:Recall('intro','seen')then return nil end self._intro=ap.
-new(self):Show()return self._intro end function aw:Notify(ax)ax=ax or{}local ay=self.NotifyMode or'All'if ay=='Off'then
-return end if ay=='Important'and ax.Type~='warning'and ax.Type~='error'then return end self.Island:Push(ax)end function
-aw:GetSpotify()if not self.Spotify then local ax=al.new(self)self.Spotify=ax ax.Error:Connect(function(ay)self:Notify({
-Title='Spotify',Content=ay,Type='warning'})end)table.insert(self.Cleanups,function()ax:Destroy()end)if self.Island then
-self.Island:SetMedia(ax)end end return self.Spotify end function aw:SwitchOffAll()local ax=0 for ay,az in table.clone(
-self.Elements)do if az.Kind=='Toggle'and az.Pinnable and az.Value then az:Set(false)ax+=1 end end return ax end function
-aw:SidePosition(ax,ay,az)az=az or{}local aA=workspace.CurrentCamera.ViewportSize local aB=336 local aC=(az.col or 1)-1
-local aD=if ax=='left'then 24+aC*aB else aA.X-ay.X-24-aC*aB local aE=if az.align=='bottom'then aA.Y-ay.Y-28 elseif az.
-align=='top'then 64 else math.floor((aA.Y-ay.Y)/2)return Vector2.new(math.clamp(aD,12,math.max(aA.X-ay.X-12,12)),math.
-clamp(aE,12,math.max(aA.Y-ay.Y-12,12)))end function aw:ResetLayout()local ax=0 local function next_()ax+=1 return(ax-1)*
-0.07 end for ay,az in self.Windows do az:ResetLayout(next_())end if self.MiniPlayer then self.MiniPlayer:ResetLayout(
-next_())end for ay,az in self.Elements do if az.Card then az.Card:ResetLayout(next_())end end self._state.windows={}self
-._state.cards={}self:_flushState()end function aw:GetLyrics()if not self._lyrics then self._lyrics=as.new(self)end
-return self._lyrics end function aw:GetMiniPlayer()if not self.MiniPlayer then local ax=am.new(self)self.MiniPlayer=ax
-ax:SetSpotify(self:GetSpotify())if self._cardsHidden then ax:Suppress(true)end table.insert(self.Cleanups,function()ax:
-Destroy()end)end return self.MiniPlayer end function aw:SetClock24(ax)self.Clock24=ax==true if self.Island then self.
-Island:SetClock24(ax)end end function aw:SetAccent(ax)ad.setAccent(ax)if self.Remember then self:Remember('settings',
-'accent',{ax.R,ax.G,ax.B})end end function aw:GetFlag(ax)local ay=self.Flags[ax]return ay and ay:Get()end function aw:
-SetVisible(ax)self.Visible=ax if#self.Windows>0 then local ay=self.Windows[1]if ax then if ay._wasVisible~=false then ay
-:Show()end else ay._wasVisible=ay.Visible ay:Hide()end end if self.Dock then self.Dock:SetVisible(ax)end if not ax then
-self:_closePopup()end end local function encode(ax)local ay=ax:Get()if ax.Kind=='Color'then return{ay.R,ay.G,ay.B}elseif
-ax.Kind=='Keybind'then return ay and ay.Name or false end return ay end local function decode(ax,ay)if ax.Kind=='Color'
-then return Color3.new(ay[1],ay[2],ay[3])elseif ax.Kind=='Keybind'then return ay and Enum.KeyCode[ay]or nil end return
-ay end function aw:SaveConfig(ax)local ay={}for az,aA in self.Flags do if aA.Get then ay[az]=encode(aA)if aA.Kind==
-'Toggle'then ay[az..'::key']=if aA.Key then aA.Key.Name else false end end end pcall(function()local az=ao.dir('configs'
-,self.Name)writefile(az..'/'..ao.clean(ax)..'.json',ab:JSONEncode(ay))end)end function aw:LoadConfig(ax)local ay=ao.
-clean(ax)..'.json'local az=ao.read(ao.dir('configs',self.Name)..'/'..ay)or ao.read('Lumen/'..self.Name..'/'..ay)if not
-az then return false end local aA=ab:JSONDecode(az)for aB,aC in aA do local aD=string.match(aB,'^(.+)::key$')if aD then
-local aE=self.Flags[aD]if aE and aE.SetKey then pcall(function()aE:SetKey(if aC then Enum.KeyCode[aC]else nil)end)end
-else local aE=self.Flags[aB]if aE and aE.Set then pcall(aE.Set,aE,decode(aE,aC),false)end end end return true end
-function aw:Unload()if self._unloading then return end self._unloading=true self:_closePopup()for ax,ay in self.Nametags
-do pcall(function()ay:SetEnabled(false)end)end self._cardsHidden=true local ax={}if self.MiniPlayer and self.MiniPlayer.
-Visible then table.insert(ax,self.MiniPlayer)end for ay,az in self.Elements do if az.Card and az.Card.Visible then table
-.insert(ax,az.Card)end end for ay,az in ax do task.delay((ay-1)*0.06,function()pcall(az.Suppress,az,true)end)end local
-ay=0 for az,aA in self.Windows do if aA.Visible then ay+=1 task.delay(ay*0.07,function()aA:Hide()end)end end if self.
-Dock then task.delay(0.15,function()self.Dock:SetVisible(false)end)end task.spawn(function()task.wait(0.45+math.max(ay*
-0.07,#ax*0.06))self.Island:Push({Title='Lumen unloaded',Content='See you next time',Type='info',Duration=1.3})task.wait(
-0.4)while self.Island._busy do task.wait(0.1)end task.wait(1)self.Island:Dismiss()task.wait(0.6)self:Destroy()end)end
-function aw:Destroy()if self._savePending then self:_flushState()end for ax,ay in self._conns do ay:Disconnect()end for
-ax,ay in self.Nametags do ay:Destroy()end for ax,ay in table.clone(self.Cleanups)do pcall(ay)end for ax,ay in table.
-clone(self.Elements)do for az,aA in ay._cleanup do pcall(aA)end end if self.Dock then self.Dock:Destroy()end self.Gui:
-Destroy()end return aw end function a.B()local aa=a.cache.B if not aa then aa={c=__modImpl()}a.cache.B=aa end return aa.
-c end end do local function __modImpl()local aa=game:GetService('HttpService')local ab=a.b()local ac={}function ac.path(
-ad,ae)return ab.dir(ad)..'/'..ae..'.json'end function ac.load(ad)local ae=ab.read(ad)if not ae or ae==''then return nil
-end local af,ag=pcall(function()return aa:JSONDecode(ae)end)return if af and type(ag)=='table'then ag else nil end
-function ac.saver(ad,ae)local af=false return function()if af then return end af=true task.delay(0.4,function()af=false
-local ag,ah=pcall(function()return aa:JSONEncode(ae())end)if ag then ab.write(ad,ah)end end)end end local ad={Zero='0',
-One='1',Two='2',Three='3',Four='4',Five='5',Six='6',Seven='7',Eight='8',Nine='9'}function ac.keyText(ae)if not ae or ae
-==''then return nil end if ad[ae]then return ad[ae]end ae=string.gsub(ae,'^Left','L')ae=string.gsub(ae,'^Right','R')ae=
-string.gsub(ae,'Control','Ctrl')return string.sub(ae,1,4)end return ac end function a.C()local aa=a.cache.C if not aa
-then aa={c=__modImpl()}a.cache.C=aa end return aa.c end end do local function __modImpl()local aa={['Idle']={[
+for az,aA in{'Title','Name','Icon','Background','Font','Stroke','TextColor','Gradient','GradientRot','TextEffect'}do if
+type(ay[aA])=='string'then ax[aA]=ay[aA]end end end local az=aj.new(self,ax)table.insert(self.Nametags,az)if self.
+NametagsVisible==false then az:SetEnabled(false)end return az end function aw:SetNametagsVisible(ax)self.NametagsVisible
+=ax for ay,az in self.Nametags do az:SetEnabled(ax)end end function aw:CreateDock()self.Dock=ah.new(self)return self.
+Dock end function aw:ShowIntro(ax)if self._intro and self._intro.alive then return self._intro end if not ax and self:
+Recall('intro','seen')then return nil end self._intro=ap.new(self):Show()return self._intro end function aw:Notify(ax)ax
+=ax or{}local ay=self.NotifyMode or'All'if ay=='Off'then return end if ay=='Important'and ax.Type~='warning'and ax.Type
+~='error'then return end self.Island:Push(ax)end function aw:GetSpotify()if not self.Spotify then local ax=al.new(self)
+self.Spotify=ax ax.Error:Connect(function(ay)self:Notify({Title='Spotify',Content=ay,Type='warning'})end)table.insert(
+self.Cleanups,function()ax:Destroy()end)if self.Island then self.Island:SetMedia(ax)end end return self.Spotify end
+function aw:SwitchOffAll()local ax=0 for ay,az in table.clone(self.Elements)do if az.Kind=='Toggle'and az.Pinnable and
+az.Value then az:Set(false)ax+=1 end end return ax end function aw:SidePosition(ax,ay,az)az=az or{}local aA=workspace.
+CurrentCamera.ViewportSize local aB=336 local aC=(az.col or 1)-1 local aD=if ax=='left'then 24+aC*aB else aA.X-ay.X-24-
+aC*aB local aE=if az.align=='bottom'then aA.Y-ay.Y-28 elseif az.align=='top'then 64 else math.floor((aA.Y-ay.Y)/2)return
+Vector2.new(math.clamp(aD,12,math.max(aA.X-ay.X-12,12)),math.clamp(aE,12,math.max(aA.Y-ay.Y-12,12)))end function aw:
+ResetLayout()local ax=0 local function next_()ax+=1 return(ax-1)*0.07 end for ay,az in self.Windows do az:ResetLayout(
+next_())end if self.MiniPlayer then self.MiniPlayer:ResetLayout(next_())end for ay,az in self.Elements do if az.Card
+then az.Card:ResetLayout(next_())end end self._state.windows={}self._state.cards={}self:_flushState()end function aw:
+GetLyrics()if not self._lyrics then self._lyrics=as.new(self)end return self._lyrics end function aw:GetMiniPlayer()if
+not self.MiniPlayer then local ax=am.new(self)self.MiniPlayer=ax ax:SetSpotify(self:GetSpotify())if self._cardsHidden
+then ax:Suppress(true)end table.insert(self.Cleanups,function()ax:Destroy()end)end return self.MiniPlayer end function
+aw:SetClock24(ax)self.Clock24=ax==true if self.Island then self.Island:SetClock24(ax)end end function aw:SetAccent(ax)ad
+.setAccent(ax)if self.Remember then self:Remember('settings','accent',{ax.R,ax.G,ax.B})end end function aw:GetFlag(ax)
+local ay=self.Flags[ax]return ay and ay:Get()end function aw:SetVisible(ax)self.Visible=ax if#self.Windows>0 then local
+ay=self.Windows[1]if ax then if ay._wasVisible~=false then ay:Show()end else ay._wasVisible=ay.Visible ay:Hide()end end
+if self.Dock then self.Dock:SetVisible(ax)end if not ax then self:_closePopup()end end local function encode(ax)local ay
+=ax:Get()if ax.Kind=='Color'then return{ay.R,ay.G,ay.B}elseif ax.Kind=='Keybind'then return ay and ay.Name or false end
+return ay end local function decode(ax,ay)if ax.Kind=='Color'then return Color3.new(ay[1],ay[2],ay[3])elseif ax.Kind==
+'Keybind'then return ay and Enum.KeyCode[ay]or nil end return ay end function aw:SaveConfig(ax)local ay={}for az,aA in
+self.Flags do if aA.Get then ay[az]=encode(aA)if aA.Kind=='Toggle'then ay[az..'::key']=if aA.Key then aA.Key.Name else
+false end end end pcall(function()local az=ao.dir('configs',self.Name)writefile(az..'/'..ao.clean(ax)..'.json',ab:
+JSONEncode(ay))end)end function aw:LoadConfig(ax)local ay=ao.clean(ax)..'.json'local az=ao.read(ao.dir('configs',self.
+Name)..'/'..ay)or ao.read('Lumen/'..self.Name..'/'..ay)if not az then return false end local aA=ab:JSONDecode(az)for aB,
+aC in aA do local aD=string.match(aB,'^(.+)::key$')if aD then local aE=self.Flags[aD]if aE and aE.SetKey then pcall(
+function()aE:SetKey(if aC then Enum.KeyCode[aC]else nil)end)end else local aE=self.Flags[aB]if aE and aE.Set then pcall(
+aE.Set,aE,decode(aE,aC),false)end end end return true end function aw:Unload()if self._unloading then return end self.
+_unloading=true self:_closePopup()for ax,ay in self.Nametags do pcall(function()ay:SetEnabled(false)end)end self.
+_cardsHidden=true local ax={}if self.MiniPlayer and self.MiniPlayer.Visible then table.insert(ax,self.MiniPlayer)end for
+ay,az in self.Elements do if az.Card and az.Card.Visible then table.insert(ax,az.Card)end end for ay,az in ax do task.
+delay((ay-1)*0.06,function()pcall(az.Suppress,az,true)end)end local ay=0 for az,aA in self.Windows do if aA.Visible then
+ay+=1 task.delay(ay*0.07,function()aA:Hide()end)end end if self.Dock then task.delay(0.15,function()self.Dock:
+SetVisible(false)end)end task.spawn(function()task.wait(0.45+math.max(ay*0.07,#ax*0.06))self.Island:Push({Title=
+'Lumen unloaded',Content='See you next time',Type='info',Duration=1.3})task.wait(0.4)while self.Island._busy do task.
+wait(0.1)end task.wait(1)self.Island:Dismiss()task.wait(0.6)self:Destroy()end)end function aw:Destroy()if self.
+_savePending then self:_flushState()end for ax,ay in self._conns do ay:Disconnect()end for ax,ay in self.Nametags do ay:
+Destroy()end for ax,ay in table.clone(self.Cleanups)do pcall(ay)end for ax,ay in table.clone(self.Elements)do for az,aA
+in ay._cleanup do pcall(aA)end end if self.Dock then self.Dock:Destroy()end self.Gui:Destroy()end return aw end function
+a.B()local aa=a.cache.B if not aa then aa={c=__modImpl()}a.cache.B=aa end return aa.c end end do local function 
+__modImpl()local aa=game:GetService('HttpService')local ab=a.b()local ac={}function ac.path(ad,ae)return ab.dir(ad)..'/'
+..ae..'.json'end function ac.load(ad)local ae=ab.read(ad)if not ae or ae==''then return nil end local af,ag=pcall(
+function()return aa:JSONDecode(ae)end)return if af and type(ag)=='table'then ag else nil end function ac.saver(ad,ae)
+local af=false return function()if af then return end af=true task.delay(0.4,function()af=false local ag,ah=pcall(
+function()return aa:JSONEncode(ae())end)if ag then ab.write(ad,ah)end end)end end local ad={Zero='0',One='1',Two='2',
+Three='3',Four='4',Five='5',Six='6',Seven='7',Eight='8',Nine='9'}function ac.keyText(ae)if not ae or ae==''then return
+nil end if ad[ae]then return ad[ae]end ae=string.gsub(ae,'^Left','L')ae=string.gsub(ae,'^Right','R')ae=string.gsub(ae,
+'Control','Ctrl')return string.sub(ae,1,4)end return ac end function a.C()local aa=a.cache.C if not aa then aa={c=
+__modImpl()}a.cache.C=aa end return aa.c end end do local function __modImpl()local aa={['Idle']={[
 '2016 Animation (mm2)']={'387947158','387947464'},['(UGC) Oh Really?']={'98004748982532','98004748982532'},['Astronaut']
 ={'891621366','891633237'},['Adidas Community']={'122257458498464','102357151005774'},['Bold']={'16738333868',
 '16738334710'},['(UGC) Slasher']={'140051337061095','140051337061095'},['(UGC) Retro']={'80479383912838',
@@ -3616,95 +3790,146 @@ Element=aY},{Name='Fullbright',Icon='sun',Element=a1},{Name='Infinite baseplate'
 'Outlines',Icon='search',Element=bb},{Name='Bang',Icon='target',Element=bk,AutoEnable=false}}for e,f in ipairs(d)do
 local g=ap:Recall('autoexec',f.Name)==true c:AddToggle({Pin=false,Name=f.Name,Icon=f.Icon,Default=g,PopOut=false,
 Callback=function(h)if ap.Remember then ap:Remember('autoexec',f.Name,h)end end})end lap()aC=av:CreateTab({Name='Music',
-Icon='music',Description='Spotify library and live playback'})aC:AddMusic()lap()local e=av:CreateTab({Name='Settings',
-Icon='sliders',Description='Appearance and configs'})e:AddSection('Appearance')e:AddColor({Name='Accent',Default=af.
-Theme.Colors.Accent,Flag='accent',Callback=function(f)ap:SetAccent(f)end})e:AddSegmented({Name='Notifications',Values={
-'All','Important','Off'},Default='All',Callback=function(f)ap.NotifyMode=f end})e:AddKeybind({Name='Toggle UI',Default=
-ap.ToggleKey,Flag='toggleUI',Callback=function(f,g)if not g and f then ap.ToggleKey=f if ap.Remember then ap:Remember(
-'settings','toggleKey',f.Name)end end end})e:AddToggle({Pin=false,Name='24-hour clock',Icon='clock',Description=
-'Island time format',Default=false,Flag='clock24',PopOut=false,Callback=function(f)ap:SetClock24(f)end})e:AddButton({
-Name='Replay intro',Icon='play',Description='Plays next time you run Lumen',Callback=function()ap:Remember('intro',
-'seen',false)ap:Notify({Title='Intro reset',Content='It will play the next time you run Lumen.',Type='info'})end})e:
-AddSection('About')e:AddLabel({Title='Lumen '..af.Version,Text=
+Icon='music',Description='Spotify library and live playback'})aC:AddMusic()lap()local e=ap:CreateNametag({Title=
+'Lumen User'})local f=0 local function teleportBehind(g)if os.clock()-f<0.6 then return end f=os.clock()local h=
+rootPart()local i=g.Character and g.Character:FindFirstChild('HumanoidRootPart')if not(h and i)then ap:Notify({Title=
+'Teleport',Content="Can't reach "..g.DisplayName..' right now.',Type='warning'})return end h.CFrame=i.CFrame*CFrame.new(
+0,0,3)ap:Notify({Title='Teleported',Content='Behind '..g.DisplayName,Type='info'})end local g=af.Net.new(ap,{Tag=e,
+OnTagClick=teleportBehind})g:SetShared(true)ap:Remember('settings','shareTag',true)ap:Remember('settings','tagTeleport',
+true)do local h=af.Theme local i,j=h.Colors,h.Fonts local k=av:CreateTab({Name='Nametags',Icon='tag',Description=
+'Design your tag, preview it, then save'})local l=k:SetTop(106)local m=ai.create('Frame',{Name='PreviewCard',Size=UDim2.
+fromScale(1,1),BackgroundColor3=i.Tile,Parent=l})ai.corner(m,20)ai.stroke(m,0.93)local n=ai.create('Frame',{Name='Host',
+Position=UDim2.fromOffset(0,0),Size=UDim2.new(1,-210,1,0),BackgroundTransparency=1,ClipsDescendants=true,Parent=m})local
+o=e:Snapshot()local p=af.Nametag.new(nil,{Host=n,Title=o.Title,Name=o.Name,Icon=o.Icon,Background=o.Background,Font=o.
+Font,Stroke=o.Stroke,TextColor=o.TextColor,DefaultTitle='Lumen User'})table.insert(ap.Cleanups,function()p:Destroy()end)
+local q=ai.create('Frame',{Name='Actions',AnchorPoint=Vector2.new(1,0.5),Position=UDim2.new(1,-14,0.5,0),Size=UDim2.new(
+0,186,0,78),BackgroundTransparency=1,Parent=m})local r=ai.create('Frame',{Position=UDim2.fromOffset(0,7),Size=UDim2.
+fromOffset(8,8),BackgroundColor3=i.Green,Parent=q})ai.corner(r,4)local s=ai.create('TextLabel',{Position=UDim2.
+fromOffset(14,0),Size=UDim2.new(1,-14,0,22),Text='Saved',Font=j.Bold,TextSize=13,TextColor3=i.Text,TextXAlignment=Enum.
+TextXAlignment.Left,Parent=q})local t=ai.create('TextButton',{Position=UDim2.fromOffset(0,34),Size=UDim2.new(1,-84,0,38)
+,BackgroundColor3=i.Raised,BackgroundTransparency=0,Parent=q})ai.corner(t,12)local u=ai.stroke(t,0.9)local v=ai.icon(t,
+'save',i.Dim,16)v.Frame.Position=UDim2.fromOffset(12,11)local w=ai.create('TextLabel',{Position=UDim2.fromOffset(34,0),
+Size=UDim2.new(1,-38,1,0),Text='Save',Font=j.Bold,TextSize=13,TextColor3=i.Dim,TextXAlignment=Enum.TextXAlignment.Left,
+Parent=t})local x=ai.create('TextButton',{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-42,0,34),Size=UDim2.
+fromOffset(38,38),BackgroundColor3=i.Raised,BackgroundTransparency=0,Parent=q})ai.corner(x,12)ai.stroke(x,0.9)local y=ai
+.icon(x,'back',i.Dim,16)y.Frame.AnchorPoint=Vector2.new(0.5,0.5)y.Frame.Position=UDim2.fromScale(0.5,0.5)local z=ai.
+create('TextButton',{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,0,0,34),Size=UDim2.fromOffset(38,38),
+BackgroundColor3=i.Raised,BackgroundTransparency=0,Parent=q})ai.corner(z,12)ai.stroke(z,0.9)local A=ai.icon(z,'refresh',
+i.Dim,16)A.Frame.AnchorPoint=Vector2.new(0.5,0.5)A.Frame.Position=UDim2.fromScale(0.5,0.5)local function same(B,C)for D,
+E in B do if C[D]~=E then return false end end return true end local function refreshStatus()local B=same(p:Snapshot(),e
+:Snapshot())if B then r.BackgroundColor3=i.Green s.Text='Saved's.TextColor3=i.Text t.BackgroundColor3=i.Raised u.
+Transparency=0.9 u.Color=i.White w.TextColor3=i.Dim v:SetColor(i.Dim,true)else r.BackgroundColor3=i.Orange s.Text=
+'Unsaved changes's.TextColor3=i.Orange local C=h.Colors.Accent t.BackgroundColor3=C u.Transparency=0.5 u.Color=C local D
+=h.onAccent(C)w.TextColor3=D v:SetColor(D,true)end end p.OnChange=refreshStatus table.insert(ap.Cleanups,h.bind(function
+()refreshStatus()end))t.MouseButton1Click:Connect(function()e:Apply(p:Snapshot())refreshStatus()ap:Notify({Title=
+'Nametag saved',Content='Other Lumen users in your server see it now.',Type='success'})end)k:AddSection('Look')local B=
+Color3.new(1,1,1)local C=k:AddInput({Name='Top line',Default=p.Title,Placeholder='Title',Callback=function(C)p:SetTitle(
+C)end})local D=k:AddInput({Name='Username',Default=p.Name or'',Placeholder='empty = your username',Callback=function(D)p
+:SetName(D)end})local E=k:AddInput({Name='Icon',Default=p.Raw.Icon or'',Placeholder='image / gif url, asset id, avatar',
+Callback=function(E)p:SetIcon(E)end})local F=k:AddInput({Name='Background',Default=p.Raw.Background or'',Placeholder=
+'image / gif url, asset id, none',Callback=function(F)p:SetBackground(F)end})local G=k:AddDropdown({Name='Font',Values=
+af.Nametag.Fonts,Default=p.FontName,Preview=af.Nametag.PreviewFont,Callback=function(G)p:SetFont(G)end})local H=k:
+AddColor({Name='Tag border pill outline',Default=p.StrokeColor or B,Picker=true,Callback=function(H)p:SetStrokeColor(H)
+end})local I=k:AddColor({Name='Text colour (solid)',Default=p.TextColor or B,Picker=true,Callback=function(I)p:
+SetTextColor(I)end})k:AddSection('Gradient & Effects')local J=if p.GradientColors then table.clone(p.GradientColors)else
+{}local K=p.GradientRot or 0 local function updateGrad()if#J>=2 then p:SetGradient(J,K)else p:SetGradient(nil,K)end end
+local L=k:AddSlider({Name='Gradient direction',Suffix='\u{b0}',Min=0,Max=360,Increment=5,Default=K,Callback=function(L)K
+=L updateGrad()end})local M=k:AddDropdown({Name='Text effect',Values={'none','typewriter','glitch','wave','bounce',
+'pulse'},Default=p.TextEffect or'none',Callback=function(M)p:SetTextEffect(M)end})local N=k:AddLabel({Title=
+'Gradient Colors',Text=if#J>=2 then(#J..' colors active: '..af.Nametag.encodeGradient(J))else
+'None (using solid text color)'})local function refreshGradStatus()if#J>=2 then N:Set(#J..' colors active: '..af.Nametag
+.encodeGradient(J),'Gradient Colors')else N:Set('None (using solid text color). Add 2+ colors to enable.',
+'Gradient Colors')end end local O=Color3.fromRGB(255,100,100)k:AddColor({Name='Pick color to add',Default=O,Picker=true,
+Callback=function(P)O=P end})k:AddButton({Name='Add color to gradient',Icon='plus',Description='Append picked color',
+Callback=function()table.insert(J,O)updateGrad()refreshGradStatus()end})k:AddButton({Name='Remove last color',Icon=
+'eraser',Description='Pop last stop',Callback=function()if#J>0 then table.remove(J)updateGrad()refreshGradStatus()end
+end})k:AddButton({Name='Clear gradient',Icon='refresh',Description='Revert to solid color',Callback=function()table.
+clear(J)updateGrad()refreshGradStatus()end})k:AddSection('Visibility')k:AddToggle({Name='Show nametags',Icon='eye',
+Description='Show over heads in the world',Default=ap.NametagsVisible~=false,Flag='nametag',Key=Enum.KeyCode.T,Callback=
+function(P)ap:SetNametagsVisible(P)end})local function load(P)p:Apply(P)C:Set(P.Title,true)D:Set(P.Name,true)E:Set(P.
+Icon,true)F:Set(P.Background,true)G:Set(P.Font,true)H:Set(af.Nametag.fromHex(P.Stroke)or B,true)I:Set(af.Nametag.
+fromHex(P.TextColor)or B,true)M:Set(P.TextEffect or'none',true)K=tonumber(P.GradientRot)or 0 L:Set(K,true)local Q=af.
+Nametag.parseGradient(P.Gradient)J=if Q then Q else{}refreshGradStatus()refreshStatus()end x.MouseButton1Click:Connect(
+function()load(e:Snapshot())end)z.MouseButton1Click:Connect(function()load({Title='Lumen User',Name='',Icon='',
+Background='',Font='Default',Stroke='',TextColor='',Gradient='',GradientRot='0',TextEffect='none'})end)end local h=av:
+CreateTab({Name='Settings',Icon='sliders',Description='Appearance and configs'})h:AddSection('Appearance')h:AddColor({
+Name='Accent',Default=af.Theme.Colors.Accent,Flag='accent',Callback=function(i)ap:SetAccent(i)end})h:AddSegmented({Name=
+'Notifications',Values={'All','Important','Off'},Default='All',Callback=function(i)ap.NotifyMode=i end})h:AddKeybind({
+Name='Toggle UI',Default=ap.ToggleKey,Flag='toggleUI',Callback=function(i,j)if not j and i then ap.ToggleKey=i if ap.
+Remember then ap:Remember('settings','toggleKey',i.Name)end end end})h:AddToggle({Pin=false,Name='24-hour clock',Icon=
+'clock',Description='Island time format',Default=false,Flag='clock24',PopOut=false,Callback=function(i)ap:SetClock24(i)
+end})h:AddButton({Name='Replay intro',Icon='play',Description='Plays next time you run Lumen',Callback=function()ap:
+Remember('intro','seen',false)ap:Notify({Title='Intro reset',Content='It will play the next time you run Lumen.',Type=
+'info'})end})h:AddSection('About')h:AddLabel({Title='Lumen '..af.Version,Text=
 [[While open, Lumen tells its server your username, user id and game, and checks for bans. Share nametag only controls whether other users see your tag.]]
-,Span=2})e:AddSection('Lyrics')e:AddInput({Name='Lyrics API key',Placeholder='checkleaked key (optional)',Default=ap:
-Recall('lyrics','key')or'',Callback=function(f)ap:GetLyrics():SetKey(f or'')end})e:AddSection('Layout')e:AddButton({Name
+,Span=2})h:AddSection('Lyrics')h:AddInput({Name='Lyrics API key',Placeholder='checkleaked key (optional)',Default=ap:
+Recall('lyrics','key')or'',Callback=function(i)ap:GetLyrics():SetKey(i or'')end})h:AddSection('Layout')h:AddButton({Name
 ='Reset layout',Icon='refresh',Description='Windows back to default',Callback=function()ap:ResetLayout()aq:
 ResetPosition()ap:Notify({Title='Layout reset',Content='Every window is back in its default place and size.',Type='info'
-})end})e:AddSection('Watermark')e:AddToggle({Pin=false,Name='Watermark',Icon='eye',Description='Drag it anywhere',
-Default=aq.Shown,PopOut=false,Callback=function(f)aq:SetShown(f)end})for f,g in ipairs({{'fps','Show framerate','bolt'},
-{'ping','Show ping','send'},{'mem','Show memory','server'}})do e:AddToggle({Pin=false,Name=g[2],Icon=g[3],Default=aq.
-stats[g[1] ],PopOut=false,Callback=function(h)aq:SetStat(g[1],h)end})end e:AddSection('Nametag')local f=ap:
-CreateNametag({Title='Lumen User'})local g=e:AddInput({Name='Tag top line',Default=f.Title,Placeholder='Title',Callback=
-function(g)f:SetTitle(g)end})local h=e:AddInput({Name='Tag username',Default=f.Name or'',Placeholder=
-'empty = your username',Callback=function(h)f:SetName(h)end})local i=e:AddInput({Name='Tag icon',Default=f.Raw.Icon or''
-,Placeholder='image url / asset id / avatar',Callback=function(i)f:SetIcon(i)end})local j=e:AddDropdown({Name='Tag font'
-,Values=af.Nametag.Fonts,Default=f.FontName,Callback=function(j)f:SetFont(j)end})local k=e:AddInput({Name=
-'Tag background',Default=f.Raw.Background or'',Placeholder='image url / asset id / none',Callback=function(k)f:
-SetBackground(k)end})local l=af.Net.new(ap,{Tag=f})e:AddToggle({Name='Share nametag',Icon='info',Description=
-'Other Lumen users see your tag',Default=l:Shares(),Pin=false,PopOut=false,Callback=function(m)l:SetShared(m)end})e:
-AddButton({Name='Reset nametag',Icon='refresh',Description='Back to default',Callback=function()f:Reset()g:Set(f.Title,
-true)h:Set('',true)i:Set('',true)k:Set('',true)j:Set('Default',true)ap:Notify({Title='Nametag reset',Content=
-'Default title, username and look',Type='success'})end})e:AddSection('Config')local m=e:AddInput({Name='Config name',
-Default='default',Placeholder='name'})e:AddButton({Name='Save',Icon='download',Description='Write config',Callback=
-function()ap:SaveConfig(m:Get())ap:Notify({Title='Saved',Content=m:Get()..'.json',Type='success'})end})e:AddButton({Name
-='Load',Icon='upload',Description='Read config',Callback=function()local n=ap:LoadConfig(m:Get())ap:Notify({Title=if n
-then'Loaded'else'Nothing found',Content=m:Get()..'.json',Type=if n then'info'else'warning'})end})local n n=e:AddButton({
-Name='Unload',Icon='alert',Description='Remove Lumen',Callback=function()as.fly,as.noclip,as.walk,as.jump,as.clickTp=
-false,false,false,false,false as.infiniteBaseplate='Off'clearBaseplates()a4=nil ba=false for o in b do clearOutline(o)
-end local o=humanoid()if o then o.WalkSpeed=at.walk o.PlatformStand=false end workspace.Gravity=at.gravity for p,q in ar
-do q:Disconnect()end ap:Unload()end})lap()aB=ap:CreateWindow({Title='Inspector',Id='Inspector.v3',Icon='server',Size=
-Vector2.new(540,460),Position=ap:SidePosition('left',Vector2.new(540,460),{col=2}),Visible=false})local o=aB:CreateTab({
-Name='Server',Icon='server',Description='This session'})o:AddSection('Session')o:AddLabel({Title=tostring(#aa:
-GetPlayers())..' players',Text='Place '..game.PlaceId,Span=2})o:AddLabel({Title='Job',Text=string.sub(game.JobId~=''and
-game.JobId or'Studio',1,24),Span=2})o:AddButton({Name='Rejoin',Icon='upload',Description='Same server',Callback=function
-()if game.JobId==''then ap:Notify({Title='Studio session',Content='There is no live server instance in Studio.',Type=
-'warning'})return end ap:Notify({Title='Rejoining',Content='Teleporting to this server instance\u{2026}',Type='info'})
-task.delay(0.5,function()if#aa:GetPlayers()<=1 then pcall(function()an:Kick('\nRejoining...')end)task.wait(0.3)ae:
-Teleport(game.PlaceId,an)else ae:TeleportToPlaceInstance(game.PlaceId,game.JobId,an)end end)end})o:AddButton({Name=
-'Teleport',Icon='link',Description='Copy script',Callback=function()local p=string.format(
+})end})h:AddSection('Watermark')h:AddToggle({Pin=false,Name='Watermark',Icon='eye',Description='Drag it anywhere',
+Default=aq.Shown,PopOut=false,Callback=function(i)aq:SetShown(i)end})for i,j in ipairs({{'fps','Show framerate','bolt'},
+{'ping','Show ping','send'},{'mem','Show memory','server'}})do h:AddToggle({Pin=false,Name=j[2],Icon=j[3],Default=aq.
+stats[j[1] ],PopOut=false,Callback=function(k)aq:SetStat(j[1],k)end})end h:AddSection('Config')local i=h:AddInput({Name=
+'Config name',Default='default',Placeholder='name'})h:AddButton({Name='Save',Icon='download',Description='Write config',
+Callback=function()ap:SaveConfig(i:Get())ap:Notify({Title='Saved',Content=i:Get()..'.json',Type='success'})end})h:
+AddButton({Name='Load',Icon='upload',Description='Read config',Callback=function()local j=ap:LoadConfig(i:Get())ap:
+Notify({Title=if j then'Loaded'else'Nothing found',Content=i:Get()..'.json',Type=if j then'info'else'warning'})end})
+local j j=h:AddButton({Name='Unload',Icon='alert',Description='Remove Lumen',Callback=function()as.fly,as.noclip,as.walk
+,as.jump,as.clickTp=false,false,false,false,false as.infiniteBaseplate='Off'clearBaseplates()a4=nil ba=false for k in b
+do clearOutline(k)end local k=humanoid()if k then k.WalkSpeed=at.walk k.PlatformStand=false end workspace.Gravity=at.
+gravity for l,m in ar do m:Disconnect()end ap:Unload()end})lap()aB=ap:CreateWindow({Title='Inspector',Id='Inspector.v3',
+Icon='server',Size=Vector2.new(540,460),Position=ap:SidePosition('left',Vector2.new(540,460),{col=2}),Visible=false})
+local k=aB:CreateTab({Name='Server',Icon='server',Description='This session'})k:AddSection('Session')k:AddLabel({Title=
+tostring(#aa:GetPlayers())..' players',Text='Place '..game.PlaceId,Span=2})k:AddLabel({Title='Job',Text=string.sub(game.
+JobId~=''and game.JobId or'Studio',1,24),Span=2})k:AddButton({Name='Rejoin',Icon='upload',Description='Same server',
+Callback=function()if game.JobId==''then ap:Notify({Title='Studio session',Content=
+'There is no live server instance in Studio.',Type='warning'})return end ap:Notify({Title='Rejoining',Content=
+'Teleporting to this server instance\u{2026}',Type='info'})task.delay(0.5,function()if#aa:GetPlayers()<=1 then pcall(
+function()an:Kick('\nRejoining...')end)task.wait(0.3)ae:Teleport(game.PlaceId,an)else ae:TeleportToPlaceInstance(game.
+PlaceId,game.JobId,an)end end)end})k:AddButton({Name='Teleport',Icon='link',Description='Copy script',Callback=function(
+)local l=string.format(
 [[game:GetService("TeleportService"):TeleportToPlaceInstance(%d, "%s", game:GetService("Players").LocalPlayer)]],game.
-PlaceId,game.JobId)local q=setclipboard or toclipboard or(Clipboard and Clipboard.set)local r=q~=nil and pcall(q,p)if
+PlaceId,game.JobId)local m=setclipboard or toclipboard or(Clipboard and Clipboard.set)local n=m~=nil and pcall(m,l)if
 game.JobId==''then ap:Notify({Title='Studio session',Content=
-[[There is no live server id here, so the script can't rejoin.]],Type='warning'})elseif r then ap:Notify({Title='Copied'
+[[There is no live server id here, so the script can't rejoin.]],Type='warning'})elseif n then ap:Notify({Title='Copied'
 ,Content='Teleport script is on your clipboard.',Type='success'})else ap:Notify({Title="Can't copy",Content=
-'This executor has no clipboard function.',Type='error'})end end})lap()local p=ap:CreateDock()function aD(q,r)if not q.
-Visible then q:Show()end q:SelectTab(r)end p:AddItem({Name='Lumen',Icon='grid',Image=af.Brand.Icon,Window=av})p:AddItem(
-{Name='Players',Icon='people',Callback=function()aD(av,a9)end})p:AddItem({Name='Music',Icon='music',Callback=function()
-aD(av,aC)end})ap:GetSpotify()lap()getReanim()getEmotes()connect(an.Chatted,function(q)local r,s=string.match(q,
-'^[;:!]%s*(%a+)%s*(.-)%s*$')r=r and string.lower(r)if r=='reanimate'or r=='reanim'then if s=='on'or s=='off'then
-getReanim():SetReanimated(s=='on')else getReanim():Open()end elseif r=='emotes'then getEmotes():Open()elseif r==
-'unemote'then getEmotes():Stop()elseif r=='emote'and s~=''then local t=string.match(s,'^%d+$')if not t then local u=
-string.lower(s)local v=getEmotes()for w,x in v.order do if string.find(string.lower(v.byId[x].name),u,1,true)then t=x
-break end end end if t then getEmotes():Play(t)elseif not getEmotes().loaded then getEmotes():LoadCatalog(false)ap:
+'This executor has no clipboard function.',Type='error'})end end})lap()local l=ap:CreateDock()function aD(m,n)if not m.
+Visible then m:Show()end m:SelectTab(n)end l:AddItem({Name='Lumen',Icon='grid',Image=af.Brand.Icon,Window=av})l:AddItem(
+{Name='Players',Icon='people',Callback=function()aD(av,a9)end})l:AddItem({Name='Music',Icon='music',Callback=function()
+aD(av,aC)end})ap:GetSpotify()lap()getReanim()getEmotes()connect(an.Chatted,function(m)local n,o=string.match(m,
+'^[;:!]%s*(%a+)%s*(.-)%s*$')n=n and string.lower(n)if n=='reanimate'or n=='reanim'then if o=='on'or o=='off'then
+getReanim():SetReanimated(o=='on')else getReanim():Open()end elseif n=='emotes'then getEmotes():Open()elseif n==
+'unemote'then getEmotes():Stop()elseif n=='emote'and o~=''then local p=string.match(o,'^%d+$')if not p then local q=
+string.lower(o)local r=getEmotes()for s,t in r.order do if string.find(string.lower(r.byId[t].name),q,1,true)then p=t
+break end end end if p then getEmotes():Play(p)elseif not getEmotes().loaded then getEmotes():LoadCatalog(false)ap:
 Notify({Title='Emotes',Content='Loading the catalogue, try again in a moment.',Type='info'})else ap:Notify({Title=
-'Emotes',Content='No emote called "'..s..'".',Type='warning'})end end end)p:AddItem({Name='Settings',Icon='sliders',
-Callback=function()aD(av,e)end})lap()local q,r local function stopFly()if q then q:Destroy()q=nil end if r then r:
-Destroy()r=nil end local s=humanoid()if s then s.PlatformStand=false end end connect(ab.Heartbeat,function()local s,t=
-humanoid(),rootPart()if not s then return end if as.walk then s.WalkSpeed=as.walkSpeed end if as.jump then if s.
-UseJumpPower then s.JumpPower=as.jumpPower else s.JumpHeight=as.jumpPower/7.2 end end if as.fly and t then if not q then
-q=Instance.new('BodyVelocity')q.MaxForce=Vector3.new(1e9,1e9,1e9)q.Velocity=Vector3.zero q.Parent=t r=Instance.new(
-'BodyGyro')r.MaxTorque=Vector3.new(1e9,1e9,1e9)r.P=9000 r.Parent=t s.PlatformStand=true end local u=ao().CFrame local v=
-Vector3.zero local w=ac if w:IsKeyDown(Enum.KeyCode.W)then v+=u.LookVector end if w:IsKeyDown(Enum.KeyCode.S)then v-=u.
-LookVector end if w:IsKeyDown(Enum.KeyCode.D)then v+=u.RightVector end if w:IsKeyDown(Enum.KeyCode.A)then v-=u.
-RightVector end if w:IsKeyDown(Enum.KeyCode.E)or w:IsKeyDown(Enum.KeyCode.Space)then v+=Vector3.yAxis end if w:
-IsKeyDown(Enum.KeyCode.Q)or w:IsKeyDown(Enum.KeyCode.LeftControl)then v-=Vector3.yAxis end q.Velocity=if v.Magnitude>0
-then v.Unit*as.flySpeed else Vector3.zero r.CFrame=u elseif q then stopFly()end end)connect(ab.Stepped,function()if as.
-noclip and an.Character then for s,t in an.Character:GetDescendants()do if t:IsA('BasePart')and t.CanCollide then t.
-CanCollide=false end end end end)connect(ac.InputBegan,function(s,t)if t or ac:GetFocusedTextBox()then return end if as.
-clickTp and s.KeyCode==Enum.KeyCode.F then local u=rootPart()if u then local v,w=pcall(function()return an:GetMouse()end
-)if v and w and w.Target then local x=w.Hit.Position local y=select(2,u.CFrame:ToEulerAnglesYXZ())u.CFrame=CFrame.new(x+
-Vector3.new(0,3,0))*CFrame.Angles(0,y,0)end end end end)do local s=0 connect(ab.Heartbeat,function(t)if as.
-infiniteBaseplate=='Off'or not a4 then return end s+=t if s<0.5 then return end s=0 updateBaseplates()end)end connect(ac
-.JumpRequest,function()local s=humanoid()if as.infJump and s then s:ChangeState(Enum.HumanoidStateType.Jumping)end end)
-connect(an.CharacterAdded,function()q,r=nil,nil if as.fly then aU:Set(false)end end)task.spawn(function()while ap.Gui.
-Parent do task.wait(1)local s=rootPart()if s then local t=s.Position ax:Set(string.format('%d, %d, %d',t.X,t.Y,t.Z))end
-local t=#aa:GetPlayers()ay:Set(string.format('%d / %d players  \u{b7}  %d min',t,aa.MaxPlayers,math.floor(workspace.
-DistributedGameTime/60)))end end)task.spawn(function()task.wait(0.3)for s,t in ipairs(d)do if ap:Recall('autoexec',t.
-Name)==true then task.spawn(function()if t.Getter then local u=t.Getter()if u then u:Show()end elseif t.Element then if
-t.AutoEnable~=false and t.Element.Set then t.Element:Set(true)end if t.Element.TogglePopOut then t.Element:TogglePopOut(
-)if t.Element.Card and not t.Element.Card.Visible then t.Element.Card:Show()end elseif t.Element.Card then t.Element.
-Card:Show()else t.Element.Card=af.Feature.new(ap,t.Element)t.Element.Card:Show()end end end)task.wait(0.15)end end end)
+'Emotes',Content='No emote called "'..o..'".',Type='warning'})end end end)l:AddItem({Name='Settings',Icon='sliders',
+Callback=function()aD(av,h)end})lap()local m,n local function stopFly()if m then m:Destroy()m=nil end if n then n:
+Destroy()n=nil end local o=humanoid()if o then o.PlatformStand=false end end connect(ab.Heartbeat,function()local o,p=
+humanoid(),rootPart()if not o then return end if as.walk then o.WalkSpeed=as.walkSpeed end if as.jump then if o.
+UseJumpPower then o.JumpPower=as.jumpPower else o.JumpHeight=as.jumpPower/7.2 end end if as.fly and p then if not m then
+m=Instance.new('BodyVelocity')m.MaxForce=Vector3.new(1e9,1e9,1e9)m.Velocity=Vector3.zero m.Parent=p n=Instance.new(
+'BodyGyro')n.MaxTorque=Vector3.new(1e9,1e9,1e9)n.P=9000 n.Parent=p o.PlatformStand=true end local q=ao().CFrame local r=
+Vector3.zero local s=ac if s:IsKeyDown(Enum.KeyCode.W)then r+=q.LookVector end if s:IsKeyDown(Enum.KeyCode.S)then r-=q.
+LookVector end if s:IsKeyDown(Enum.KeyCode.D)then r+=q.RightVector end if s:IsKeyDown(Enum.KeyCode.A)then r-=q.
+RightVector end if s:IsKeyDown(Enum.KeyCode.E)or s:IsKeyDown(Enum.KeyCode.Space)then r+=Vector3.yAxis end if s:
+IsKeyDown(Enum.KeyCode.Q)or s:IsKeyDown(Enum.KeyCode.LeftControl)then r-=Vector3.yAxis end m.Velocity=if r.Magnitude>0
+then r.Unit*as.flySpeed else Vector3.zero n.CFrame=q elseif m then stopFly()end end)connect(ab.Stepped,function()if as.
+noclip and an.Character then for o,p in an.Character:GetDescendants()do if p:IsA('BasePart')and p.CanCollide then p.
+CanCollide=false end end end end)connect(ac.InputBegan,function(o,p)if p or ac:GetFocusedTextBox()then return end if as.
+clickTp and o.KeyCode==Enum.KeyCode.F then local q=rootPart()if q then local r,s=pcall(function()return an:GetMouse()end
+)if r and s and s.Target then local t=s.Hit.Position local u=select(2,q.CFrame:ToEulerAnglesYXZ())q.CFrame=CFrame.new(t+
+Vector3.new(0,3,0))*CFrame.Angles(0,u,0)end end end end)do local o=0 connect(ab.Heartbeat,function(p)if as.
+infiniteBaseplate=='Off'or not a4 then return end o+=p if o<0.5 then return end o=0 updateBaseplates()end)end connect(ac
+.JumpRequest,function()local o=humanoid()if as.infJump and o then o:ChangeState(Enum.HumanoidStateType.Jumping)end end)
+connect(an.CharacterAdded,function()m,n=nil,nil if as.fly then aU:Set(false)end end)task.spawn(function()while ap.Gui.
+Parent do task.wait(1)local o=rootPart()if o then local p=o.Position ax:Set(string.format('%d, %d, %d',p.X,p.Y,p.Z))end
+local p=#aa:GetPlayers()ay:Set(string.format('%d / %d players  \u{b7}  %d min',p,aa.MaxPlayers,math.floor(workspace.
+DistributedGameTime/60)))end end)task.spawn(function()task.wait(0.3)for o,p in ipairs(d)do if ap:Recall('autoexec',p.
+Name)==true then task.spawn(function()if p.Getter then local q=p.Getter()if q then q:Show()end elseif p.Element then if
+p.AutoEnable~=false and p.Element.Set then p.Element:Set(true)end if p.Element.TogglePopOut then p.Element:TogglePopOut(
+)if p.Element.Card and not p.Element.Card.Visible then p.Element.Card:Show()end elseif p.Element.Card then p.Element.
+Card:Show()else p.Element.Card=af.Feature.new(ap,p.Element)p.Element.Card:Show()end end end)task.wait(0.15)end end end)
 task.spawn(function()while ap._introPending or(ap._intro and ap._intro.alive)do task.wait(0.1)end if ap.Gui.Parent and
-ap.Visible then av:Show()end task.wait(2)l:Start()end)if not ap._introPending and not(ap._intro and ap._intro.alive)then
+ap.Visible then av:Show()end task.wait(2)g:Start()end)if not ap._introPending and not(ap._intro and ap._intro.alive)then
 ap:Notify({Title='Lumen ready',Content='Press G to hide or show.',Type='info'})end return nil
