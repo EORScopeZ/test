@@ -2529,42 +2529,45 @@ function scenes.hang(player, arg)
 end
 
 local function plaque(model, base, title, name)
-	local function piece(size, cf, color, material)
-		return make("Part", {
-			Size = size,
-			CFrame = base * cf,
-			Anchored = true,
-			CanCollide = false,
-			CanQuery = false,
-			CanTouch = false,
-			Material = material,
-			Color = color,
-			Parent = model,
-		})
-	end
-	piece(Vector3.new(5.4, 2.1, 0.2), CFrame.new(0, 7.4, -4.15), Color3.fromRGB(70, 44, 26), Enum.Material.Wood)
-	local face = piece(Vector3.new(4.9, 1.6, 0.1), CFrame.new(0, 7.4, -4.3), Color3.fromRGB(236, 226, 204), Enum.Material.SmoothPlastic)
-	for _, x in { -2.2, 2.2 } do
-		piece(Vector3.new(0.12, 1.4, 0.12), CFrame.new(x, 8.75, -4.15), Color3.fromRGB(90, 90, 96), Enum.Material.Metal)
-	end
-	local gui = make("SurfaceGui", { Face = Enum.NormalId.Front, SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud, PixelsPerStud = 60, LightInfluence = 0.6, Parent = face })
+	local face = make("Part", {
+		Size = Vector3.new(5.2, 1.5, 0.12),
+		CFrame = base * CFrame.new(0, 8.2, -4.08),
+		Anchored = true,
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
+		Material = Enum.Material.SmoothPlastic,
+		Color = Color3.fromRGB(14, 14, 14),
+		Transparency = 0,
+		Reflectance = 0,
+		TopSurface = Enum.SurfaceType.Smooth,
+		BottomSurface = Enum.SurfaceType.Smooth,
+		Parent = model,
+	})
+	local gui = make("SurfaceGui", {
+		Face = Enum.NormalId.Front,
+		SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud,
+		PixelsPerStud = 60,
+		LightInfluence = 0,
+		Parent = face,
+	})
 	make("TextLabel", {
 		Text = title,
-		Font = Enum.Font.GothamBlack,
+		Font = Enum.Font.GothamBold,
 		TextScaled = true,
-		TextColor3 = Color3.fromRGB(40, 28, 20),
+		TextColor3 = Color3.fromRGB(255, 255, 255),
 		BackgroundTransparency = 1,
-		Position = UDim2.fromScale(0.06, 0.08),
-		Size = UDim2.fromScale(0.88, 0.58),
+		Position = UDim2.fromScale(0.06, 0.12),
+		Size = UDim2.fromScale(0.88, 0.48),
 		Parent = gui,
 	})
 	make("TextLabel", {
 		Text = name,
-		Font = Enum.Font.GothamBold,
+		Font = Enum.Font.GothamMedium,
 		TextScaled = true,
-		TextColor3 = Color3.fromRGB(110, 84, 60),
+		TextColor3 = Color3.fromRGB(170, 170, 175),
 		BackgroundTransparency = 1,
-		Position = UDim2.fromScale(0.1, 0.66),
+		Position = UDim2.fromScale(0.1, 0.64),
 		Size = UDim2.fromScale(0.8, 0.24),
 		Parent = gui,
 	})
@@ -2585,6 +2588,10 @@ local function cell(player, arg, color, material)
 			CanTouch = false,
 			Material = material,
 			Color = color,
+			Transparency = 0,
+			Reflectance = 0,
+			TopSurface = Enum.SurfaceType.Smooth,
+			BottomSurface = Enum.SurfaceType.Smooth,
 			Parent = model,
 		})
 	end
@@ -2694,24 +2701,12 @@ local function label(player, spec)
 	end
 end
 
-function scenes.cage(player, arg)
-	local free, model, base = cell(player, arg, Color3.fromRGB(90, 150, 255), Enum.Material.ForceField)
+function scenes.jail(player, arg)
+	local free, model, base = cell(player, arg, Color3.fromRGB(0, 0, 0), Enum.Material.SmoothPlastic)
 	if free then
-		plaque(model, base, string.match(arg, "^%S+ %S+ %S+ %S+ (.+)$") or "CAGED", player.DisplayName)
+		plaque(model, base, string.match(arg, "^%S+ %S+ %S+ %S+ (.+)$") or "JAILED", player.DisplayName)
 	end
 	return free
-end
-
-function scenes.jail(player, arg)
-	local free = cell(player, arg, Color3.fromRGB(60, 60, 66), Enum.Material.Metal)
-	if not free then
-		return nil
-	end
-	local unlabel = label(player, { t = "JAILED", c = "ff5050", f = "Gotham", s = "Medium", b = "Card" })
-	return function()
-		unlabel()
-		free()
-	end
 end
 
 function scenes.sign(player, arg)
@@ -2754,11 +2749,65 @@ function scenes.smite(player)
 		from = to
 	end
 	make("PointLight", { Brightness = 8, Range = 40, Color = Color3.fromRGB(190, 220, 255), Parent = last })
+	local bolt = make("Sound", {
+		SoundId = "rbxassetid://1079408535",
+		Volume = 2,
+		RollOffMinDistance = 10,
+		RollOffMaxDistance = 120,
+		Parent = root,
+	})
+	bolt:Play()
+	Debris:AddItem(bolt, 6)
 	model.Parent = workspace
 	for _, part in model:GetChildren() do
 		TweenService:Create(part, TweenInfo.new(0.6), { Transparency = 1 }):Play()
 	end
 	Debris:AddItem(model, 0.7)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = { char, model }
+	local hit = workspace:Raycast(root.Position + Vector3.new(0, 2, 0), Vector3.new(0, -30, 0), params)
+	local groundPos = if hit then hit.Position else root.Position - Vector3.new(0, 3, 0)
+	local normal = if hit then hit.Normal else Vector3.new(0, 1, 0)
+	local scorchCF = CFrame.lookAt(groundPos + normal * 0.03, groundPos + normal * 1.03) * CFrame.Angles(0, math.pi / 2, 0)
+	local scorch = make("Model", { Name = "LumenScorch" })
+	make("Part", {
+		Shape = Enum.PartType.Cylinder,
+		Size = Vector3.new(0.05, 9, 9),
+		CFrame = scorchCF,
+		Anchored = true,
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
+		Material = Enum.Material.Slate,
+		Color = Color3.fromRGB(20, 18, 18),
+		Transparency = 0.25,
+		CastShadow = false,
+		Parent = scorch,
+	})
+	make("Part", {
+		Shape = Enum.PartType.Cylinder,
+		Size = Vector3.new(0.07, 5.2, 5.2),
+		CFrame = scorchCF,
+		Anchored = true,
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
+		Material = Enum.Material.Slate,
+		Color = Color3.fromRGB(6, 6, 6),
+		Transparency = 0.05,
+		CastShadow = false,
+		Parent = scorch,
+	})
+	scorch.Parent = workspace
+	task.delay(27, function()
+		if scorch.Parent then
+			for _, part in scorch:GetChildren() do
+				TweenService:Create(part, TweenInfo.new(3), { Transparency = 1 }):Play()
+			end
+		end
+	end)
+	Debris:AddItem(scorch, 30)
 	if player == Players.LocalPlayer then
 		local hum = body()
 		if hum then
@@ -2768,7 +2817,7 @@ function scenes.smite(player)
 	return nil
 end
 
-local placed = { crucify = true, hang = true, cage = true, jail = true }
+local placed = { crucify = true, hang = true, jail = true }
 local held = {}
 
 local function release(id, kind)
