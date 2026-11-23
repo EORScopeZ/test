@@ -2475,7 +2475,7 @@ local function ground(player)
 end
 
 local function site(arg)
-	local x, y, z, yaw = string.match(arg or "", "^(%S+) (%S+) (%S+) (%S+)$")
+	local x, y, z, yaw = string.match(arg or "", "^(%S+) (%S+) (%S+) (%S+)")
 	x, y, z, yaw = tonumber(x), tonumber(y), tonumber(z), tonumber(yaw)
 	return if x and y and z and yaw then CFrame.new(x, y, z) * CFrame.Angles(0, yaw, 0) else nil
 end
@@ -2528,6 +2528,48 @@ function scenes.hang(player, arg)
 	end
 end
 
+local function plaque(model, base, title, name)
+	local function piece(size, cf, color, material)
+		return make("Part", {
+			Size = size,
+			CFrame = base * cf,
+			Anchored = true,
+			CanCollide = false,
+			CanQuery = false,
+			CanTouch = false,
+			Material = material,
+			Color = color,
+			Parent = model,
+		})
+	end
+	piece(Vector3.new(5.4, 2.1, 0.2), CFrame.new(0, 7.4, -4.15), Color3.fromRGB(70, 44, 26), Enum.Material.Wood)
+	local face = piece(Vector3.new(4.9, 1.6, 0.1), CFrame.new(0, 7.4, -4.3), Color3.fromRGB(236, 226, 204), Enum.Material.SmoothPlastic)
+	for _, x in { -2.2, 2.2 } do
+		piece(Vector3.new(0.12, 1.4, 0.12), CFrame.new(x, 8.75, -4.15), Color3.fromRGB(90, 90, 96), Enum.Material.Metal)
+	end
+	local gui = make("SurfaceGui", { Face = Enum.NormalId.Front, SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud, PixelsPerStud = 60, LightInfluence = 0.6, Parent = face })
+	make("TextLabel", {
+		Text = title,
+		Font = Enum.Font.GothamBlack,
+		TextScaled = true,
+		TextColor3 = Color3.fromRGB(40, 28, 20),
+		BackgroundTransparency = 1,
+		Position = UDim2.fromScale(0.06, 0.08),
+		Size = UDim2.fromScale(0.88, 0.58),
+		Parent = gui,
+	})
+	make("TextLabel", {
+		Text = name,
+		Font = Enum.Font.GothamBold,
+		TextScaled = true,
+		TextColor3 = Color3.fromRGB(110, 84, 60),
+		BackgroundTransparency = 1,
+		Position = UDim2.fromScale(0.1, 0.66),
+		Size = UDim2.fromScale(0.8, 0.24),
+		Parent = gui,
+	})
+end
+
 local function cell(player, arg, color, material)
 	local base = site(arg)
 	if not base then
@@ -2555,13 +2597,26 @@ local function cell(player, arg, color, material)
 		bar(Vector3.new(0.25, 9, 0.25), CFrame.new(3.9, 4.6, i))
 	end
 	model.Parent = workspace
+	local conn
 	if player == Players.LocalPlayer then
-		local _, root = body()
-		if root then
-			root.CFrame = base * CFrame.new(0, 3, 0)
+		local function enter(char)
+			local root = char:WaitForChild("HumanoidRootPart", 10)
+			task.wait(0.2)
+			if root and model.Parent then
+				root.CFrame = base * CFrame.new(0, 3, 0)
+			end
+		end
+		conn = player.CharacterAdded:Connect(enter)
+		if player.Character then
+			task.spawn(enter, player.Character)
 		end
 	end
-	return model
+	return function()
+		if conn then
+			conn:Disconnect()
+		end
+		model:Destroy()
+	end, model, base
 end
 
 local fonts = {
@@ -2640,21 +2695,22 @@ local function label(player, spec)
 end
 
 function scenes.cage(player, arg)
-	local model = cell(player, arg, Color3.fromRGB(120, 200, 255), Enum.Material.Neon)
-	return model and function()
-		model:Destroy()
+	local free, model, base = cell(player, arg, Color3.fromRGB(90, 150, 255), Enum.Material.ForceField)
+	if free then
+		plaque(model, base, string.match(arg, "^%S+ %S+ %S+ %S+ (.+)$") or "CAGED", player.DisplayName)
 	end
+	return free
 end
 
 function scenes.jail(player, arg)
-	local model = cell(player, arg, Color3.fromRGB(60, 60, 66), Enum.Material.Metal)
-	if not model then
+	local free = cell(player, arg, Color3.fromRGB(60, 60, 66), Enum.Material.Metal)
+	if not free then
 		return nil
 	end
 	local unlabel = label(player, { t = "JAILED", c = "ff5050", f = "Gotham", s = "Medium", b = "Card" })
 	return function()
 		unlabel()
-		model:Destroy()
+		free()
 	end
 end
 
@@ -3153,11 +3209,12 @@ local function start()
 		if not target then
 			return false
 		end
-		if arg == nil and placed[cmd] then
-			arg = ground(target)
-			if not arg then
+		if arg ~= "off" and placed[cmd] then
+			local spot = ground(target)
+			if not spot then
 				return false
 			end
+			arg = if arg then spot .. " " .. arg else spot
 		end
 		task.spawn(stage, target, cmd, arg)
 		return send({ t = "cmd", cmd = cmd, id = tostring(id), arg = arg, all = true })
