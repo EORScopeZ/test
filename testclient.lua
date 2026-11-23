@@ -10,6 +10,10 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TextService = game:GetService("TextService")
 local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
+local SoundService = game:GetService("SoundService")
+local Lighting = game:GetService("Lighting")
+local Debris = game:GetService("Debris")
 
 local env = getgenv and getgenv() or _G
 local server = string.gsub(string.gsub(env.LumenServer or LPS_ENCSTR("https://lum3n.lol"), "/+$", ""), "/ws$", "")
@@ -2159,10 +2163,6 @@ local function dragStart(target)
 	if not target or not target.Parent or target == me then
 		return
 	end
-	if dragState.target == target then
-		dragStop()
-		return
-	end
 	dragStop()
 	dragState.token += 1
 	local token = dragState.token
@@ -2286,29 +2286,425 @@ local function dragStart(target)
 	end)
 end
 
-local commands = {
-	sit = function(humanoid)
-		if humanoid then
-			humanoid.Sit = true
+local frights = { "9565121852", "13812091235", "5182578556", "99181901800612", "13193479764", "12527364300", "136342594291398", "10970697149", "121616559982446" }
+local screams = { "5710016194", "161964303", "126552929107766", "84131007103998", "123124825019861", "81987511375108" }
+
+local function body()
+	local char = Players.LocalPlayer.Character
+	return char and char:FindFirstChildOfClass("Humanoid"), char and char:FindFirstChild("HumanoidRootPart")
+end
+
+local function sound(id, volume)
+	local s = make("Sound", { SoundId = "rbxassetid://" .. id, Volume = volume, Parent = SoundService })
+	s:Play()
+	Debris:AddItem(s, 12)
+end
+
+local function overlay(image, audio, volume, hold)
+	local gui = make("ScreenGui", { IgnoreGuiInset = true, ResetOnSpawn = false, DisplayOrder = 1000000, Parent = holder() })
+	local picture = make("ImageLabel", {
+		Image = "rbxassetid://" .. image,
+		ScaleType = Enum.ScaleType.Fit,
+		BackgroundColor3 = Color3.new(),
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 1),
+		Parent = gui,
+	})
+	sound(audio, volume)
+	task.delay(hold, function()
+		TweenService:Create(picture, TweenInfo.new(0.4), { ImageTransparency = 1, BackgroundTransparency = 1 }):Play()
+		task.wait(0.4)
+		gui:Destroy()
+	end)
+	return picture
+end
+
+local hazed, calm = 0, nil
+
+local function haze(strength, duration, colors)
+	hazed += 1
+	local token = hazed
+	calm = calm or workspace.CurrentCamera.FieldOfView
+	local blur = make("BlurEffect", { Size = 0, Parent = Lighting })
+	local tint = if colors then make("ColorCorrectionEffect", { Saturation = 0.6, Parent = Lighting }) else nil
+	local start = os.clock()
+	RunService:UnbindFromRenderStep("lumenhaze")
+	RunService:BindToRenderStep("lumenhaze", Enum.RenderPriority.Camera.Value + 1, function()
+		local t = os.clock() - start
+		local fade = math.clamp(math.min(t, duration - t), 0, 1) * strength
+		local camera = workspace.CurrentCamera
+		camera.CFrame *= CFrame.Angles(math.sin(t * 1.3) * 0.03 * fade, math.sin(t * 0.8) * 0.05 * fade, math.sin(t * 1.1) * 0.1 * fade)
+		camera.FieldOfView = calm + math.sin(t * 2.2) * 7 * fade
+		blur.Size = 5 * fade
+		if tint then
+			tint.TintColor = Color3.fromHSV(t * 0.2 % 1, 0.35 * fade, 1)
 		end
-	end,
-	jump = function(humanoid)
-		if humanoid then
-			humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+	end)
+	task.delay(duration, function()
+		blur:Destroy()
+		if tint then
+			tint:Destroy()
 		end
-	end,
-	kill = function(humanoid)
-		if humanoid then
-			humanoid.Health = 0
+		if hazed == token then
+			RunService:UnbindFromRenderStep("lumenhaze")
+			workspace.CurrentCamera.FieldOfView = calm
+			calm = nil
 		end
-	end,
-	drag = function(_, fromId)
-		local target = fromId and Players:GetPlayerByUserId(fromId)
-		if target then
-			dragStart(target)
-		end
-	end,
+	end)
+end
+
+local function sober()
+	hazed += 1
+	RunService:UnbindFromRenderStep("lumenhaze")
+	if calm then
+		workspace.CurrentCamera.FieldOfView = calm
+		calm = nil
+	end
+end
+
+local poses = {
+	RightShoulder = CFrame.Angles(0, 0, math.pi / 2),
+	LeftShoulder = CFrame.Angles(0, 0, -math.pi / 2),
+	["Right Shoulder"] = CFrame.Angles(-math.pi / 2, 0, 0),
+	["Left Shoulder"] = CFrame.Angles(-math.pi / 2, 0, 0),
+	RightElbow = CFrame.identity,
+	LeftElbow = CFrame.identity,
 }
+
+local function limp(char, on)
+	local animate = char:FindFirstChild("Animate")
+	if animate then
+		animate.Disabled = on
+	end
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if not hum then
+		return
+	end
+	hum.PlatformStand = on
+	if not on then
+		hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+		return
+	end
+	local animator = hum:FindFirstChildOfClass("Animator")
+	if animator then
+		for _, track in animator:GetPlayingAnimationTracks() do
+			track:Stop(0)
+		end
+	end
+end
+
+local function pin(player, place, spread)
+	local own = player == Players.LocalPlayer
+	local rig, motors = nil, {}
+	local function step()
+		local char = player.Character
+		local root = char and char:FindFirstChild("HumanoidRootPart")
+		if not root then
+			return
+		end
+		if rig ~= char then
+			rig = char
+			table.clear(motors)
+			if own then
+				limp(char, true)
+			end
+		end
+		if spread and next(motors) == nil then
+			for name, pose in poses do
+				local motor = char:FindFirstChild(name, true)
+				if motor and motor:IsA("Motor6D") then
+					motors[motor] = pose
+				end
+			end
+		end
+		for motor, pose in motors do
+			motor.Transform = pose
+		end
+		if own then
+			root.CFrame = place()
+			root.AssemblyLinearVelocity = Vector3.zero
+			root.AssemblyAngularVelocity = Vector3.zero
+		end
+	end
+	local conns = { RunService.Stepped:Connect(step), RunService.Heartbeat:Connect(step) }
+	return function()
+		for _, conn in conns do
+			conn:Disconnect()
+		end
+		for motor in motors do
+			motor.Transform = CFrame.identity
+		end
+		if own and player.Character then
+			limp(player.Character, false)
+		end
+	end
+end
+
+local function wood(model, size, cf)
+	return make("Part", {
+		Size = size,
+		CFrame = cf,
+		Anchored = true,
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
+		Material = Enum.Material.Wood,
+		Color = Color3.fromRGB(86, 54, 30),
+		Parent = model,
+	})
+end
+
+local function ground(player)
+	local char = player.Character
+	local root = char and char:FindFirstChild("HumanoidRootPart")
+	if not root then
+		return nil
+	end
+	local params = RaycastParams.new()
+	params.FilterDescendantsInstances = { char }
+	local hit = workspace:Raycast(root.Position, Vector3.new(0, -60, 0), params)
+	local look = root.CFrame.LookVector
+	local y = if hit then hit.Position.Y else root.Position.Y - 3
+	return string.format("%.2f %.2f %.2f %.3f", root.Position.X, y, root.Position.Z, math.atan2(-look.X, -look.Z))
+end
+
+local function site(arg)
+	local x, y, z, yaw = string.match(arg or "", "^(%S+) (%S+) (%S+) (%S+)$")
+	x, y, z, yaw = tonumber(x), tonumber(y), tonumber(z), tonumber(yaw)
+	return if x and y and z and yaw then CFrame.new(x, y, z) * CFrame.Angles(0, yaw, 0) else nil
+end
+
+local scenes = {}
+
+function scenes.crucify(player, arg)
+	local base = site(arg)
+	if not base then
+		return nil
+	end
+	local model = make("Model", { Name = "LumenCross" })
+	local foot = wood(model, Vector3.new(3.5, 0.6, 3.5), base * CFrame.new(0, 0.3, 0))
+	local post = wood(model, Vector3.new(1.2, 11, 1.2), base * CFrame.new(0, 6.1, 0))
+	wood(model, Vector3.new(7.5, 1.2, 1.2), base * CFrame.new(0, 8.6, 0))
+	make("Fire", { Size = 8, Heat = 6, Parent = foot })
+	make("PointLight", { Color = Color3.fromRGB(255, 130, 40), Range = 20, Brightness = 2, Parent = post })
+	model.Parent = workspace
+	local place = base * CFrame.new(0, 7.8, -1.1)
+	local undo = pin(player, function()
+		return place
+	end, true)
+	return function()
+		undo()
+		model:Destroy()
+	end
+end
+
+function scenes.hang(player, arg)
+	local base = site(arg)
+	if not base then
+		return nil
+	end
+	local model = make("Model", { Name = "LumenGallows" })
+	wood(model, Vector3.new(1, 12, 1), base * CFrame.new(-3, 6, 0))
+	wood(model, Vector3.new(1, 12, 1), base * CFrame.new(3, 6, 0))
+	wood(model, Vector3.new(7, 1, 1), base * CFrame.new(0, 12.5, 0))
+	local rope = wood(model, Vector3.new(0.25, 3, 0.25), base * CFrame.new(0, 10.5, 0))
+	rope.Material = Enum.Material.Fabric
+	rope.Color = Color3.fromRGB(176, 156, 118)
+	model.Parent = workspace
+	local start = os.clock()
+	local undo = pin(player, function()
+		local swing = math.sin((os.clock() - start) * 1.4) * 0.06
+		return base * CFrame.new(0, 12, 0) * CFrame.Angles(swing, 0, swing * 0.5) * CFrame.new(0, -5.1, 0)
+	end, false)
+	return function()
+		undo()
+		model:Destroy()
+	end
+end
+
+local held = {}
+
+local function release(id, kind)
+	local slot = held[id]
+	local entry = slot and slot[kind]
+	if entry then
+		slot[kind] = nil
+		if entry.undo then
+			pcall(entry.undo)
+		end
+	end
+end
+
+local function clear(id)
+	for kind in held[id] or {} do
+		release(id, kind)
+	end
+	held[id] = nil
+end
+
+local function stage(player, kind, arg)
+	local id = player.UserId
+	local slot = held[id]
+	if arg ~= "off" and slot and slot[kind] and slot[kind].arg == arg then
+		return
+	end
+	release(id, kind)
+	if arg == "off" then
+		return
+	end
+	slot = held[id] or {}
+	held[id] = slot
+	local entry = { arg = arg }
+	slot[kind] = entry
+	local ok, undo = pcall(scenes[kind], player, arg)
+	undo = if ok then undo else nil
+	if slot[kind] ~= entry then
+		if undo then
+			pcall(undo)
+		end
+	elseif undo then
+		entry.undo = undo
+	else
+		slot[kind] = nil
+	end
+end
+
+local looped
+local commands = {}
+
+function commands.kill()
+	local hum = body()
+	if hum then
+		hum.Health = 0
+	end
+end
+
+function commands.sit()
+	local hum = body()
+	if hum then
+		hum.Sit = true
+	end
+end
+
+function commands.jump()
+	local hum = body()
+	if hum then
+		hum.Sit = false
+		hum:ChangeState(Enum.HumanoidStateType.Jumping)
+	end
+end
+
+function commands.bring(from)
+	local _, root = body()
+	local char = from.Character
+	local them = char and char:FindFirstChild("HumanoidRootPart")
+	if root and them then
+		root.CFrame = them.CFrame * CFrame.new(0, 0, -4) * CFrame.Angles(0, math.pi, 0)
+	end
+end
+
+function commands.freeze(_, arg)
+	local _, root = body()
+	if root then
+		root.Anchored = arg ~= "off"
+	end
+end
+
+function commands.stun(_, arg)
+	local hum = body()
+	if hum then
+		hum.PlatformStand = arg ~= "off"
+	end
+end
+
+function commands.fling()
+	local _, root = body()
+	if not root then
+		return
+	end
+	local angle = math.random() * math.pi * 2
+	local anchor = make("Attachment", { Parent = root })
+	make("LinearVelocity", {
+		Attachment0 = anchor,
+		MaxForce = math.huge,
+		RelativeTo = Enum.ActuatorRelativeTo.World,
+		VectorVelocity = Vector3.new(math.cos(angle) * 140, 150, math.sin(angle) * 140),
+		Parent = anchor,
+	})
+	root.AssemblyAngularVelocity = Vector3.new(math.random(-30, 30), math.random(-30, 30), math.random(-30, 30))
+	Debris:AddItem(anchor, 0.25)
+end
+
+function commands.trip()
+	local hum, root = body()
+	if not (hum and root) then
+		return
+	end
+	local ahead = root.CFrame.LookVector
+	hum.PlatformStand = true
+	root.CFrame *= CFrame.Angles(-math.pi / 2, 0, 0)
+	root.AssemblyLinearVelocity = ahead * 14 + Vector3.new(0, 6, 0)
+	task.delay(2, function()
+		if hum.Parent then
+			hum.PlatformStand = false
+			hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+		end
+	end)
+end
+
+function commands.loopkill(_, arg)
+	if looped then
+		looped:Disconnect()
+		looped = nil
+	end
+	if arg == "off" then
+		return
+	end
+	looped = Players.LocalPlayer.CharacterAdded:Connect(function(char)
+		local hum = char:WaitForChild("Humanoid", 10)
+		if hum then
+			hum.Health = 0
+		end
+	end)
+	commands.kill()
+end
+
+function commands.flashbang()
+	local picture = overlay("11088883735", "129172304986568", 10, 4)
+	task.delay(1, function()
+		picture.Image = ""
+		picture.BackgroundColor3 = white
+		picture.BackgroundTransparency = 0
+		TweenService:Create(picture, TweenInfo.new(3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { BackgroundTransparency = 1 }):Play()
+	end)
+end
+
+function commands.jumpscare()
+	local picture = overlay(frights[math.random(#frights)], screams[math.random(#screams)], 10, 2.5)
+	picture.ScaleType = Enum.ScaleType.Stretch
+end
+
+function commands.panini()
+	overlay("106404414030833", "6770036737", 1, 1.8).BackgroundTransparency = 0
+end
+
+function commands.drunk()
+	haze(1, 15, false)
+end
+
+function commands.high()
+	haze(1.6, 20, true)
+end
+
+function commands.drag(from, arg)
+	if arg == "off" then
+		if dragState.target == from then
+			dragStop()
+		end
+	elseif dragState.target ~= from then
+		dragStart(from)
+	end
+end
 
 local function start()
 	local tags = {}
@@ -2339,11 +2735,7 @@ local function start()
 	end
 
 	local peers = {}
-	local owner = { users = peers, commands = {}, me = ownerids[me.UserId] == true }
-	for name in commands do
-		table.insert(owner.commands, name)
-	end
-	table.sort(owner.commands)
+	local owner = { users = peers, me = ownerids[me.UserId] == true }
 
 	local function changed()
 		if owner.changed then
@@ -2363,17 +2755,28 @@ local function start()
 			peers[tostring(msg.peer.id)] = msg.peer
 			mark(msg.peer.id, true)
 			changed()
+			if owner.me then
+				for id, slot in held do
+					for kind, entry in slot do
+						send({ t = "cmd", cmd = kind, id = tostring(id), arg = entry.arg, all = true })
+					end
+				end
+			end
 		elseif msg.t == "leave" then
 			peers[tostring(msg.id)] = nil
 			mark(msg.id, false)
 			changed()
 		elseif msg.t == "cmd" then
-			local run = commands[msg.cmd]
-			local fromId = tonumber(msg.from)
-			if run and fromId and ownerids[fromId] then
-				local character = me.Character
-				local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-				pcall(run, humanoid, fromId)
+			local from = tonumber(msg.from)
+			local caller = from and ownerids[from] and Players:GetPlayerByUserId(from)
+			local arg = if type(msg.arg) == "string" then msg.arg else nil
+			if caller and scenes[msg.cmd] then
+				local target = Players:GetPlayerByUserId(tonumber(msg.id) or 0)
+				if target then
+					task.spawn(stage, target, msg.cmd, arg)
+				end
+			elseif caller and commands[msg.cmd] then
+				task.spawn(pcall, commands[msg.cmd], caller, arg)
 			end
 		elseif msg.t == "kick" then
 			me:Kick(type(msg.reason) == "string" and msg.reason ~= "" and msg.reason or "Kicked")
@@ -2393,16 +2796,31 @@ local function start()
 		end
 	end)
 
-	function owner.send(cmd, id)
-		if owner.me then
-			return send({ t = "cmd", cmd = cmd, id = tostring(id) })
+	function owner.send(cmd, id, arg)
+		if not owner.me then
+			return false
 		end
-		return false
+		if not scenes[cmd] then
+			return send({ t = "cmd", cmd = cmd, id = tostring(id), arg = arg })
+		end
+		local target = Players:GetPlayerByUserId(tonumber(id) or 0)
+		if not target then
+			return false
+		end
+		if arg == nil then
+			arg = ground(target)
+			if not arg then
+				return false
+			end
+		end
+		task.spawn(stage, target, cmd, arg)
+		return send({ t = "cmd", cmd = cmd, id = tostring(id), arg = arg, all = true })
 	end
 	_G.LumenOwner = owner
 
 	local joined = Players.PlayerAdded:Connect(add)
 	local left = Players.PlayerRemoving:Connect(function(player)
+		clear(player.UserId)
 		if tags[player] then
 			tags[player]:destroy()
 			tags[player] = nil
@@ -2412,6 +2830,14 @@ local function start()
 	return function()
 		stop()
 		dragStop()
+		sober()
+		if looped then
+			looped:Disconnect()
+			looped = nil
+		end
+		for id in held do
+			clear(id)
+		end
 		_G.LumenOwner = nil
 		joined:Disconnect()
 		left:Disconnect()
