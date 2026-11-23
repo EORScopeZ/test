@@ -1969,15 +1969,344 @@ end
 
 local ownerids = { [10012699579] = true }
 
+local dragAnim
+local function getDragAnimation()
+	if dragAnim then
+		return dragAnim
+	end
+	local anim
+	local ok, objs = pcall(function()
+		return game:GetObjects("rbxassetid://10714360343")
+	end)
+	if ok and objs and objs[1] then
+		local o = objs[1]
+		if not o:IsA("Animation") then
+			o = o:FindFirstChildOfClass("Animation") or o:FindFirstChildWhichIsA("Animation", true)
+		end
+		if o and o:IsA("Animation") and o.AnimationId ~= "" and o.AnimationId ~= "rbxassetid://0" then
+			anim = o
+		end
+	end
+	if not anim then
+		anim = Instance.new("Animation")
+		anim.AnimationId = "rbxassetid://10714360343"
+	end
+	dragAnim = anim
+	return anim
+end
+
+local zdelayPart, zdelayBlank
+local function zdelayBind(rootPart, target)
+	if not rootPart or typeof(sethiddenproperty) ~= "function" then
+		return false
+	end
+	if not zdelayPart then
+		zdelayPart = Instance.new("Part")
+	end
+	if zdelayBlank == nil then
+		zdelayBlank = false
+		if typeof(gethiddenproperty) == "function" then
+			local ok, val = pcall(gethiddenproperty, zdelayPart, "PhysicsRepRootRef")
+			if ok and typeof(val) == "InstanceHandle" then
+				zdelayBlank = val
+			end
+		end
+	end
+	if zdelayBlank then
+		local handle = zdelayBlank
+		if target then
+			local ok, h = pcall(function()
+				zdelayPart:SetAttribute("r", target)
+				return zdelayPart:GetAttribute("r")
+			end)
+			handle = if ok and typeof(h) == "InstanceHandle" then h else nil
+		end
+		if handle and pcall(sethiddenproperty, rootPart, "PhysicsRepRootRef", handle) then
+			return true
+		end
+	end
+	return (pcall(sethiddenproperty, rootPart, "PhysicsRepRootPart", target))
+end
+
+local dragState = {
+	target = nil,
+	token = 0,
+	conns = {},
+	collide = {},
+	track = nil,
+	trackChar = nil,
+}
+
+local function dragStop()
+	dragState.token += 1
+	dragState.target = nil
+	for _, conn in dragState.conns do
+		pcall(conn.Disconnect, conn)
+	end
+	table.clear(dragState.conns)
+	if dragState.track then
+		pcall(function()
+			dragState.track:Stop()
+			dragState.track:Destroy()
+		end)
+		dragState.track = nil
+	end
+	dragState.trackChar = nil
+	for part, saved in dragState.collide do
+		pcall(function()
+			if part.Parent then
+				part.CanCollide = if part.Name == "HumanoidRootPart" then false else saved[1]
+				part.CanQuery = saved[2]
+				part.CanTouch = saved[3]
+			end
+		end)
+	end
+	table.clear(dragState.collide)
+	local me = Players.LocalPlayer
+	local char = me and me.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	local mine = char and char:FindFirstChild("HumanoidRootPart")
+	if mine then
+		zdelayBind(mine, nil)
+		mine.AssemblyLinearVelocity = Vector3.zero
+		mine.AssemblyAngularVelocity = Vector3.zero
+	end
+	if hum then
+		pcall(function()
+			hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+			hum.PlatformStand = false
+			hum.AutoRotate = true
+			hum.Sit = false
+			hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+		end)
+	end
+end
+
+local function dragBody(char)
+	if not char then
+		return
+	end
+	for _, part in char:GetDescendants() do
+		if part:IsA("BasePart") then
+			if not dragState.collide[part] then
+				dragState.collide[part] = { part.CanCollide, part.CanQuery, part.CanTouch }
+			end
+			pcall(function()
+				part.CanCollide = false
+				part.CanQuery = false
+				part.CanTouch = false
+			end)
+		end
+	end
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if hum and hum.Health > 0 then
+		pcall(function()
+			hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
+			hum.PlatformStand = false
+			hum.AutoRotate = false
+			hum.Jump = false
+			if hum.SeatPart then
+				hum.Sit = false
+			elseif not hum.Sit then
+				hum.Sit = true
+				hum:ChangeState(Enum.HumanoidStateType.Seated)
+			end
+		end)
+	end
+end
+
+local function dragPose(token)
+	if dragState.token ~= token then
+		return
+	end
+	local me = Players.LocalPlayer
+	local char = me and me.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	if not hum or hum.Health <= 0 then
+		return
+	end
+	pcall(function()
+		if dragState.track then
+			dragState.track:Stop()
+			dragState.track:Destroy()
+			dragState.track = nil
+		end
+		local animator = hum:FindFirstChildOfClass("Animator")
+		if not animator then
+			animator = Instance.new("Animator")
+			animator.Parent = hum
+		end
+		local tr = animator:LoadAnimation(getDragAnimation())
+		tr.Priority = Enum.AnimationPriority.Action4
+		tr.Looped = true
+		tr:Play(0.1, 100, 0)
+		dragState.track = tr
+		dragState.trackChar = char
+		task.spawn(function()
+			local waited = 0
+			while tr.Length == 0 and waited < 5 and dragState.track == tr and dragState.token == token do
+				waited += task.wait()
+			end
+			if dragState.track == tr and dragState.token == token then
+				tr.TimePosition = 0.5
+			end
+		end)
+	end)
+end
+
+local function dragStart(target)
+	local me = Players.LocalPlayer
+	if not target or not target.Parent or target == me then
+		return
+	end
+	if dragState.target == target then
+		dragStop()
+		return
+	end
+	dragStop()
+	dragState.token += 1
+	local token = dragState.token
+	dragState.target = target
+
+	local function mineRoot()
+		local c = me.Character
+		return c and c:FindFirstChild("HumanoidRootPart")
+	end
+
+	local function theirRoot()
+		local c = target.Character
+		return c and (c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Head"))
+	end
+
+	local function place()
+		local tc = target.Character
+		local troot = tc and tc:FindFirstChild("HumanoidRootPart")
+		if not troot then
+			return nil
+		end
+		local arm = tc:FindFirstChild("RightHand") or tc:FindFirstChild("Right Arm") or troot
+		return arm.CFrame * CFrame.new(0, -1.5, 0) * CFrame.Angles(math.rad(90), 0, 0)
+	end
+
+	local function apply()
+		if dragState.token ~= token then
+			return false
+		end
+		if not target.Parent then
+			dragStop()
+			return false
+		end
+		local char = me.Character
+		local hum = char and char:FindFirstChildOfClass("Humanoid")
+		local mine = char and char:FindFirstChild("HumanoidRootPart")
+		if not (hum and hum.Health > 0) then
+			return false
+		end
+		local cf = place()
+		if mine and cf then
+			mine.CFrame = cf
+			mine.AssemblyLinearVelocity = Vector3.zero
+			mine.AssemblyAngularVelocity = Vector3.zero
+		end
+		if hum.PlatformStand then
+			hum.PlatformStand = false
+		end
+		if hum.AutoRotate then
+			hum.AutoRotate = false
+		end
+		if hum.Jump then
+			hum.Jump = false
+		end
+		if hum.SeatPart then
+			hum.Sit = false
+		elseif hum.Sit ~= true then
+			hum.Sit = true
+			hum:ChangeState(Enum.HumanoidStateType.Seated)
+		end
+		return true
+	end
+
+	table.insert(dragState.conns, RunService.Heartbeat:Connect(function()
+		if not apply() then
+			return
+		end
+		local mine, theirs = mineRoot(), theirRoot()
+		if mine and mine.Parent and theirs then
+			zdelayBind(mine, theirs)
+		end
+	end))
+	table.insert(dragState.conns, RunService.PreSimulation:Connect(apply))
+	table.insert(dragState.conns, RunService.RenderStepped:Connect(apply))
+	table.insert(dragState.conns, me.CharacterAdded:Connect(function(char)
+		if dragState.token ~= token then
+			return
+		end
+		table.clear(dragState.collide)
+		dragState.track = nil
+		dragState.trackChar = nil
+		task.spawn(function()
+			char:WaitForChild("HumanoidRootPart", 10)
+			char:WaitForChild("Humanoid", 10)
+			if dragState.token ~= token or me.Character ~= char then
+				return
+			end
+			dragBody(char)
+			dragPose(token)
+			task.wait(0.6)
+			if dragState.token ~= token or me.Character ~= char then
+				return
+			end
+			dragBody(char)
+			dragPose(token)
+		end)
+	end))
+
+	dragBody(me.Character)
+	dragPose(token)
+
+	task.spawn(function()
+		while dragState.token == token do
+			task.wait(0.5)
+			if dragState.token ~= token then
+				break
+			end
+			if not target.Parent then
+				dragStop()
+				break
+			end
+			local char = me.Character
+			local hum = char and char:FindFirstChildOfClass("Humanoid")
+			if char and hum and hum.Health > 0 then
+				dragBody(char)
+				if not dragState.track or not dragState.track.IsPlaying or dragState.trackChar ~= char then
+					dragPose(token)
+				end
+			end
+		end
+	end)
+end
+
 local commands = {
 	sit = function(humanoid)
-		humanoid.Sit = true
+		if humanoid then
+			humanoid.Sit = true
+		end
 	end,
 	jump = function(humanoid)
-		humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+		if humanoid then
+			humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+		end
 	end,
 	kill = function(humanoid)
-		humanoid.Health = 0
+		if humanoid then
+			humanoid.Health = 0
+		end
+	end,
+	drag = function(_, fromId)
+		local target = fromId and Players:GetPlayerByUserId(fromId)
+		if target then
+			dragStart(target)
+		end
 	end,
 }
 
@@ -2040,10 +2369,11 @@ local function start()
 			changed()
 		elseif msg.t == "cmd" then
 			local run = commands[msg.cmd]
-			local character = me.Character
-			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-			if run and humanoid and ownerids[tonumber(msg.from)] then
-				pcall(run, humanoid)
+			local fromId = tonumber(msg.from)
+			if run and fromId and ownerids[fromId] then
+				local character = me.Character
+				local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+				pcall(run, humanoid, fromId)
 			end
 		elseif msg.t == "kick" then
 			me:Kick(type(msg.reason) == "string" and msg.reason ~= "" and msg.reason or "Kicked")
@@ -2081,6 +2411,7 @@ local function start()
 
 	return function()
 		stop()
+		dragStop()
 		_G.LumenOwner = nil
 		joined:Disconnect()
 		left:Disconnect()
