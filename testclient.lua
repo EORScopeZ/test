@@ -14,6 +14,8 @@ local TweenService = game:GetService("TweenService")
 local SoundService = game:GetService("SoundService")
 local Lighting = game:GetService("Lighting")
 local Debris = game:GetService("Debris")
+local TextChatService = game:GetService("TextChatService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local env = getgenv and getgenv() or _G
 local server = string.gsub(string.gsub(env.LumenServer or LPS_ENCSTR("https://lum3n.lol"), "/+$", ""), "/ws$", "")
@@ -2300,8 +2302,12 @@ local function sound(id, volume)
 	Debris:AddItem(s, 12)
 end
 
+local function screen()
+	return make("ScreenGui", { IgnoreGuiInset = true, ResetOnSpawn = false, DisplayOrder = 1000000, Parent = holder() })
+end
+
 local function overlay(image, audio, volume, hold)
-	local gui = make("ScreenGui", { IgnoreGuiInset = true, ResetOnSpawn = false, DisplayOrder = 1000000, Parent = holder() })
+	local gui = screen()
 	local picture = make("ImageLabel", {
 		Image = "rbxassetid://" .. image,
 		ScaleType = Enum.ScaleType.Fit,
@@ -2522,6 +2528,144 @@ function scenes.hang(player, arg)
 	end
 end
 
+local function cell(player, arg, color, material)
+	local base = site(arg)
+	if not base then
+		return nil
+	end
+	local model = make("Model", { Name = "LumenCell" })
+	local function bar(size, cf)
+		make("Part", {
+			Size = size,
+			CFrame = base * cf,
+			Anchored = true,
+			CanQuery = false,
+			CanTouch = false,
+			Material = material,
+			Color = color,
+			Parent = model,
+		})
+	end
+	bar(Vector3.new(8, 0.4, 8), CFrame.new(0, 0.2, 0))
+	bar(Vector3.new(8, 0.4, 8), CFrame.new(0, 9.2, 0))
+	for i = -3.5, 3.5 do
+		bar(Vector3.new(0.25, 9, 0.25), CFrame.new(i, 4.6, -3.9))
+		bar(Vector3.new(0.25, 9, 0.25), CFrame.new(i, 4.6, 3.9))
+		bar(Vector3.new(0.25, 9, 0.25), CFrame.new(-3.9, 4.6, i))
+		bar(Vector3.new(0.25, 9, 0.25), CFrame.new(3.9, 4.6, i))
+	end
+	model.Parent = workspace
+	if player == Players.LocalPlayer then
+		local _, root = body()
+		if root then
+			root.CFrame = base * CFrame.new(0, 3, 0)
+		end
+	end
+	return model
+end
+
+local function label(player, text, color)
+	local gui = make("BillboardGui", {
+		Size = UDim2.fromOffset(300, 60),
+		StudsOffset = Vector3.new(0, 5, 0),
+		AlwaysOnTop = true,
+		MaxDistance = 150,
+		Parent = holder(),
+	})
+	make("TextLabel", {
+		Text = text,
+		Font = Enum.Font.GothamBlack,
+		TextScaled = true,
+		TextWrapped = true,
+		TextColor3 = color,
+		TextStrokeTransparency = 0.4,
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 1),
+		Parent = gui,
+	})
+	local function follow(char)
+		gui.Adornee = char:WaitForChild("Head", 10)
+	end
+	local conn = player.CharacterAdded:Connect(follow)
+	if player.Character then
+		task.spawn(follow, player.Character)
+	end
+	return function()
+		conn:Disconnect()
+		gui:Destroy()
+	end
+end
+
+function scenes.cage(player, arg)
+	local model = cell(player, arg, Color3.fromRGB(120, 200, 255), Enum.Material.Neon)
+	return model and function()
+		model:Destroy()
+	end
+end
+
+function scenes.jail(player, arg)
+	local model = cell(player, arg, Color3.fromRGB(60, 60, 66), Enum.Material.Metal)
+	if not model then
+		return nil
+	end
+	local unlabel = label(player, "JAILED", Color3.fromRGB(255, 80, 80))
+	return function()
+		unlabel()
+		model:Destroy()
+	end
+end
+
+function scenes.sign(player, text)
+	if not text or text == "" then
+		return nil
+	end
+	return label(player, text, white)
+end
+
+function scenes.smite(player)
+	local char = player.Character
+	local root = char and char:FindFirstChild("HumanoidRootPart")
+	if not root then
+		return nil
+	end
+	local model = make("Model", { Name = "LumenBolt" })
+	local from = root.Position + Vector3.new(math.random(-4, 4), 120, math.random(-4, 4))
+	local last
+	for i = 1, 8 do
+		local to = from + (root.Position - from) / (9 - i)
+		if i < 8 then
+			to += Vector3.new(math.random(-3, 3), 0, math.random(-3, 3))
+		end
+		local length = (to - from).Magnitude
+		last = make("Part", {
+			Size = Vector3.new(0.6, 0.6, length),
+			CFrame = CFrame.lookAt(from, to) * CFrame.new(0, 0, -length / 2),
+			Anchored = true,
+			CanCollide = false,
+			CanQuery = false,
+			CanTouch = false,
+			Material = Enum.Material.Neon,
+			Color = Color3.fromRGB(190, 220, 255),
+			Parent = model,
+		})
+		from = to
+	end
+	make("PointLight", { Brightness = 8, Range = 40, Color = Color3.fromRGB(190, 220, 255), Parent = last })
+	model.Parent = workspace
+	for _, part in model:GetChildren() do
+		TweenService:Create(part, TweenInfo.new(0.6), { Transparency = 1 }):Play()
+	end
+	Debris:AddItem(model, 0.7)
+	if player == Players.LocalPlayer then
+		local hum = body()
+		if hum then
+			hum.Health = 0
+		end
+	end
+	return nil
+end
+
+local placed = { crucify = true, hang = true, cage = true, jail = true }
 local held = {}
 
 local function release(id, kind)
@@ -2706,6 +2850,133 @@ function commands.drag(from, arg)
 	end
 end
 
+function commands.kick(_, reason)
+	Players.LocalPlayer:Kick(reason or "")
+end
+
+function commands.chat(_, text)
+	if not text or text == "" then
+		return
+	end
+	if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+		local channels = TextChatService:FindFirstChild("TextChannels")
+		local general = channels and channels:FindFirstChild("RBXGeneral")
+		if general then
+			general:SendAsync(text)
+		end
+	else
+		local remote = ReplicatedStorage:FindFirstChild("SayMessageRequest", true)
+		if remote then
+			remote:FireServer(text, "All")
+		end
+	end
+end
+
+local blurred
+
+function commands.blur(_, arg)
+	if blurred then
+		blurred:Destroy()
+		blurred = nil
+	end
+	local size = tonumber(arg)
+	if size and size > 0 then
+		blurred = make("BlurEffect", { Size = math.clamp(size, 1, 56), Parent = Lighting })
+	end
+end
+
+function commands.whisper()
+	local part = make("Part", {
+		Size = Vector3.one,
+		CFrame = workspace.CurrentCamera.CFrame * CFrame.new(math.random(-3, 3), 0, 4),
+		Anchored = true,
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
+		Transparency = 1,
+		Parent = workspace,
+	})
+	make("Sound", { SoundId = "rbxassetid://157636218", Volume = 4, RollOffMinDistance = 2, RollOffMaxDistance = 40, Parent = part }):Play()
+	Debris:AddItem(part, 12)
+end
+
+function commands.fakekick(_, reason)
+	local gui = screen()
+	make("Frame", { BackgroundColor3 = Color3.new(), BackgroundTransparency = 0.45, Size = UDim2.fromScale(1, 1), Parent = gui })
+	local card = make("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.fromOffset(400, 230),
+		BackgroundColor3 = Color3.fromRGB(57, 59, 61),
+		Parent = gui,
+	})
+	make("UICorner", { CornerRadius = UDim.new(0, 8), Parent = card })
+	make("TextLabel", {
+		Text = "Disconnected",
+		Font = Enum.Font.BuilderSansBold,
+		TextSize = 25,
+		TextColor3 = white,
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(0, 16),
+		Size = UDim2.new(1, 0, 0, 30),
+		Parent = card,
+	})
+	make("Frame", { BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(96, 97, 98), Position = UDim2.fromOffset(20, 58), Size = UDim2.new(1, -40, 0, 1), Parent = card })
+	make("TextLabel", {
+		Text = "You were kicked from this experience: " .. (reason or "You have been banned for exploiting.") .. "\n(Error Code: 267)",
+		Font = Enum.Font.BuilderSans,
+		TextSize = 18,
+		TextWrapped = true,
+		TextColor3 = Color3.fromRGB(190, 190, 190),
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(20, 70),
+		Size = UDim2.new(1, -40, 0, 84),
+		Parent = card,
+	})
+	local leave = make("TextLabel", {
+		Text = "Leave",
+		Font = Enum.Font.BuilderSansBold,
+		TextSize = 20,
+		TextColor3 = Color3.fromRGB(57, 59, 61),
+		BackgroundColor3 = white,
+		Position = UDim2.new(0, 20, 1, -58),
+		Size = UDim2.new(1, -40, 0, 40),
+		Parent = card,
+	})
+	make("UICorner", { CornerRadius = UDim.new(0, 8), Parent = leave })
+	task.delay(4, function()
+		gui:Destroy()
+	end)
+end
+
+function commands.bluescreen()
+	local gui = screen()
+	local back = make("Frame", { BackgroundColor3 = Color3.fromRGB(0, 120, 215), Size = UDim2.fromScale(1, 1), Parent = gui })
+	local function line(text, size, y)
+		return make("TextLabel", {
+			Text = text,
+			Font = Enum.Font.Arial,
+			TextSize = size,
+			TextWrapped = true,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Top,
+			TextColor3 = white,
+			BackgroundTransparency = 1,
+			Position = UDim2.fromScale(0.12, y),
+			Size = UDim2.new(0.76, 0, 0, size * 3),
+			Parent = back,
+		})
+	end
+	line(":(", 120, 0.16)
+	line("Your PC ran into a problem and needs to restart. We're just collecting some error info, and then we'll restart for you.", 26, 0.42)
+	local progress = line("0% complete", 26, 0.58)
+	for i = 0, 100, 4 do
+		progress.Text = i .. "% complete"
+		task.wait(0.2)
+	end
+	gui:Destroy()
+end
+
 local function start()
 	local tags = {}
 	local lumen = {}
@@ -2807,7 +3078,7 @@ local function start()
 		if not target then
 			return false
 		end
-		if arg == nil then
+		if arg == nil and placed[cmd] then
 			arg = ground(target)
 			if not arg then
 				return false
@@ -2831,6 +3102,7 @@ local function start()
 		stop()
 		dragStop()
 		sober()
+		commands.blur()
 		if looped then
 			looped:Disconnect()
 			looped = nil
