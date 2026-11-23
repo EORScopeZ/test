@@ -2564,34 +2564,77 @@ local function cell(player, arg, color, material)
 	return model
 end
 
-local function label(player, text, color)
+local fonts = {
+	Gotham = Enum.Font.GothamBlack,
+	Fredoka = Enum.Font.FredokaOne,
+	Bangers = Enum.Font.Bangers,
+	Marker = Enum.Font.PermanentMarker,
+	Arcade = Enum.Font.Arcade,
+	Creepster = Enum.Font.Creepster,
+}
+local scales = { Small = 0.75, Medium = 1, Large = 1.4 }
+
+local function label(player, spec)
+	local scale = scales[spec.s] or 1
+	local color = Color3.fromHex(if type(spec.c) == "string" and string.match(spec.c, "^#?%x%x%x%x%x%x$") then spec.c else "ffffff")
+	local style = spec.b or "Plain"
 	local gui = make("BillboardGui", {
-		Size = UDim2.fromOffset(300, 60),
-		StudsOffset = Vector3.new(0, 5, 0),
+		Name = "LumenSign",
 		AlwaysOnTop = true,
-		MaxDistance = 150,
+		LightInfluence = 0,
+		MaxDistance = 45,
+		ResetOnSpawn = false,
+		Size = UDim2.fromOffset(math.round(300 * scale), math.round(64 * scale)),
+		StudsOffsetWorldSpace = Vector3.new(0, 4.8, 0),
 		Parent = holder(),
 	})
-	make("TextLabel", {
-		Text = text,
-		Font = Enum.Font.GothamBlack,
+	local card = make("CanvasGroup", {
+		BackgroundColor3 = Color3.fromRGB(15, 15, 15),
+		BackgroundTransparency = if style == "Card" then 0.25 else 1,
+		Size = UDim2.fromScale(1, 1),
+		Parent = gui,
+	})
+	if style == "Card" then
+		make("UICorner", { CornerRadius = UDim.new(0, math.round(14 * scale)), Parent = card })
+		make("UIStroke", { Color = color, Transparency = 0.5, Thickness = 1.5, Parent = card })
+	end
+	local words = make("TextLabel", {
+		Text = spec.t,
+		Font = fonts[spec.f] or Enum.Font.GothamBlack,
 		TextScaled = true,
 		TextWrapped = true,
 		TextColor3 = color,
-		TextStrokeTransparency = 0.4,
 		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1),
-		Parent = gui,
+		Position = UDim2.fromScale(0.05, 0.1),
+		Size = UDim2.fromScale(0.9, 0.8),
+		Parent = card,
+	})
+	make("UIStroke", {
+		Color = if style == "Glow" then color else Color3.new(),
+		Thickness = if style == "Glow" then 3 else 1.5,
+		Transparency = if style == "Glow" then 0.55 else 0.3,
+		Parent = words,
 	})
 	local function follow(char)
 		gui.Adornee = char:WaitForChild("Head", 10)
 	end
-	local conn = player.CharacterAdded:Connect(follow)
+	local conns = {
+		player.CharacterAdded:Connect(follow),
+		RunService.RenderStepped:Connect(function()
+			local head = gui.Adornee
+			if head then
+				local far = (workspace.CurrentCamera.CFrame.Position - head.Position).Magnitude
+				card.GroupTransparency = math.clamp((far - 30) / 15, 0, 1)
+			end
+		end),
+	}
 	if player.Character then
 		task.spawn(follow, player.Character)
 	end
 	return function()
-		conn:Disconnect()
+		for _, conn in conns do
+			conn:Disconnect()
+		end
 		gui:Destroy()
 	end
 end
@@ -2608,18 +2651,22 @@ function scenes.jail(player, arg)
 	if not model then
 		return nil
 	end
-	local unlabel = label(player, "JAILED", Color3.fromRGB(255, 80, 80))
+	local unlabel = label(player, { t = "JAILED", c = "ff5050", f = "Gotham", s = "Medium", b = "Card" })
 	return function()
 		unlabel()
 		model:Destroy()
 	end
 end
 
-function scenes.sign(player, text)
-	if not text or text == "" then
+function scenes.sign(player, arg)
+	local spec = decode(arg or "")
+	if type(spec) ~= "table" then
+		spec = { t = arg }
+	end
+	if type(spec.t) ~= "string" or spec.t == "" then
 		return nil
 	end
-	return label(player, text, white)
+	return label(player, spec)
 end
 
 function scenes.smite(player)
@@ -2901,52 +2948,80 @@ function commands.whisper()
 end
 
 function commands.fakekick(_, reason)
+	local _, root = body()
+	local was = root and root.Anchored
+	if root then
+		root.Anchored = true
+	end
 	local gui = screen()
-	make("Frame", { BackgroundColor3 = Color3.new(), BackgroundTransparency = 0.45, Size = UDim2.fromScale(1, 1), Parent = gui })
-	local card = make("Frame", {
+	local blur = make("BlurEffect", { Size = 0, Parent = Lighting })
+	local shade = make("Frame", { BackgroundColor3 = Color3.new(), BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Parent = gui })
+	local card = make("CanvasGroup", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.fromOffset(400, 230),
+		Size = UDim2.fromOffset(400, 226),
 		BackgroundColor3 = Color3.fromRGB(57, 59, 61),
+		GroupTransparency = 1,
 		Parent = gui,
 	})
 	make("UICorner", { CornerRadius = UDim.new(0, 8), Parent = card })
+	make("UIScale", { Scale = math.clamp(workspace.CurrentCamera.ViewportSize.Y / 720, 0.7, 1.4), Parent = card })
 	make("TextLabel", {
 		Text = "Disconnected",
-		Font = Enum.Font.BuilderSansBold,
-		TextSize = 25,
+		FontFace = Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.Bold),
+		TextSize = 24,
 		TextColor3 = white,
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(0, 16),
-		Size = UDim2.new(1, 0, 0, 30),
+		Position = UDim2.fromOffset(0, 18),
+		Size = UDim2.new(1, 0, 0, 28),
 		Parent = card,
 	})
-	make("Frame", { BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(96, 97, 98), Position = UDim2.fromOffset(20, 58), Size = UDim2.new(1, -40, 0, 1), Parent = card })
+	make("Frame", { BorderSizePixel = 0, BackgroundColor3 = white, BackgroundTransparency = 0.8, Position = UDim2.fromOffset(20, 60), Size = UDim2.new(1, -40, 0, 1), Parent = card })
 	make("TextLabel", {
 		Text = "You were kicked from this experience: " .. (reason or "You have been banned for exploiting.") .. "\n(Error Code: 267)",
-		Font = Enum.Font.BuilderSans,
-		TextSize = 18,
+		FontFace = Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.Regular),
+		TextSize = 17,
 		TextWrapped = true,
-		TextColor3 = Color3.fromRGB(190, 190, 190),
+		TextColor3 = Color3.fromRGB(213, 213, 214),
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(20, 70),
-		Size = UDim2.new(1, -40, 0, 84),
+		Position = UDim2.fromOffset(20, 72),
+		Size = UDim2.new(1, -40, 0, 76),
 		Parent = card,
 	})
-	local leave = make("TextLabel", {
+	local leave = make("TextButton", {
 		Text = "Leave",
-		Font = Enum.Font.BuilderSansBold,
-		TextSize = 20,
+		FontFace = Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.Bold),
+		TextSize = 18,
 		TextColor3 = Color3.fromRGB(57, 59, 61),
+		AutoButtonColor = false,
 		BackgroundColor3 = white,
-		Position = UDim2.new(0, 20, 1, -58),
-		Size = UDim2.new(1, -40, 0, 40),
+		Position = UDim2.new(0, 20, 1, -56),
+		Size = UDim2.new(1, -40, 0, 36),
 		Parent = card,
 	})
 	make("UICorner", { CornerRadius = UDim.new(0, 8), Parent = leave })
-	task.delay(4, function()
-		gui:Destroy()
+	local fade = TweenInfo.new(0.25)
+	TweenService:Create(blur, fade, { Size = 24 }):Play()
+	TweenService:Create(shade, fade, { BackgroundTransparency = 0.5 }):Play()
+	TweenService:Create(card, fade, { GroupTransparency = 0 }):Play()
+	leave.MouseEnter:Connect(function()
+		leave.BackgroundColor3 = Color3.fromRGB(220, 220, 222)
 	end)
+	leave.MouseLeave:Connect(function()
+		leave.BackgroundColor3 = white
+	end)
+	local function close()
+		if not gui.Parent then
+			return
+		end
+		gui:Destroy()
+		blur:Destroy()
+		if root then
+			root.Anchored = was
+		end
+	end
+	leave.MouseButton1Click:Connect(close)
+	task.delay(10, close)
 end
 
 function commands.bluescreen()
