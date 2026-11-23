@@ -2769,10 +2769,10 @@ function scenes.smite(player)
 	local hit = workspace:Raycast(root.Position + Vector3.new(0, 2, 0), Vector3.new(0, -30, 0), params)
 	local groundPos = if hit then hit.Position else root.Position - Vector3.new(0, 3, 0)
 	local normal = if hit then hit.Normal else Vector3.new(0, 1, 0)
-	local scorchCF = CFrame.lookAt(groundPos + normal * 0.04, groundPos + normal * 1.04) * CFrame.Angles(-math.pi / 2, math.random() * math.pi * 2, 0)
+	local scorchCF = CFrame.lookAt(groundPos + normal * 0.05, groundPos + normal * 1.05, if math.abs(normal.Y) < 0.95 then Vector3.yAxis else Vector3.xAxis) * CFrame.Angles(-math.pi / 2, math.random() * math.pi * 2, 0)
 	local scorch = make("Part", {
 		Name = "LumenScorch",
-		Size = Vector3.new(9, 0.05, 9),
+		Size = Vector3.new(2.5, 0.05, 2.5),
 		CFrame = scorchCF,
 		Anchored = true,
 		CanCollide = false,
@@ -2784,14 +2784,15 @@ function scenes.smite(player)
 	})
 	local mark = make("Decal", {
 		Face = Enum.NormalId.Top,
-		Texture = "rbxassetid://1084991215",
-		Color3 = Color3.fromRGB(15, 15, 15),
-		Transparency = 0.1,
+		Texture = "rbxassetid://12112187930",
+		Color3 = Color3.fromRGB(175, 175, 175),
+		Transparency = 0,
 		Parent = scorch,
 	})
+	TweenService:Create(scorch, TweenInfo.new(0.18, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), { Size = Vector3.new(14, 0.05, 14) }):Play()
 	local smoke = make("Smoke", {
 		Color = Color3.fromRGB(30, 30, 30),
-		Opacity = 0.25,
+		Opacity = 0.2,
 		RiseVelocity = 2.5,
 		Size = 3,
 		Parent = scorch,
