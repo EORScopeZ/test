@@ -1973,7 +1973,7 @@ local function listen(handler)
 	return stop, send
 end
 
-local ownerids = { [10012699579] = true }
+local ownerids = { [10012699579] = true, [10187927236] = true }
 
 local dragAnim
 local function getDragAnimation()
@@ -2751,7 +2751,7 @@ function scenes.smite(player)
 	make("PointLight", { Brightness = 8, Range = 40, Color = Color3.fromRGB(190, 220, 255), Parent = last })
 	local bolt = make("Sound", {
 		SoundId = "rbxassetid://1079408535",
-		Volume = 2,
+		Volume = 0.5,
 		RollOffMinDistance = 10,
 		RollOffMaxDistance = 120,
 		Parent = root,
@@ -2769,42 +2769,41 @@ function scenes.smite(player)
 	local hit = workspace:Raycast(root.Position + Vector3.new(0, 2, 0), Vector3.new(0, -30, 0), params)
 	local groundPos = if hit then hit.Position else root.Position - Vector3.new(0, 3, 0)
 	local normal = if hit then hit.Normal else Vector3.new(0, 1, 0)
-	local scorchCF = CFrame.lookAt(groundPos + normal * 0.03, groundPos + normal * 1.03) * CFrame.Angles(0, math.pi / 2, 0)
-	local scorch = make("Model", { Name = "LumenScorch" })
-	make("Part", {
-		Shape = Enum.PartType.Cylinder,
-		Size = Vector3.new(0.05, 9, 9),
+	local scorchCF = CFrame.lookAt(groundPos + normal * 0.04, groundPos + normal * 1.04) * CFrame.Angles(-math.pi / 2, math.random() * math.pi * 2, 0)
+	local scorch = make("Part", {
+		Name = "LumenScorch",
+		Size = Vector3.new(9, 0.05, 9),
 		CFrame = scorchCF,
 		Anchored = true,
 		CanCollide = false,
 		CanQuery = false,
 		CanTouch = false,
-		Material = Enum.Material.Slate,
-		Color = Color3.fromRGB(20, 18, 18),
-		Transparency = 0.25,
+		Transparency = 1,
 		CastShadow = false,
+		Parent = workspace,
+	})
+	local mark = make("Decal", {
+		Face = Enum.NormalId.Top,
+		Texture = "rbxassetid://1084991215",
+		Color3 = Color3.fromRGB(15, 15, 15),
+		Transparency = 0.1,
 		Parent = scorch,
 	})
-	make("Part", {
-		Shape = Enum.PartType.Cylinder,
-		Size = Vector3.new(0.07, 5.2, 5.2),
-		CFrame = scorchCF,
-		Anchored = true,
-		CanCollide = false,
-		CanQuery = false,
-		CanTouch = false,
-		Material = Enum.Material.Slate,
-		Color = Color3.fromRGB(6, 6, 6),
-		Transparency = 0.05,
-		CastShadow = false,
+	local smoke = make("Smoke", {
+		Color = Color3.fromRGB(30, 30, 30),
+		Opacity = 0.25,
+		RiseVelocity = 2.5,
+		Size = 3,
 		Parent = scorch,
 	})
-	scorch.Parent = workspace
+	task.delay(8, function()
+		if smoke.Parent then
+			smoke.Enabled = false
+		end
+	end)
 	task.delay(27, function()
-		if scorch.Parent then
-			for _, part in scorch:GetChildren() do
-				TweenService:Create(part, TweenInfo.new(3), { Transparency = 1 }):Play()
-			end
+		if mark.Parent then
+			TweenService:Create(mark, TweenInfo.new(3), { Transparency = 1 }):Play()
 		end
 	end)
 	Debris:AddItem(scorch, 30)
